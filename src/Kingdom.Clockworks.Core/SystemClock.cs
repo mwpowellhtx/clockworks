@@ -21,7 +21,7 @@ namespace Kingdom.Clockworks
         /// Private Default Constructor
         /// </summary>
         /// <param name="newNow">The new now.</param>
-        private SystemClock(DateTime newNow)
+        public SystemClock(DateTime newNow)
         {
             //TODO: we may need to be concerned about date/time components? but I do not think that this is necessary ...
             //TODO: make sure this is always in local time ... TBD
