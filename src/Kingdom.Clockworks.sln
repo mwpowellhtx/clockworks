@@ -1,0 +1,35 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.31101.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kingdom.Clockworks.Core", "Kingdom.Clockworks.Core\Kingdom.Clockworks.Core.csproj", "{8D8076E8-C579-40E8-98AD-25F64E11D7AC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kingdom.Clockworks.Tests", "Kingdom.Clockworks.Tests\Kingdom.Clockworks.Tests.csproj", "{3D4AD462-7F65-41DB-B12F-D35E07D8F556}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{203A4B64-C701-4CD8-B870-242905884B74}"
+	ProjectSection(SolutionItems) = preProject
+		.nuget\NuGet.Config = .nuget\NuGet.Config
+		.nuget\NuGet.exe = .nuget\NuGet.exe
+		.nuget\NuGet.targets = .nuget\NuGet.targets
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{8D8076E8-C579-40E8-98AD-25F64E11D7AC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8D8076E8-C579-40E8-98AD-25F64E11D7AC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8D8076E8-C579-40E8-98AD-25F64E11D7AC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8D8076E8-C579-40E8-98AD-25F64E11D7AC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3D4AD462-7F65-41DB-B12F-D35E07D8F556}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3D4AD462-7F65-41DB-B12F-D35E07D8F556}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3D4AD462-7F65-41DB-B12F-D35E07D8F556}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3D4AD462-7F65-41DB-B12F-D35E07D8F556}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

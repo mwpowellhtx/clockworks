@@ -1,0 +1,6 @@
+Debug/
+Release/
+packages/
+*.suo
+*.DotSettings
+*.user
