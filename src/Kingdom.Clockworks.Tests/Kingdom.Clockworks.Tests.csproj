@@ -46,6 +46,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="SystemClockFixture.cs" />
+    <Compile Include="SystemClockInstanceTests.cs" />
     <Compile Include="SystemClockTests.cs" />
     <Compile Include="TestFixtureBase.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
