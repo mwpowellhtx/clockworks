@@ -4,3 +4,4 @@ packages/
 *.suo
 *.DotSettings
 *.user
+TestResults/

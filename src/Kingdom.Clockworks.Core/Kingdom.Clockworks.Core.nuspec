@@ -2,7 +2,7 @@
 <package>
   <metadata>
     <id>Kingdom.Clockworks.Core</id>
-    <version>1.0.1</version>
+    <version>1.1.0</version>
     <authors>Michael W. Powell</authors>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>Sometimes it is necessary to exercise control over a system clock during controlled, simulated experiments.</description>
@@ -10,5 +10,7 @@
   <files>
     <file src="bin\Release\Kingdom.Clockworks.Core.dll" target="lib\net40" />
     <file src="bin\Release\Kingdom.Clockworks.Core.xml" target="lib\net40" />
+    <file src="bin\Release\Kingdom.Unitworks.Core.dll" target="lib\net40" />
+    <file src="bin\Release\Kingdom.Unitworks.Core.xml" target="lib\net40" />
   </files>
 </package>
