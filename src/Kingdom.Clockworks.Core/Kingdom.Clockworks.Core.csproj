@@ -43,12 +43,15 @@
   <ItemGroup>
     <Compile Include="Stopwatches\IMeasurableStopwatch.cs" />
     <Compile Include="Stopwatches\IScalableStopwatch.cs" />
+    <Compile Include="Stopwatches\ISteppableRequest.cs" />
     <Compile Include="Stopwatches\ISteppableStopwatch.cs" />
     <Compile Include="Stopwatches\ISimulationStopwatch.cs" />
+    <Compile Include="Stopwatches\RequestType.cs" />
     <Compile Include="Stopwatches\RunningDirection.cs" />
     <Compile Include="Stopwatches\SimulatedElapsedEventArgs.cs" />
     <Compile Include="Stopwatches\SimulationStopwatchExtensionMethods.cs" />
     <Compile Include="Stopwatches\SimulationStopwatch.cs" />
+    <Compile Include="Stopwatches\StopwatchRequest.cs" />
     <Compile Include="SystemClock.cs" />
     <Compile Include="Disposable.cs" />
     <Compile Include="ISystemClock.cs" />

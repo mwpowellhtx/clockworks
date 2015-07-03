@@ -9,23 +9,47 @@ namespace Kingdom.Clockworks
     public class SimulatedElapsedEventArgs : EventArgs
     {
         /// <summary>
-        /// Gets the Elapsed time span.
+        /// Gets the Request.
         /// </summary>
-        public readonly TimeSpan Elapsed;
+        public readonly StopwatchRequest Request;
 
         /// <summary>
-        /// 
+        /// Gets the CurrentElapsed <see cref="TimeSpan"/>.
+        /// </summary>
+        public readonly TimeSpan CurrentElapsed;
+
+        /// <summary>
+        /// Gets the TotalElapsed <see cref="TimeSpan"/>.
+        /// </summary>
+        public readonly TimeSpan TotalElapsed;
+
+        /// <summary>
+        /// Gets the IntervalQuantity.
         /// </summary>
         public readonly TimeQuantity IntervalQuantity;
 
         /// <summary>
+        /// Gets the TotalElapsedQuantity.
+        /// </summary>
+        public readonly TimeQuantity TotalElapsedQuantity;
+
+        /// <summary>
         /// Internal Constructor
         /// </summary>
-        /// <param name="elapsed"></param>
-        internal SimulatedElapsedEventArgs(TimeQuantity intervalQuantity, TimeSpan elapsed)
+        /// <param name="request"></param>
+        /// <param name="intervalQuantity"></param>
+        /// <param name="currentElapsed"></param>
+        /// <param name="totalElapsedQuantity"></param>
+        /// <param name="totalElapsed"></param>
+        internal SimulatedElapsedEventArgs(StopwatchRequest request,
+            TimeQuantity intervalQuantity, TimeSpan currentElapsed,
+            TimeQuantity totalElapsedQuantity, TimeSpan totalElapsed)
         {
+            Request = request;
             IntervalQuantity = intervalQuantity;
-            Elapsed = elapsed;
+            CurrentElapsed = currentElapsed;
+            TotalElapsedQuantity = totalElapsedQuantity;
+            TotalElapsed = totalElapsed;
         }
     }
 }

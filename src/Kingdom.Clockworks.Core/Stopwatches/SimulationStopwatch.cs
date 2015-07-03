@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
@@ -47,32 +48,37 @@ namespace Kingdom.Clockworks
         /// </summary>
         TimeSpan IMeasurableStopwatch.Elapsed
         {
-            get { return _elapsed; }
+            get { lock (this) return _elapsed; }
         }
 
         /// <summary>
-        /// Gets or sets whether IsRunning. If the stopwatch can resume from the last known
-        /// <see cref="Direction"/> it will. Otherwise assumes <see cref="RunningDirection.Forward"/>.
+        /// Gets the ElapsedQuantity <see cref="TimeQuantity"/>.
+        /// </summary>
+        TimeQuantity IMeasurableStopwatch.ElapsedQuantity
+        {
+            get { lock (this) return _elapsedQuantity; }
+        }
+
+        /// <summary>
+        /// Gets the CurrentRequest.
+        /// </summary>
+        StopwatchRequest IMeasurableStopwatch.CurrentRequest
+        {
+            get { lock (this) return _lastRequest; }
+        }
+
+        /// <summary>
+        /// Gets whether the stopwatch IsRunning.
         /// </summary>
         public bool IsRunning
         {
             get
             {
-                //TODO: Timeout + Direction? Timeout represents whether the _timer is moving or not.
-                return Timeout.Infinite != (long) _timerIntervalTimeSpan.TotalMilliseconds
-                       && Direction != null;
-            }
-            set
-            {
-                switch (_lastDirection)
+                lock (this)
                 {
-                    case null:
-                        Direction = RunningDirection.Forward;
-                        break;
-
-                    default:
-                        Direction = _lastDirection;
-                        break;
+                    //TODO: Timeout + Direction? Timeout represents whether the _timer is moving or not.
+                    return Timeout.Infinite != (long) _timerIntervalTimeSpan.TotalMilliseconds
+                           && (_lastRequest != null && _lastRequest.WillRun);
                 }
             }
         }
@@ -280,10 +286,9 @@ namespace Kingdom.Clockworks
         public SimulationStopwatch()
         {
             _intervalRatio = 1d;
-            _elapsed = TimeSpan.Zero;
 
-            _steps = 1;
-            _direction = null;
+            _elapsed = TimeSpan.Zero;
+            _elapsedQuantity = 0d.ToTimeQuantity(TimeUnit.Millisecond);
 
             const int defaultPeriod = Timeout.Infinite;
             _timer = new Timer(StopwatchCallback, null, defaultPeriod, defaultPeriod);
@@ -298,6 +303,11 @@ namespace Kingdom.Clockworks
         private TimeSpan _elapsed;
 
         /// <summary>
+        /// ElapsedQuantity backing field.
+        /// </summary>
+        private TimeQuantity _elapsedQuantity;
+
+        /// <summary>
         /// Represents the intenral interval ratio. This is always in terms of seconds per second.
         /// </summary>
         /// <see cref="SecondsPerSecond"/>
@@ -309,19 +319,53 @@ namespace Kingdom.Clockworks
         private TimeSpan _timerIntervalTimeSpan;
 
         /// <summary>
-        /// Keeps track of in which direction the stopwatch is moving.
-        /// </summary>
-        private RunningDirection? _direction;
-
-        /// <summary>
-        /// Keeps track of the number of steps that are occurring at every stopwatch timer event.
-        /// </summary>
-        private int _steps;
-
-        /// <summary>
         /// Timer backing field.
         /// </summary>
         private readonly Timer _timer;
+
+        /// <summary>
+        /// Requests backing field.
+        /// </summary>
+        private readonly ConcurrentStack<StopwatchRequest> _requests = new ConcurrentStack<StopwatchRequest>();
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        private StopwatchRequest GetNextRequest(StopwatchRequest request)
+        {
+            _requests.Push(request);
+            return GetNextRequest();
+        }
+
+        /// <summary>
+        /// LastRequest backing field.
+        /// </summary>
+        private StopwatchRequest _lastRequest;
+
+        /// <summary>
+        /// Returns the next <see cref="StopwatchRequest"/>.
+        /// </summary>
+        /// <returns></returns>
+        private StopwatchRequest GetNextRequest()
+        {
+            if (_requests.IsEmpty)
+                return _lastRequest = StopwatchRequest.Default;
+
+            StopwatchRequest request;
+
+            // ReSharper disable once RedundantAssignment
+            var popped = _requests.TryPop(out request);
+            Debug.Assert(popped);
+            Debug.Assert(request != null);
+
+            // Push it back onto the stack if continuous.
+            if (request.IsContinuous)
+                _requests.Push(request);
+
+            return _lastRequest = request;
+        }
 
         /// <summary>
         /// Receives the stopwatch timer callback.
@@ -333,7 +377,7 @@ namespace Kingdom.Clockworks
             {
                 Debug.Assert(state == null);
                 //TODO: should consider passing both direction and steps with every increment, whether automatically timed or manual...
-                Next(_steps);
+                Next(GetNextRequest());
             }
         }
 
@@ -386,8 +430,14 @@ namespace Kingdom.Clockworks
         {
             lock (this)
             {
-                //TODO: assuming start means forward: or should it mean lastDirection|Forward
-                Direction = RunningDirection.Forward;
+                var request = GetNextRequest();
+
+                if (request.WillNotRun)
+                {
+                    _requests.Clear();
+                    _requests.Push(new StopwatchRequest(RunningDirection.Forward, 1, RequestType.Continuous));
+                }
+
                 _timerIntervalTimeSpan = interval;
                 _timer.Change(_timerIntervalTimeSpan, _timerIntervalTimeSpan);
             }
@@ -401,7 +451,10 @@ namespace Kingdom.Clockworks
             lock (this)
             {
                 const int period = Timeout.Infinite;
+
                 _timer.Change(period, period);
+
+                if (GetNextRequest().WillRun) _requests.Clear();
             }
         }
 
@@ -413,7 +466,7 @@ namespace Kingdom.Clockworks
             lock (this)
             {
                 _elapsed = TimeSpan.Zero;
-                //TODO: reset whatever store we will use to keep track of stopwatch intervals ...
+                _elapsedQuantity = 0d.ToTimeQuantity(TimeUnit.Millisecond);
             }
         }
 
@@ -422,61 +475,36 @@ namespace Kingdom.Clockworks
         #region Steppable Stopwatch Members
 
         /// <summary>
-        /// Keeps track of the last <see cref="Direction"/> which is used when pausing
-        /// and resuming the stopwatch from running.
+        /// This portion of the stopwatch is consistent regardless of whether we are
+        /// talking about <see cref="Next"/> or <see cref="NextAsync"/>.
         /// </summary>
-        private RunningDirection? _lastDirection;
-
-        /// <summary>
-        /// Gets or sets the Direction in which the stopwatch is moving.
-        /// </summary>
-        /// <see cref="RunningDirection.Forward"/>
-        /// <see cref="RunningDirection.Backward"/>
-        public RunningDirection? Direction
+        /// <param name="request"></param>
+        /// <returns></returns>
+        private SimulatedElapsedEventArgs GetNextEventArgs(ISteppableRequest request)
         {
-            get { lock (this) return _direction; }
-            set
-            {
-                lock (this)
-                {
-                    if (value == _direction) return;
+            // The important moving parts are tucked away in their single areas of responsibility.
+            var intervalQuantity = _intervalRatio.ToTimeQuantity()
+                .ToTimeQuantity(TimeUnit.Millisecond)*request.Steps;
 
-                    _lastDirection = value;
+            var current = TimeSpan.FromMilliseconds(intervalQuantity.Value);
 
-                    switch (_direction = value)
-                    {
-                        case RunningDirection.Forward:
-                            _steps = Math.Abs(_steps);
-                            break;
-
-                        case RunningDirection.Backward:
-                            _steps = -Math.Abs(_steps);
-                            break;
-                    }
-                }
-            }
+            return new SimulatedElapsedEventArgs(
+                request as StopwatchRequest, intervalQuantity, current,
+                _elapsedQuantity += intervalQuantity, _elapsed += current);
         }
 
         /// <summary>
-        /// Handles the next <paramref name="steps"/> asynchronously within itself. This should
-        /// permit event handlers external to the stopwatch to call back into the properties and
-        /// such if necessary since the lock will have released during the event handler.
+        /// Processes the next stopwatch <paramref name="request"/> asynchronously.
         /// </summary>
-        /// <param name="steps"></param>
-        private void NextAsync(int steps)
+        /// <param name="request"></param>
+        private void NextAsync(ISteppableRequest request)
         {
             IAsyncResult elapsedRaised;
 
             lock (this)
             {
-                var intervalQuantity = _intervalRatio.ToTimeQuantity()*steps;
-
-                var current = _direction.HasValue ? TimeSpan.FromSeconds(intervalQuantity.Value) : TimeSpan.Zero;
-
-                _elapsed += current;
-
                 // Defer event handling free the lock in case anyone wants to callback into the stopwatch.
-                elapsedRaised = RaiseElapsedAsync(new SimulatedElapsedEventArgs(intervalQuantity, current));
+                elapsedRaised = RaiseElapsedAsync(GetNextEventArgs(request));
             }
 
             //TODO: wait with a time out?
@@ -491,21 +519,15 @@ namespace Kingdom.Clockworks
         }
 
         /// <summary>
-        /// Moves the simulation stopwatch to the next step.
+        /// Processes the next stopwatch <paramref name="request"/>.
         /// </summary>
-        /// <param name="steps"></param>
-        private void Next(int steps)
+        /// <param name="request"></param>
+        private void Next(ISteppableRequest request)
         {
             lock (this)
             {
-                var intervalQuantity = _intervalRatio.ToTimeQuantity()*steps;
-
-                var current = _direction.HasValue ? TimeSpan.FromSeconds(intervalQuantity.Value) : TimeSpan.Zero;
-
-                _elapsed += current;
-
                 // Defer event handling free the lock in case anyone wants to callback into the stopwatch.
-                RaiseElapsed(new SimulatedElapsedEventArgs(intervalQuantity, current));
+                RaiseElapsed(GetNextEventArgs(request));
             }
         }
 
@@ -514,35 +536,95 @@ namespace Kingdom.Clockworks
          * or instantaneous, as necessary. */
 
         /// <summary>
-        /// Moves the stopwatch forward by the specified number of <paramref name="steps"/>.
-        /// Optionally specifies whether the move is <paramref name="continuous"/>.
+        /// Increments the stopwatch by one <see cref="RequestType.Instantaneous"/> step.
+        /// </summary>
+        public void Increment()
+        {
+            Increment(1, RequestType.Instantaneous);
+        }
+
+        /// <summary>
+        /// Decrements the stopwatch by one <see cref="RequestType.Instantaneous"/> step.
+        /// </summary>
+        public void Decrement()
+        {
+            Decrement(1, RequestType.Instantaneous);
+        }
+
+        /// <summary>
+        /// Increments the stopwatch given a number of <paramref name="steps"/> and <paramref name="type"/>.
         /// </summary>
         /// <param name="steps"></param>
-        /// <param name="continuous"></param>
-        public void Increment(int steps = 1, bool continuous = false)
+        /// <param name="type"></param>
+        public void Increment(int steps, RequestType type = RequestType.Continuous)
         {
             lock (this)
             {
-                var actualSteps = steps;
-                if (continuous) _steps = actualSteps;
-                Next(actualSteps);
+                Next(GetNextRequest(new StopwatchRequest(RunningDirection.Forward, steps, type)));
             }
         }
 
         /// <summary>
-        /// Moves the stopwatch backward by the specified number of <paramref name="steps"/>.
-        /// Optionally specifies whether the move is <paramref name="continuous"/>.
+        /// Decrements the stopwatch given a number of <paramref name="steps"/> and <paramref name="type"/>.
         /// </summary>
         /// <param name="steps"></param>
-        /// <param name="continuous"></param>
-        public void Decrement(int steps = 1, bool continuous = false)
+        /// <param name="type"></param>
+        public void Decrement(int steps, RequestType type = RequestType.Continuous)
         {
             lock (this)
             {
-                var actualSteps = -steps;
-                if (continuous) _steps = actualSteps;
-                Next(actualSteps);
+                Next(GetNextRequest(new StopwatchRequest(RunningDirection.Backward, steps, type)));
             }
+        }
+
+        #endregion
+
+        #region Overloaded Operators
+
+        /// <summary>
+        /// Increments operator overload increments the stopwatch by one.
+        /// </summary>
+        /// <param name="stopwatch"></param>
+        /// <returns></returns>
+        public static SimulationStopwatch operator ++(SimulationStopwatch stopwatch)
+        {
+            stopwatch.Increment();
+            return stopwatch;
+        }
+
+        /// <summary>
+        /// Decrements operator overload decrements the stopwatch by one.
+        /// </summary>
+        /// <param name="stopwatch"></param>
+        /// <returns></returns>
+        public static SimulationStopwatch operator --(SimulationStopwatch stopwatch)
+        {
+            stopwatch.Decrement();
+            return stopwatch;
+        }
+
+        /// <summary>
+        /// Addition operator overload increments the stopwatch by the number of <paramref name="steps"/>.
+        /// </summary>
+        /// <param name="stopwatch"></param>
+        /// <param name="steps"></param>
+        /// <returns></returns>
+        public static SimulationStopwatch operator +(SimulationStopwatch stopwatch, int steps)
+        {
+            stopwatch.Increment(steps, RequestType.Instantaneous);
+            return stopwatch;
+        }
+
+        /// <summary>
+        /// Subtraction operator overload decrements the stopwatch by the number of <paramref name="steps"/>.
+        /// </summary>
+        /// <param name="stopwatch"></param>
+        /// <param name="steps"></param>
+        /// <returns></returns>
+        public static SimulationStopwatch operator -(SimulationStopwatch stopwatch, int steps)
+        {
+            stopwatch.Decrement(steps, RequestType.Instantaneous);
+            return stopwatch;
         }
 
         #endregion

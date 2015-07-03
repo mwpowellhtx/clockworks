@@ -6,24 +6,27 @@
     public interface ISteppableStopwatch
     {
         /// <summary>
-        /// Increments the stopwatch using a specified number of <paramref name="steps"/>.
-        /// Optionally, this request may perform on a <paramref name="continuous"/> basis.
+        /// Increments the stopwatch by one <see cref="RequestType.Instantaneous"/> step.
         /// </summary>
-        /// <param name="steps"></param>
-        /// <param name="continuous"></param>
-        void Increment(int steps = 1, bool continuous = true);
+        void Increment();
 
         /// <summary>
-        /// Decrements the stopwatch using a specified number of <paramref name="steps"/>.
-        /// Optionally, this request may perform on a <paramref name="continuous"/> basis.
+        /// Decrements the stopwatch by one <see cref="RequestType.Instantaneous"/> step.
         /// </summary>
-        /// <param name="steps"></param>
-        /// <param name="continuous"></param>
-        void Decrement(int steps = 1, bool continuous = true);
+        void Decrement();
 
         /// <summary>
-        /// Gets or sets the Direction in whcih the stopwatch is moving.
+        /// Increments the stopwatch given a number of <paramref name="steps"/> and <paramref name="type"/>.
         /// </summary>
-        RunningDirection? Direction { get; set; }
+        /// <param name="steps"></param>
+        /// <param name="type"></param>
+        void Increment(int steps, RequestType type = RequestType.Continuous);
+
+        /// <summary>
+        /// Decrements the stopwatch given a number of <paramref name="steps"/> and <paramref name="type"/>.
+        /// </summary>
+        /// <param name="steps"></param>
+        /// <param name="type"></param>
+        void Decrement(int steps, RequestType type = RequestType.Continuous);
     }
 }

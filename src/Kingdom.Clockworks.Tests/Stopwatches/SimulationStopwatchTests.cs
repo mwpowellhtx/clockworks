@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reactive.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
@@ -260,7 +261,7 @@ namespace Kingdom.Clockworks
                     ssw.Elapsed += (sender, e) =>
                     {
                         quantitySum += e.IntervalQuantity;
-                        elapsed += e.Elapsed;
+                        elapsed += e.CurrentElapsed;
                         eventCount++;
                     };
 
@@ -304,5 +305,234 @@ namespace Kingdom.Clockworks
             await CumulativeAsync(timerInterval, durationSeconds, stopwatchInterval,
                 numeratorUnit, denominatorUnit);
         }
+
+        #region Increment and Decrement Members
+
+        /// <summary>
+        /// 
+        /// </summary>
+        internal class RunningDirectionValuesAttribute : ValuesAttribute
+        {
+            /// <summary>
+            /// <see cref="RunningDirection"/>
+            /// </summary>
+            private static readonly RunningDirection? Null = null;
+
+            /// <summary>
+            /// <see cref="RunningDirection.Forward"/>
+            /// </summary>
+            private static readonly RunningDirection? Forward = RunningDirection.Forward;
+
+            /// <summary>
+            /// <see cref="RunningDirection.Backward"/>
+            /// </summary>
+            private static readonly RunningDirection? Backward = RunningDirection.Backward;
+
+            /// <summary>
+            /// Constructor
+            /// </summary>
+            public RunningDirectionValuesAttribute()
+                : base(Null, Forward, Backward)
+            {
+            }
+        }
+
+        internal class StepValuesAttribute : ValuesAttribute
+        {
+            public StepValuesAttribute()
+                : base(0, 1, 2, 3)
+            {
+            }
+        }
+
+        internal class RequestTypeValuesAttribute : ValuesAttribute
+        {
+            public RequestTypeValuesAttribute()
+                : base(RequestType.Instantaneous, RequestType.Continuous)
+            {
+            }
+        }
+
+        private static void VerifyStarNcrementRequest(double intervalSecondsPerSecond,
+            StopwatchRequest expectedRequest, SimulatedElapsedEventArgs e)
+        {
+            Assert.That(expectedRequest, Is.Not.Null);
+
+            Assert.That(e.Request.Equals(expectedRequest));
+            Assert.That(((ISteppableRequest) e.Request).Equals(expectedRequest));
+
+            //TODO: we're probably a little too intwined with the subject being tested... but this is a decent enough start...
+            var expectedElapsedMilliseconds = (intervalSecondsPerSecond.ToTimeQuantity()
+                .ToTimeQuantity(TimeUnit.Millisecond)*expectedRequest.Steps).Value;
+
+            // It so happens that we're expecting the one interval, also in total.
+            Assert.That(e.IntervalQuantity.Value, Is.EqualTo(expectedElapsedMilliseconds).Within(Epsilon));
+            Assert.That(e.TotalElapsedQuantity.Value, Is.EqualTo(expectedElapsedMilliseconds).Within(Epsilon));
+        }
+
+        /// <summary>
+        /// Verifies the outcome regardless whether <see cref="ISteppableStopwatch.Increment()"/>,
+        /// <see cref="ISteppableStopwatch.Decrement()"/>, or one of its neighbors were involved.
+        /// </summary>
+        /// <param name="intervalSecondsPerSecond"></param>
+        /// <param name="expectedRequest"></param>
+        /// <param name="theAction"></param>
+        private static void MakeSureStarNcrementCorrect(double intervalSecondsPerSecond,
+            StopwatchRequest expectedRequest, Action<SimulationStopwatch> theAction)
+        {
+            Assert.That(theAction, Is.Not.Null);
+
+            /* I am really loathe to take on too many in the way of dependencies for a test
+             * suite, but this particular set of tests does really lend itself to listening
+             * reactively, in an observable manner, for one event outcomes. */
+
+            RunStopwatchScenario(sw =>
+            {
+                sw.SecondsPerSecond = intervalSecondsPerSecond;
+
+                var observableElapsed = Observable.FromEventPattern<SimulatedElapsedEventArgs>(
+                    handler => sw.Elapsed += handler, handler => sw.Elapsed -= handler)
+                    .Select(p => p.EventArgs);
+
+                // ReSharper disable once AccessToModifiedClosure
+                using (observableElapsed.Subscribe(e => VerifyStarNcrementRequest(
+                    intervalSecondsPerSecond, expectedRequest, e)))
+                {
+                    theAction(sw);
+                }
+            });
+        }
+
+        [Test]
+        [Combinatorial]
+        public void Make_sure_increment_method_correct(
+            [TimeQuantityValues] double intervalSecondsPerSecond,
+            [StepValues] int steps, [RequestTypeValues] RequestType type)
+        {
+            MakeSureStarNcrementCorrect(intervalSecondsPerSecond,
+                new StopwatchRequest(RunningDirection.Forward, steps, type),
+                sw => sw.Increment(steps, type));
+        }
+
+        [Test]
+        [Combinatorial]
+        public void Make_sure_decrement_method_correct(
+            [TimeQuantityValues] double intervalSecondsPerSecond,
+            [StepValues] int steps, [RequestTypeValues] RequestType type)
+        {
+            MakeSureStarNcrementCorrect(intervalSecondsPerSecond,
+                new StopwatchRequest(RunningDirection.Backward, steps, type),
+                sw => sw.Decrement(steps, type));
+        }
+
+        [Test]
+        [Combinatorial]
+        public void Make_sure_increment_method_no_args_correct(
+            [TimeQuantityValues] double intervalSecondsPerSecond)
+        {
+            MakeSureStarNcrementCorrect(intervalSecondsPerSecond,
+                new StopwatchRequest(RunningDirection.Forward),
+                sw => sw.Increment());
+        }
+
+        [Test]
+        [Combinatorial]
+        public void Make_sure_decrement_method_no_args_correct(
+            [TimeQuantityValues] double intervalSecondsPerSecond)
+        {
+            MakeSureStarNcrementCorrect(intervalSecondsPerSecond,
+                new StopwatchRequest(RunningDirection.Backward),
+                sw => sw.Decrement());
+        }
+
+        [Test]
+        [Combinatorial]
+        public void Make_sure_increment_operator_post_fix_correct(
+            [TimeQuantityValues] double intervalSecondsPerSecond)
+        {
+            // ReSharper disable once RedundantAssignment
+            MakeSureStarNcrementCorrect(intervalSecondsPerSecond,
+                new StopwatchRequest(RunningDirection.Forward),
+                sw => sw++);
+        }
+
+        [Test]
+        [Combinatorial]
+        public void Make_sure_increment_operator_pre_fix_correct(
+            [TimeQuantityValues] double intervalSecondsPerSecond)
+        {
+            // ReSharper disable once RedundantAssignment
+            MakeSureStarNcrementCorrect(intervalSecondsPerSecond,
+                new StopwatchRequest(RunningDirection.Forward),
+                sw => ++sw);
+        }
+
+        [Test]
+        [Combinatorial]
+        public void Make_sure_decrement_operator_post_fix_correct(
+            [TimeQuantityValues] double intervalSecondsPerSecond)
+        {
+            // ReSharper disable once RedundantAssignment
+            MakeSureStarNcrementCorrect(intervalSecondsPerSecond,
+                new StopwatchRequest(RunningDirection.Backward),
+                sw => sw--);
+        }
+
+        [Test]
+        [Combinatorial]
+        public void Make_sure_decrement_operator_pre_fix_correct(
+            [TimeQuantityValues] double intervalSecondsPerSecond)
+        {
+            // ReSharper disable once RedundantAssignment
+            MakeSureStarNcrementCorrect(intervalSecondsPerSecond,
+                new StopwatchRequest(RunningDirection.Backward),
+                sw => --sw);
+        }
+
+        [Test]
+        [Combinatorial]
+        public void Make_sure_addition_operator_correct(
+            [TimeQuantityValues] double intervalSecondsPerSecond,
+            [StepValues] int steps)
+        {
+            MakeSureStarNcrementCorrect(intervalSecondsPerSecond,
+                new StopwatchRequest(RunningDirection.Forward, steps),
+                sw => Assert.That(sw + steps, Is.SameAs(sw)));
+        }
+
+        [Test]
+        [Combinatorial]
+        public void Make_sure_addition_assignment_operator_correct(
+            [TimeQuantityValues] double intervalSecondsPerSecond,
+            [StepValues] int steps)
+        {
+            MakeSureStarNcrementCorrect(intervalSecondsPerSecond,
+                new StopwatchRequest(RunningDirection.Forward, steps),
+                sw => Assert.That(sw += steps, Is.SameAs(sw)));
+        }
+
+        [Test]
+        [Combinatorial]
+        public void Make_sure_subtraction_operator_correct(
+            [TimeQuantityValues] double intervalSecondsPerSecond,
+            [StepValues] int steps)
+        {
+            MakeSureStarNcrementCorrect(intervalSecondsPerSecond,
+                new StopwatchRequest(RunningDirection.Backward, steps),
+                sw => Assert.That(sw - steps, Is.SameAs(sw)));
+        }
+
+        [Test]
+        [Combinatorial]
+        public void Make_sure_subtraction_assignment_operator_correct(
+            [TimeQuantityValues] double intervalSecondsPerSecond,
+            [StepValues] int steps)
+        {
+            MakeSureStarNcrementCorrect(intervalSecondsPerSecond,
+                new StopwatchRequest(RunningDirection.Backward, steps),
+                sw => Assert.That(sw -= steps, Is.SameAs(sw)));
+        }
+
+        #endregion
     }
 }
