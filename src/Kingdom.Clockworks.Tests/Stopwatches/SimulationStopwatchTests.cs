@@ -353,11 +353,26 @@ namespace Kingdom.Clockworks
             }
         }
 
+        /// <summary>
+        /// Verifies that the "star"-ncrement operations function correctly.
+        /// </summary>
+        /// <param name="intervalSecondsPerSecond"></param>
+        /// <param name="expectedRequest"></param>
+        /// <param name="e"></param>
         private static void VerifyStarNcrementRequest(double intervalSecondsPerSecond,
             StopwatchRequest expectedRequest, SimulatedElapsedEventArgs e)
         {
             Assert.That(expectedRequest, Is.Not.Null);
 
+            // TODO: in and of themselves these really deserve a dedicated StopwatchRequestsTests suite...
+            // TODO: however, for the same of establishing "SameAs", this may be interesting...
+            Assert.That(expectedRequest.Equals(expectedRequest));
+            Assert.That(e.Request.Equals(e.Request));
+            Assert.That(((ISteppableRequest) expectedRequest).Equals(expectedRequest));
+            Assert.That(((ISteppableRequest) e.Request).Equals(e.Request));
+
+            // We establish that they should equal the other, but that they should not be the same.
+            Assert.That(e.Request, Is.Not.SameAs(expectedRequest));
             Assert.That(e.Request.Equals(expectedRequest));
             Assert.That(((ISteppableRequest) e.Request).Equals(expectedRequest));
 
@@ -403,6 +418,13 @@ namespace Kingdom.Clockworks
             });
         }
 
+        /// <summary>
+        /// Makes sure that the <see cref="SimulationStopwatch.Increment(int,RequestType)"/> method
+        /// works correctly.
+        /// </summary>
+        /// <param name="intervalSecondsPerSecond"></param>
+        /// <param name="steps"></param>
+        /// <param name="type"></param>
         [Test]
         [Combinatorial]
         public void Make_sure_increment_method_correct(
@@ -414,6 +436,13 @@ namespace Kingdom.Clockworks
                 sw => sw.Increment(steps, type));
         }
 
+        /// <summary>
+        /// Makes sure that the <see cref="SimulationStopwatch.Decrement(int,RequestType)"/> method
+        /// works correctly.
+        /// </summary>
+        /// <param name="intervalSecondsPerSecond"></param>
+        /// <param name="steps"></param>
+        /// <param name="type"></param>
         [Test]
         [Combinatorial]
         public void Make_sure_decrement_method_correct(
@@ -425,6 +454,10 @@ namespace Kingdom.Clockworks
                 sw => sw.Decrement(steps, type));
         }
 
+        /// <summary>
+        /// Makes sure that the <see cref="SimulationStopwatch.Increment()"/> method works correctly.
+        /// </summary>
+        /// <param name="intervalSecondsPerSecond"></param>
         [Test]
         [Combinatorial]
         public void Make_sure_increment_method_no_args_correct(
@@ -435,6 +468,10 @@ namespace Kingdom.Clockworks
                 sw => sw.Increment());
         }
 
+        /// <summary>
+        /// Makes sure that the <see cref="SimulationStopwatch.Decrement()"/> method works correctly.
+        /// </summary>
+        /// <param name="intervalSecondsPerSecond"></param>
         [Test]
         [Combinatorial]
         public void Make_sure_decrement_method_no_args_correct(
@@ -445,9 +482,14 @@ namespace Kingdom.Clockworks
                 sw => sw.Decrement());
         }
 
+        /// <summary>
+        /// Makes sure that the <see cref="SimulationStopwatch.op_Increment"/> operator postfix form works correctly.
+        /// </summary>
+        /// <param name="intervalSecondsPerSecond"></param>
+        /// <a href="!:http://msdn.microsoft.com/en-us/library/36x43w8w.aspx"> ++ Operator (C# Reference) </a>
         [Test]
         [Combinatorial]
-        public void Make_sure_increment_operator_post_fix_correct(
+        public void Make_sure_increment_operator_postfix_correct(
             [TimeQuantityValues] double intervalSecondsPerSecond)
         {
             // ReSharper disable once RedundantAssignment
@@ -456,9 +498,14 @@ namespace Kingdom.Clockworks
                 sw => sw++);
         }
 
+        /// <summary>
+        /// Makes sure that the <see cref="SimulationStopwatch.op_Increment"/> operator prefix form works correctly.
+        /// </summary>
+        /// <param name="intervalSecondsPerSecond"></param>
+        /// <a href="!:http://msdn.microsoft.com/en-us/library/36x43w8w.aspx"> ++ Operator (C# Reference) </a>
         [Test]
         [Combinatorial]
-        public void Make_sure_increment_operator_pre_fix_correct(
+        public void Make_sure_increment_operator_prefix_correct(
             [TimeQuantityValues] double intervalSecondsPerSecond)
         {
             // ReSharper disable once RedundantAssignment
@@ -467,9 +514,14 @@ namespace Kingdom.Clockworks
                 sw => ++sw);
         }
 
+        /// <summary>
+        /// Makes sure that the <see cref="SimulationStopwatch.op_Decrement"/> operator postfix form works correctly.
+        /// </summary>
+        /// <param name="intervalSecondsPerSecond"></param>
+        /// <a href="!:http://msdn.microsoft.com/en-us/library/wc3z3k8c.aspx"> -- Operator (C# Reference) </a>
         [Test]
         [Combinatorial]
-        public void Make_sure_decrement_operator_post_fix_correct(
+        public void Make_sure_decrement_operator_postfix_correct(
             [TimeQuantityValues] double intervalSecondsPerSecond)
         {
             // ReSharper disable once RedundantAssignment
@@ -478,9 +530,14 @@ namespace Kingdom.Clockworks
                 sw => sw--);
         }
 
+        /// <summary>
+        /// Makes sure that the <see cref="SimulationStopwatch.op_Decrement"/> operator prefix form works correctly.
+        /// </summary>
+        /// <param name="intervalSecondsPerSecond"></param>
+        /// <a href="!:http://msdn.microsoft.com/en-us/library/wc3z3k8c.aspx"> -- Operator (C# Reference) </a>
         [Test]
         [Combinatorial]
-        public void Make_sure_decrement_operator_pre_fix_correct(
+        public void Make_sure_decrement_operator_prefix_correct(
             [TimeQuantityValues] double intervalSecondsPerSecond)
         {
             // ReSharper disable once RedundantAssignment
@@ -489,6 +546,12 @@ namespace Kingdom.Clockworks
                 sw => --sw);
         }
 
+        /// <summary>
+        /// Makes sure that the <see cref="SimulationStopwatch.op_Addition"/> operator works correctly.
+        /// </summary>
+        /// <param name="intervalSecondsPerSecond"></param>
+        /// <param name="steps"></param>
+        /// <a href="!:http://msdn.microsoft.com/en-us/library/k1a63xkz.aspx"> + Operator (C# Reference) </a>
         [Test]
         [Combinatorial]
         public void Make_sure_addition_operator_correct(
@@ -500,6 +563,15 @@ namespace Kingdom.Clockworks
                 sw => Assert.That(sw + steps, Is.SameAs(sw)));
         }
 
+        /// <summary>
+        /// Makes sure that the <see cref="SimulationStopwatch.op_Addition"/> assignment operator
+        /// works correctly. Technically, if the binary operator works the unary assignment should
+        /// work as well, but we will do this for sake of being thorough since it takes hardly any
+        /// time at all to support.
+        /// </summary>
+        /// <param name="intervalSecondsPerSecond"></param>
+        /// <param name="steps"></param>
+        /// <a href="!:http://msdn.microsoft.com/en-us/library/sa7629ew.aspx"> += Operator (C# Reference) </a>
         [Test]
         [Combinatorial]
         public void Make_sure_addition_assignment_operator_correct(
@@ -511,6 +583,12 @@ namespace Kingdom.Clockworks
                 sw => Assert.That(sw += steps, Is.SameAs(sw)));
         }
 
+        /// <summary>
+        /// Makes sure that the <see cref="SimulationStopwatch.op_Subtraction"/> operator works correctly.
+        /// </summary>
+        /// <param name="intervalSecondsPerSecond"></param>
+        /// <param name="steps"></param>
+        /// <a href="!:http://msdn.microsoft.com/en-us/library/wch5w409.aspx"> - Operator (C# Reference) </a>
         [Test]
         [Combinatorial]
         public void Make_sure_subtraction_operator_correct(
@@ -522,6 +600,15 @@ namespace Kingdom.Clockworks
                 sw => Assert.That(sw - steps, Is.SameAs(sw)));
         }
 
+        /// <summary>
+        /// Makes sure that the <see cref="SimulationStopwatch.op_Subtraction"/> assignment operator
+        /// works correctly. Technically, if the binary operator works the unary assignment should
+        /// work as well, but we will do this for sake of being thorough since it takes hardly any
+        /// time at all to support.
+        /// </summary>
+        /// <param name="intervalSecondsPerSecond"></param>
+        /// <param name="steps"></param>
+        /// <a href="!:http://msdn.microsoft.com/en-us/library/2y9zhhx1.aspx"> -= Operator (C# Reference) </a>
         [Test]
         [Combinatorial]
         public void Make_sure_subtraction_assignment_operator_correct(
