@@ -1,4 +1,4 @@
-﻿namespace Kingdom.Clockworks
+﻿namespace Kingdom.Clockworks.Stopwatches
 {
     /// <summary>
     /// Represents the capability to step the stopwatch along.

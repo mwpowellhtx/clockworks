@@ -1,4 +1,4 @@
-namespace Kingdom.Clockworks.Stopwatches
+﻿namespace Kingdom.Clockworks.Timers
 {
     /// <summary>
     /// 
@@ -8,11 +8,11 @@ namespace Kingdom.Clockworks.Stopwatches
         /// <summary>
         /// 
         /// </summary>
-        Instantaneous,
+        CountDown,
 
         /// <summary>
         /// 
         /// </summary>
-        Continuous
+        CountUp,
     }
 }

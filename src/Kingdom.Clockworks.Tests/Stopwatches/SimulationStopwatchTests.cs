@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Kingdom.Clockworks.Units;
 using NUnit.Framework;
 
-namespace Kingdom.Clockworks
+namespace Kingdom.Clockworks.Stopwatches
 {
     public class SimulationStopwatchTests : ClockworksTestFixtureBase
     {

@@ -5,7 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Kingdom.Clockworks.Units;
 
-namespace Kingdom.Clockworks
+namespace Kingdom.Clockworks.Stopwatches
 {
     /// <summary>
     /// Represents a simulation stopwatch. This does not depend on a live system clock, but,

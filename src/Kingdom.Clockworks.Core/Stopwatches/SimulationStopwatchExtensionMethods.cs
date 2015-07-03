@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Kingdom.Clockworks
+namespace Kingdom.Clockworks.Stopwatches
 {
     /// <summary>
     /// 

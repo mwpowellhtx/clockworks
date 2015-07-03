@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Kingdom.Clockworks
+namespace Kingdom.Clockworks.Stopwatches
 {
     //TODO: may need/want high resolution capability besides DateTime ("low" resolution)...
 

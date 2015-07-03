@@ -1,6 +1,6 @@
 using System;
 
-namespace Kingdom.Clockworks
+namespace Kingdom.Clockworks.Stopwatches
 {
     /// <summary>
     /// Represents a request on a running <see cref="SimulationStopwatch"/>.

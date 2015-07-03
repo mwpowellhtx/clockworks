@@ -1,4 +1,4 @@
-namespace Kingdom.Clockworks
+namespace Kingdom.Clockworks.Stopwatches
 {
     /// <summary>
     /// Represents in which direction the stopwatch should run.

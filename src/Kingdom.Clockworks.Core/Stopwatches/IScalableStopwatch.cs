@@ -1,6 +1,6 @@
 using Kingdom.Clockworks.Units;
 
-namespace Kingdom.Clockworks
+namespace Kingdom.Clockworks.Stopwatches
 {
     /// <summary>
     /// 
