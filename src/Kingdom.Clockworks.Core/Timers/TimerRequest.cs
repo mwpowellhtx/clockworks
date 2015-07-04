@@ -1,24 +1,24 @@
-using System;
+﻿using System;
 
-namespace Kingdom.Clockworks.Stopwatches
+namespace Kingdom.Clockworks.Timers
 {
     /// <summary>
-    /// Represents a request on a running <see cref="SimulationStopwatch"/>.
+    /// Represents a timer request.
     /// </summary>
-    public class StopwatchRequest
+    public class TimerRequest
         : TimeableRequestBase
             , ISteppableRequest
-            , IEquatable<StopwatchRequest>
+            , IEquatable<TimerRequest>
     {
         /// <summary>
-        /// 
+        /// Gets the Default <see cref="TimerRequest"/> instance.
         /// </summary>
-        public static readonly StopwatchRequest Default = new StopwatchRequest(steps: 0);
+        public static readonly TimerRequest DefaultRequest = new TimerRequest(steps: 0);
 
         /// <summary>
         /// Returns the number of <see cref="TimeableRequestBase.Steps"/> depending on the
         /// <see cref="RunningDirection"/> in which the clock is moving. Remember that to
-        /// a stopwatch forward is to add time.
+        /// a timer moving forward is to substract time.
         /// </summary>
         /// <param name="startingFrom"></param>
         /// <returns></returns>
@@ -27,20 +27,20 @@ namespace Kingdom.Clockworks.Stopwatches
             switch (Direction)
             {
                 case RunningDirection.Forward:
-                    return Math.Abs(startingFrom);
-                case RunningDirection.Backward:
                     return -Math.Abs(startingFrom);
+                case RunningDirection.Backward:
+                    return Math.Abs(startingFrom);
             }
             return 0;
         }
 
         /// <summary>
-        /// Default Constructor
+        /// Constructor
         /// </summary>
         /// <param name="direction"></param>
         /// <param name="steps"></param>
         /// <param name="type"></param>
-        public StopwatchRequest(
+        public TimerRequest(
             RunningDirection? direction = null,
             int steps = 1,
             RequestType type = RequestType.Instantaneous)
@@ -56,9 +56,9 @@ namespace Kingdom.Clockworks.Stopwatches
         /// <param name="a"></param>
         /// <param name="b"></param>
         /// <returns></returns>
-        public static bool Equals(StopwatchRequest a, StopwatchRequest b)
+        public static bool Equals(TimerRequest a, TimerRequest b)
         {
-            return Equals<StopwatchRequest>(a, b);
+            return Equals<TimerRequest>(a, b);
         }
 
         /// <summary>
@@ -76,7 +76,7 @@ namespace Kingdom.Clockworks.Stopwatches
         /// </summary>
         /// <param name="other"></param>
         /// <returns></returns>
-        public bool Equals(StopwatchRequest other)
+        public bool Equals(TimerRequest other)
         {
             return Equals(this, other);
         }

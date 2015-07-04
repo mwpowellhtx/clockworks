@@ -71,6 +71,8 @@ namespace Kingdom.Clockworks.Units
         {
         }
 
+        #region Mathematical Operator Overloads
+
         /// <summary>
         /// Performs an additive operation on <paramref name="a"/> and <paramref name="b"/>.
         /// </summary>
@@ -144,5 +146,83 @@ namespace Kingdom.Clockworks.Units
             var bPart = Converter.Convert(b.Value, b.Unit, BaseUnit);
             return aPart/bPart;
         }
+
+        #endregion
+
+        #region Logical Operator Overloads
+
+        /// <summary>
+        /// Equality operator overload.
+        /// </summary>
+        /// <param name="a"></param>
+        /// <param name="b"></param>
+        /// <returns></returns>
+        /// <a href="!:http://msdn.microsoft.com/en-us/library/53k8ybth.aspx"> == Operator (C# Reference) </a>
+        public static bool operator ==(TimeQuantity a, TimeQuantity b)
+        {
+            return a.ToTimeQuantity().Value.Equals(b.ToTimeQuantity().Value);
+        }
+
+        /// <summary>
+        /// Inequality operator overload.
+        /// </summary>
+        /// <param name="a"></param>
+        /// <param name="b"></param>
+        /// <returns></returns>
+        /// <a href="!:http://msdn.microsoft.com/en-us/library/3tz250sf.aspx"> != Operator (C# Reference) </a>
+        public static bool operator !=(TimeQuantity a, TimeQuantity b)
+        {
+            return !a.ToTimeQuantity().Value.Equals(b.ToTimeQuantity().Value);
+        }
+
+        /// <summary>
+        /// Greater than relational operator overload.
+        /// </summary>
+        /// <param name="a"></param>
+        /// <param name="b"></param>
+        /// <returns></returns>
+        /// <a href="!:http://msdn.microsoft.com/en-us/library/yxk8751b.aspx"> &gt; Operator (C# Reference) </a>
+        public static bool operator >(TimeQuantity a, TimeQuantity b)
+        {
+            return a.ToTimeQuantity().Value > b.ToTimeQuantity().Value;
+        }
+
+        /// <summary>
+        /// Less than relational operator overload.
+        /// </summary>
+        /// <param name="a"></param>
+        /// <param name="b"></param>
+        /// <returns></returns>
+        /// <a href="!:http://msdn.microsoft.com/en-us/library/z5wecxwa.aspx"> &lt; Operator (C# Reference) </a>
+        public static bool operator <(TimeQuantity a, TimeQuantity b)
+        {
+            return a.ToTimeQuantity().Value < b.ToTimeQuantity().Value;
+        }
+
+        /// <summary>
+        /// Greater than or equal to relational operator overload.
+        /// </summary>
+        /// <param name="a"></param>
+        /// <param name="b"></param>
+        /// <returns></returns>
+        /// <a href="!:http://msdn.microsoft.com/en-us/library/a59bsyk4.aspx"> &gt;= Operator (C# Reference) </a>
+        public static bool operator >=(TimeQuantity a, TimeQuantity b)
+        {
+            return a.ToTimeQuantity().Value >= b.ToTimeQuantity().Value;
+        }
+
+        /// <summary>
+        /// Less than relational operator overload.
+        /// </summary>
+        /// <param name="a"></param>
+        /// <param name="b"></param>
+        /// <returns></returns>
+        /// <a href="!:http://msdn.microsoft.com/en-us/library/hx063734.aspx"> &lt;= Operator (C# Reference) </a>
+        public static bool operator <=(TimeQuantity a, TimeQuantity b)
+        {
+            return a.ToTimeQuantity().Value <= b.ToTimeQuantity().Value;
+        }
+
+        #endregion
     }
 }

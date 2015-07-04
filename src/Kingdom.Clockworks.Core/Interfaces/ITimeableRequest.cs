@@ -1,19 +1,17 @@
-using System;
-
-namespace Kingdom.Clockworks.Stopwatches
+namespace Kingdom.Clockworks
 {
     /// <summary>
     /// 
     /// </summary>
-    public interface ISteppableRequest : IEquatable<ISteppableRequest>
+    public interface ITimeableRequest
     {
         /// <summary>
-        /// Gets the requested Direction.
+        /// Gets the Direction in which the timeable concern should move.
         /// </summary>
         RunningDirection? Direction { get; }
 
         /// <summary>
-        /// Gets the number of requested Steps.
+        /// Gets the number of Steps per request.
         /// </summary>
         int Steps { get; }
 
@@ -26,5 +24,15 @@ namespace Kingdom.Clockworks.Stopwatches
         /// Gets whether WillNotRun.
         /// </summary>
         bool WillNotRun { get; }
+
+        /// <summary>
+        /// Gets whether IsContinuous.
+        /// </summary>
+        bool IsContinuous { get; }
+
+        /// <summary>
+        /// Gets whether IsInstantaneous.
+        /// </summary>
+        bool IsInstantaneous { get; }
     }
 }

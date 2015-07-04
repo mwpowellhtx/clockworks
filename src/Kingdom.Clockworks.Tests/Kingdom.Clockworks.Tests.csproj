@@ -58,6 +58,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Stopwatches\SimulationStopwatchTests.cs" />
+    <Compile Include="TimeableClockTestFixtureBase.cs" />
     <Compile Include="Units\TimeConverterTests.cs" />
     <Compile Include="SystemClockFixture.cs" />
     <Compile Include="SystemClockInstanceTests.cs" />

@@ -1,4 +1,4 @@
-namespace Kingdom.Clockworks.Stopwatches
+namespace Kingdom.Clockworks
 {
     /// <summary>
     /// 

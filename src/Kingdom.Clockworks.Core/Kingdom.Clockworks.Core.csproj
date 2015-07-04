@@ -41,22 +41,30 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Stopwatches\IMeasurableStopwatch.cs" />
-    <Compile Include="Stopwatches\IScalableStopwatch.cs" />
-    <Compile Include="Stopwatches\ISteppableRequest.cs" />
-    <Compile Include="Stopwatches\ISteppableStopwatch.cs" />
+    <Compile Include="Interfaces\IStartableClock.cs" />
+    <Compile Include="Interfaces\IMeasurableClock.cs" />
+    <Compile Include="Interfaces\IScaleableClock.cs" />
+    <Compile Include="Bases\ElapsedEventArgsBase.cs" />
+    <Compile Include="Interfaces\ISteppableRequest.cs" />
+    <Compile Include="Interfaces\ISteppableClock.cs" />
     <Compile Include="Stopwatches\ISimulationStopwatch.cs" />
-    <Compile Include="Stopwatches\RequestType.cs" />
-    <Compile Include="Stopwatches\RunningDirection.cs" />
-    <Compile Include="Stopwatches\SimulatedElapsedEventArgs.cs" />
-    <Compile Include="Stopwatches\SimulationStopwatchExtensionMethods.cs" />
+    <Compile Include="Enumerations\RequestType.cs" />
+    <Compile Include="Interfaces\ITimeableRequest.cs" />
+    <Compile Include="Enumerations\RunningDirection.cs" />
+    <Compile Include="Stopwatches\StopwatchElapsedEventArgs.cs" />
+    <Compile Include="Extensions\TimeableClockExtensionMethods.cs" />
     <Compile Include="Stopwatches\SimulationStopwatch.cs" />
     <Compile Include="Stopwatches\StopwatchRequest.cs" />
+    <Compile Include="Bases\TimeableClockBase.cs" />
     <Compile Include="SystemClock.cs" />
     <Compile Include="Disposable.cs" />
-    <Compile Include="ISystemClock.cs" />
+    <Compile Include="Interfaces\ISystemClock.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Timers\RequestType.cs" />
+    <Compile Include="Timers\ISimulationTimer.cs" />
+    <Compile Include="Bases\TimeableRequestBase.cs" />
+    <Compile Include="Timers\SimulationTimer.cs" />
+    <Compile Include="Timers\TimerElapsedEventArgs.cs" />
+    <Compile Include="Timers\TimerRequest.cs" />
     <Compile Include="Units\TimeConverter.cs" />
     <Compile Include="Units\TimeQuantity.cs" />
     <Compile Include="Units\TimeQuantityExtensionMethods.cs" />
@@ -71,6 +79,7 @@
       <Name>Kingdom.Unitworks.Core</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

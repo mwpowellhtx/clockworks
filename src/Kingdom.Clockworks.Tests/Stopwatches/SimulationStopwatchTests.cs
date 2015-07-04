@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Reactive.Linq;
-using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using Kingdom.Clockworks.Units;
@@ -8,117 +7,9 @@ using NUnit.Framework;
 
 namespace Kingdom.Clockworks.Stopwatches
 {
-    public class SimulationStopwatchTests : ClockworksTestFixtureBase
+    public class SimulationStopwatchTests : TimeableClockTestFixtureBase
     {
-        /// <summary>
-        /// Runs the stopwatch <paramref name="scenario"/>.
-        /// </summary>
-        /// <param name="scenario"></param>
-        private static void RunStopwatchScenario(Action<SimulationStopwatch> scenario)
-        {
-            Assert.That(scenario, Is.Not.Null);
-            using (var stopwatch = new SimulationStopwatch())
-            {
-                scenario(stopwatch);
-            }
-        }
-
-        /// <summary>
-        /// Returns the property value accessed by forming the property name from
-        /// the <paramref name="numeratorUnit"/> and <paramref name="denominatorUnit"/>.
-        /// </summary>
-        /// <param name="scalable"></param>
-        /// <param name="numeratorUnit"></param>
-        /// <param name="denominatorUnit"></param>
-        /// <returns></returns>
-        private static double? GetStopwatchMeasure(IScalableStopwatch scalable,
-            TimeUnit numeratorUnit, TimeUnit denominatorUnit)
-        {
-            var name = string.Format(@"{0}sPer{1}", numeratorUnit, denominatorUnit);
-            const BindingFlags flags = BindingFlags.Public | BindingFlags.GetProperty | BindingFlags.Instance;
-            var property = scalable.GetType().GetProperty(name, flags);
-            return property == null ? (double?) null : (double) property.GetValue(scalable);
-        }
-
-        /// <summary>
-        /// Returns the raw ratio whose result should be expressed in terms of the numerator
-        /// and denominator units.
-        /// </summary>
-        /// <param name="intervalSecondsPerSecond"></param>
-        /// <param name="numeratorUnit"></param>
-        /// <param name="denominatorUnit"></param>
-        /// <returns></returns>
-        private double GetRawTimePerTime(double intervalSecondsPerSecond,
-            TimeUnit numeratorUnit, TimeUnit denominatorUnit)
-        {
-            // Yes we start from this basis for the ratio.
-            var num = ConvertFromBase(numeratorUnit, intervalSecondsPerSecond);
-            var denom = ConvertFromBase(denominatorUnit, 1d);
-            return num/denom;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="intervalSecondsPerSecond"></param>
-        /// <param name="numeratorUnit"></param>
-        /// <param name="denominatorUnit"></param>
-        /// <returns></returns>
-        private double GetTimePerTime(double intervalSecondsPerSecond,
-            TimeUnit numeratorUnit, TimeUnit denominatorUnit)
-        {
-            // Yes we start from this basis for the ratio.
-            var num = ConvertFromBase(numeratorUnit, intervalSecondsPerSecond);
-            var denom = ConvertFromBase(denominatorUnit, 1d);
-
-            // Be sure and compare/contrast like with like.
-            var baseNum = ConvertToBase(numeratorUnit, num);
-            var baseDenom = ConvertToBase(denominatorUnit, denom);
-
-            return baseNum/baseDenom;
-        }
-
         //TODO: may capture these items into a SimulationStopwatchFiture of sorts...
-
-        [Test]
-        [TestCase(1d, TimeUnit.Millisecond, 0.001d)]
-        [TestCase(1d, TimeUnit.Second, 1d)]
-        [TestCase(1d, TimeUnit.Minute, 60d)]
-        [TestCase(1d, TimeUnit.Hour, 3600d)]
-        [TestCase(1d, TimeUnit.Day, 86400d)]
-        [TestCase(1d, TimeUnit.Week, 604800d)]
-        public void Converting_time_quantities_throws_no_exceptions(double value, TimeUnit unit, double expectedValue)
-        {
-            //TODO: pick up other TimeUnit parts...
-            var actualValue = 0d;
-
-            TestDelegate getter = () => actualValue = ConvertToBase(unit, value);
-
-            Assert.That(getter, Throws.Nothing);
-
-            Assert.That(actualValue, Is.EqualTo(expectedValue).Within(Epsilon));
-        }
-
-        /// <summary>
-        /// Returns the estimated event count calculating <paramref name="interval"/> into
-        /// <paramref name="durationSeconds"/>.
-        /// </summary>
-        /// <param name="interval">A stopwatch period in milliseconds.</param>
-        /// <param name="durationSeconds">The number of seconds in which to run.</param>
-        /// <returns></returns>
-        private static int GetEstimatedEventCount(double interval, double durationSeconds)
-        {
-            var result = 0;
-
-            while (durationSeconds*1000d
-                   > interval*(result == 0 ? 0 : 1)
-                   + interval*(result > 0 ? result - 1 : 0))
-            {
-                result++;
-            }
-
-            return result;
-        }
 
         /// <summary>
         /// 
@@ -135,7 +26,7 @@ namespace Kingdom.Clockworks.Stopwatches
             var expectedEventCount = GetEstimatedEventCount(interval, durationSeconds);
             var actualEventCount = 0;
 
-            RunStopwatchScenario(ssw =>
+            RunClockScenario<SimulationStopwatch>(ssw =>
             {
                 ssw.Elapsed += (sender, e) => actualEventCount++;
                 ssw.Start(interval);
@@ -143,28 +34,6 @@ namespace Kingdom.Clockworks.Stopwatches
             });
 
             Assert.That(actualEventCount, Is.EqualTo(expectedEventCount).Within(1));
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="stopwatch"></param>
-        /// <param name="intervalSecondsPerSecond"></param>
-        /// <param name="numeratorUnit"></param>
-        /// <param name="denominatorUnit"></param>
-        private void VerifyUnitPerUnitProperties(IScalableStopwatch stopwatch,
-            double intervalSecondsPerSecond, TimeUnit numeratorUnit, TimeUnit denominatorUnit)
-        {
-            var actualValue = GetStopwatchMeasure(stopwatch, numeratorUnit, denominatorUnit);
-
-            if (actualValue == null) return;
-
-            var expectedValue = GetTimePerTime(intervalSecondsPerSecond,
-                numeratorUnit, denominatorUnit);
-
-            Assert.That(actualValue.Value, Is.EqualTo(expectedValue).Within(Epsilon),
-                @"Verification failed for numerator {0} and denominator {1}.",
-                numeratorUnit, denominatorUnit);
         }
 
         /// <summary>
@@ -188,7 +57,7 @@ namespace Kingdom.Clockworks.Stopwatches
                 TimeUnit.Hour
             };
 
-            RunStopwatchScenario(ssw =>
+            RunClockScenario<SimulationStopwatch>(ssw =>
             {
                 var sswIntervalSecondsPerSecond = ssw[TimeUnit.Second, TimeUnit.Second];
                 Assert.That(sswIntervalSecondsPerSecond, Is.EqualTo(1d).Within(Epsilon));
@@ -209,22 +78,6 @@ namespace Kingdom.Clockworks.Stopwatches
                     }
                 }
             });
-        }
-
-        public class TimerIntervalValuesAttribute : ValuesAttribute
-        {
-            internal TimerIntervalValuesAttribute()
-                : base(100, 250, 500, 750)
-            {
-            }
-        }
-
-        public class DurationValuesAttribute : ValuesAttribute
-        {
-            internal DurationValuesAttribute()
-                : base(1d, 2d, 3d)
-            {
-            }
         }
 
         /// <summary>
@@ -254,7 +107,7 @@ namespace Kingdom.Clockworks.Stopwatches
                 // Elapsed is less meaningful because the TimeSpan just does not have the precision necessary.
                 var elapsed = TimeSpan.Zero;
 
-                RunStopwatchScenario(ssw =>
+                RunClockScenario<SimulationStopwatch>(ssw =>
                 {
                     ssw[numeratorUnit, denominatorUnit] = stopwatchInterval;
 
@@ -309,58 +162,13 @@ namespace Kingdom.Clockworks.Stopwatches
         #region Increment and Decrement Members
 
         /// <summary>
-        /// 
-        /// </summary>
-        internal class RunningDirectionValuesAttribute : ValuesAttribute
-        {
-            /// <summary>
-            /// <see cref="RunningDirection"/>
-            /// </summary>
-            private static readonly RunningDirection? Null = null;
-
-            /// <summary>
-            /// <see cref="RunningDirection.Forward"/>
-            /// </summary>
-            private static readonly RunningDirection? Forward = RunningDirection.Forward;
-
-            /// <summary>
-            /// <see cref="RunningDirection.Backward"/>
-            /// </summary>
-            private static readonly RunningDirection? Backward = RunningDirection.Backward;
-
-            /// <summary>
-            /// Constructor
-            /// </summary>
-            public RunningDirectionValuesAttribute()
-                : base(Null, Forward, Backward)
-            {
-            }
-        }
-
-        internal class StepValuesAttribute : ValuesAttribute
-        {
-            public StepValuesAttribute()
-                : base(0, 1, 2, 3)
-            {
-            }
-        }
-
-        internal class RequestTypeValuesAttribute : ValuesAttribute
-        {
-            public RequestTypeValuesAttribute()
-                : base(RequestType.Instantaneous, RequestType.Continuous)
-            {
-            }
-        }
-
-        /// <summary>
         /// Verifies that the "star"-ncrement operations function correctly.
         /// </summary>
         /// <param name="intervalSecondsPerSecond"></param>
         /// <param name="expectedRequest"></param>
         /// <param name="e"></param>
         private static void VerifyStarNcrementRequest(double intervalSecondsPerSecond,
-            StopwatchRequest expectedRequest, SimulatedElapsedEventArgs e)
+            StopwatchRequest expectedRequest, StopwatchElapsedEventArgs e)
         {
             Assert.That(expectedRequest, Is.Not.Null);
 
@@ -386,8 +194,8 @@ namespace Kingdom.Clockworks.Stopwatches
         }
 
         /// <summary>
-        /// Verifies the outcome regardless whether <see cref="ISteppableStopwatch.Increment()"/>,
-        /// <see cref="ISteppableStopwatch.Decrement()"/>, or one of its neighbors were involved.
+        /// Verifies the outcome regardless whether <see cref="ISteppableClock.Increment()"/>,
+        /// <see cref="ISteppableClock.Decrement()"/>, or one of its neighbors were involved.
         /// </summary>
         /// <param name="intervalSecondsPerSecond"></param>
         /// <param name="expectedRequest"></param>
@@ -401,19 +209,19 @@ namespace Kingdom.Clockworks.Stopwatches
              * suite, but this particular set of tests does really lend itself to listening
              * reactively, in an observable manner, for one event outcomes. */
 
-            RunStopwatchScenario(sw =>
+            RunClockScenario<SimulationStopwatch>(ssw =>
             {
-                sw.SecondsPerSecond = intervalSecondsPerSecond;
+                ssw.SecondsPerSecond = intervalSecondsPerSecond;
 
-                var observableElapsed = Observable.FromEventPattern<SimulatedElapsedEventArgs>(
-                    handler => sw.Elapsed += handler, handler => sw.Elapsed -= handler)
+                var observableElapsed = Observable.FromEventPattern<StopwatchElapsedEventArgs>(
+                    handler => ssw.Elapsed += handler, handler => ssw.Elapsed -= handler)
                     .Select(p => p.EventArgs);
 
                 // ReSharper disable once AccessToModifiedClosure
                 using (observableElapsed.Subscribe(e => VerifyStarNcrementRequest(
                     intervalSecondsPerSecond, expectedRequest, e)))
                 {
-                    theAction(sw);
+                    theAction(ssw);
                 }
             });
         }
