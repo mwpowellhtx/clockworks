@@ -17,17 +17,17 @@ namespace Kingdom.Clockworks.Timers
         /// </summary>
         public SimulationTimer()
         {
-            _startingTimerQuantity = 0d.ToTimeQuantity(TimeUnit.Millisecond);
+            _targetQuantity = 0d.ToTimeQuantity(TimeUnit.Millisecond);
         }
 
         #region Internal Timer Concerns
 
         /// <summary>
-        /// Returns a remaining time factory.
+        /// Returns a <see cref="TimeSpan"/> factory.
         /// </summary>
         /// <param name="unit"></param>
         /// <returns></returns>
-        private static Func<double, TimeSpan> GetRemainingTimeSpanFactory(TimeUnit unit)
+        private static Func<double, TimeSpan> GetTimeSpanFactory(TimeUnit unit)
         {
             switch (unit)
             {
@@ -39,7 +39,7 @@ namespace Kingdom.Clockworks.Timers
 
                 case TimeUnit.Minute:
                     return TimeSpan.FromMinutes;
-                
+
                 case TimeUnit.Second:
                     return TimeSpan.FromSeconds;
 
@@ -57,9 +57,9 @@ namespace Kingdom.Clockworks.Timers
         /// </summary>
         /// <param name="quantity"></param>
         /// <returns></returns>
-        private static TimeSpan GetRemainingTimeSpan(TimeQuantity quantity)
+        private static TimeSpan GetTimeSpan(TimeQuantity quantity)
         {
-            var factory = GetRemainingTimeSpanFactory(quantity.Unit);
+            var factory = GetTimeSpanFactory(quantity.Unit);
             return factory(quantity.Value);
         }
 
@@ -78,23 +78,23 @@ namespace Kingdom.Clockworks.Timers
                     .ToTimeQuantity(TimeUnit.Millisecond)*request.Steps;
 
                 // Constrain the Candidate quantity by the Balance between here and Starting.
-                var remainingQuantity = Math.Max(0d, (_startingTimerQuantity - _elapsedQuantity)
+                var remainingQuantity = Math.Max(0d, (_targetQuantity - _elapsedQuantity)
                     .ToTimeQuantity(TimeUnit.Millisecond).Value).ToTimeQuantity(TimeUnit.Millisecond);
 
                 // Accepting the lesser of the two values within reach of the Starting spec.
-                var intervalQuantity = Math.Min(candidateQuantity.Value, remainingQuantity.Value)
+                var currentQuantity = Math.Min(candidateQuantity.Value, remainingQuantity.Value)
                     .ToTimeQuantity(TimeUnit.Millisecond);
 
-                var current = TimeSpan.FromMilliseconds(intervalQuantity.Value);
-
-                _elapsedQuantity += intervalQuantity;
-                _elapsed += current;
+                var current = TimeSpan.FromMilliseconds(currentQuantity.Value);
 
                 // Disengate the timer from running if exceeding the Starting spec.
-                if (_elapsedQuantity >= _startingTimerQuantity) Stop();
+                if (_elapsedQuantity + currentQuantity >= _targetQuantity) Stop();
 
-                return new TimerElapsedEventArgs(request, intervalQuantity, current,
-                    remainingQuantity, GetRemainingTimeSpan(remainingQuantity));
+                return new TimerElapsedEventArgs(request,
+                    _elapsedQuantity += currentQuantity, _elapsed += current,
+                    currentQuantity, current,
+                    _targetQuantity, GetTimeSpan(_targetQuantity),
+                    remainingQuantity, GetTimeSpan(remainingQuantity));
             }
         }
 
@@ -116,6 +116,21 @@ namespace Kingdom.Clockworks.Timers
 
         #endregion
 
+        #region Timer Members
+
+        private TimeQuantity _targetQuantity;
+
+        /// <summary>
+        /// Gets or sets the TargetMilliseconds.
+        /// </summary>
+        public double TargetMilliseconds
+        {
+            get { lock (this) return _targetQuantity.ToTimeQuantity(TimeUnit.Millisecond).Value; }
+            set { lock (this) _targetQuantity = value.ToTimeQuantity(TimeUnit.Millisecond); }
+        }
+
+        #endregion
+
         #region Steppable Clock Members
 
         /// <summary>
@@ -129,7 +144,7 @@ namespace Kingdom.Clockworks.Timers
         protected override TimerRequest CreateRequest(RunningDirection? direction = null,
             int steps = 1, RequestType type = RequestType.Continuous)
         {
-            throw new NotImplementedException();
+            return new TimerRequest(direction, steps, type);
         }
 
         #endregion
@@ -180,28 +195,6 @@ namespace Kingdom.Clockworks.Timers
         {
             timer.Decrement(steps, RequestType.Instantaneous);
             return timer;
-        }
-
-        #endregion
-
-        #region Startable Clock Members
-
-        /// <summary>
-        /// StartingTimerQuantity backing field.
-        /// </summary>
-        private TimeQuantity _startingTimerQuantity;
-
-        /// <summary>
-        /// Resets the stopwatch timer.
-        /// </summary>
-        /// <param name="elapsedMilliseconds"></param>
-        public override void Reset(double elapsedMilliseconds)
-        {
-            lock (this)
-            {
-                base.Reset(elapsedMilliseconds);
-                _startingTimerQuantity = elapsedMilliseconds.ToTimeQuantity(TimeUnit.Millisecond);
-            }
         }
 
         #endregion

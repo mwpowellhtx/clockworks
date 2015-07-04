@@ -24,6 +24,8 @@ namespace Kingdom.Clockworks
 
             const int defaultPeriod = Timeout.Infinite;
             _timer = new Timer(ProtectedTimerCallback, null, defaultPeriod, defaultPeriod);
+
+            Reset(0d);
         }
 
         #region Internal Members
@@ -157,6 +159,7 @@ namespace Kingdom.Clockworks
             get { return GetScaledIntervalTime(TimeUnit.Millisecond); }
         }
 
+        //TODO: per second? or per steps? remember, the component I am forgetting about is the timer period in calculating elapsed parts... which is either instant (per request) or timed (with timer component)
         /// <summary>
         /// Gets the SecondsPerSecond. This is considered the base unit of measure for the
         /// timerable clock. All other calculations are performed with this unit of measure
@@ -320,10 +323,29 @@ namespace Kingdom.Clockworks
         public abstract void Stop();
 
         /// <summary>
-        /// Resets the timerable clock timer.
+        /// Gets or sets the Elapsed <see cref="TimeSpan"/>.
+        /// </summary>
+        // ReSharper disable once InconsistentNaming
+        protected TimeSpan _elapsed;
+
+        /// <summary>
+        /// Gets or sets the ElapsedQuantity.
+        /// </summary>
+        // ReSharper disable once InconsistentNaming
+        protected TimeQuantity _elapsedQuantity;
+
+        /// <summary>
+        /// Resets the timeable clock.
         /// </summary>
         /// <param name="elapsedMilliseconds"></param>
-        public abstract void Reset(double elapsedMilliseconds);
+        public void Reset(double elapsedMilliseconds)
+        {
+            lock (this)
+            {
+                _elapsed = TimeSpan.Zero;
+                _elapsedQuantity = elapsedMilliseconds.ToTimeQuantity(TimeUnit.Millisecond);
+            }
+        }
 
         #endregion
 
@@ -442,18 +464,6 @@ namespace Kingdom.Clockworks
                 }
             }
         }
-
-        /// <summary>
-        /// Gets or sets the Elapsed <see cref="TimeSpan"/>.
-        /// </summary>
-        // ReSharper disable once InconsistentNaming
-        protected TimeSpan _elapsed;
-
-        /// <summary>
-        /// Gets or sets the ElapsedQuantity.
-        /// </summary>
-        // ReSharper disable once InconsistentNaming
-        protected TimeQuantity _elapsedQuantity;
 
         /// <summary>
         /// Gets the current Elapsed TimeSpan.
@@ -688,19 +698,6 @@ namespace Kingdom.Clockworks
                 TryChangeTimer(period, period);
 
                 if (GetNextRequest().WillRun) _requests.Clear();
-            }
-        }
-
-        /// <summary>
-        /// Resets the timerable clock.
-        /// </summary>
-        /// <param name="elapsedMilliseconds"></param>
-        public override void Reset(double elapsedMilliseconds)
-        {
-            lock (this)
-            {
-                _elapsed = TimeSpan.FromMilliseconds(elapsedMilliseconds);
-                _elapsedQuantity = elapsedMilliseconds.ToTimeQuantity(TimeUnit.Millisecond);
             }
         }
 

@@ -12,5 +12,9 @@ namespace Kingdom.Clockworks.Timers
             , IStartableClock
             , IDisposable
     {
+        /// <summary>
+        /// Gets or sets the TargetMilliseconds.
+        /// </summary>
+        double TargetMilliseconds { get; set; }
     }
 }

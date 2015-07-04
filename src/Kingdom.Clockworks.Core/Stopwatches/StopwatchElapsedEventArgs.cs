@@ -9,29 +9,18 @@ namespace Kingdom.Clockworks.Stopwatches
     public class StopwatchElapsedEventArgs : ElapsedEventArgsBase<StopwatchRequest>
     {
         /// <summary>
-        /// Gets the TotalElapsed <see cref="TimeSpan"/>.
-        /// </summary>
-        public readonly TimeSpan TotalElapsed;
-
-        /// <summary>
-        /// Gets the TotalElapsedQuantity.
-        /// </summary>
-        public readonly TimeQuantity TotalElapsedQuantity;
-
-        /// <summary>
         /// Internal Constructor
         /// </summary>
         /// <param name="request"></param>
-        /// <param name="intervalQuantity"></param>
-        /// <param name="currentElapsed"></param>
-        /// <param name="totalElapsedQuantity"></param>
-        /// <param name="totalElapsed"></param>
-        internal StopwatchElapsedEventArgs(StopwatchRequest request, TimeQuantity intervalQuantity,
-            TimeSpan currentElapsed, TimeQuantity totalElapsedQuantity, TimeSpan totalElapsed)
-            : base(request, intervalQuantity, currentElapsed)
+        /// <param name="elapsedQuantity"></param>
+        /// <param name="elapsed"></param>
+        /// <param name="currentQuantity"></param>
+        /// <param name="current"></param>
+        internal StopwatchElapsedEventArgs(StopwatchRequest request,
+            TimeQuantity elapsedQuantity, TimeSpan elapsed,
+            TimeQuantity currentQuantity, TimeSpan current)
+            : base(request, elapsedQuantity, elapsed, currentQuantity, current)
         {
-            TotalElapsed = totalElapsed;
-            TotalElapsedQuantity = totalElapsedQuantity;
         }
     }
 }

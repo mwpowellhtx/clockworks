@@ -9,29 +9,49 @@ namespace Kingdom.Clockworks.Timers
     public class TimerElapsedEventArgs : ElapsedEventArgsBase<TimerRequest>
     {
         /// <summary>
-        /// Gets the TotalRemaining <see cref="TimeSpan"/>.
+        /// 
         /// </summary>
-        public readonly TimeSpan TotalRemaining;
+        public readonly TimeQuantity TargetQuantity;
 
         /// <summary>
-        /// Gets the TotalRemainingQuantity.
+        /// gets the Target <see cref="TimeSpan"/>.
         /// </summary>
-        public readonly TimeQuantity TotalRemainingQuantity;
+        public readonly TimeSpan Target;
+
+        /// <summary>
+        /// Gets the RemainingQuantity.
+        /// </summary>
+        public readonly TimeQuantity RemainingQuantity;
+
+        /// <summary>
+        /// Gets the Remaining <see cref="TimeSpan"/>.
+        /// </summary>
+        public readonly TimeSpan Remaining;
 
         /// <summary>
         /// Internal Constructor
         /// </summary>
         /// <param name="request"></param>
-        /// <param name="intervalQuantity"></param>
-        /// <param name="currentElapsed"></param>
-        /// <param name="totalRemainingQuantity"></param>
-        /// <param name="totalRemaining"></param>
-        internal TimerElapsedEventArgs(TimerRequest request, TimeQuantity intervalQuantity,
-            TimeSpan currentElapsed, TimeQuantity totalRemainingQuantity, TimeSpan totalRemaining)
-            : base(request, intervalQuantity, currentElapsed)
+        /// <param name="elapsedQuantity"></param>
+        /// <param name="elapsed"></param>
+        /// <param name="currentQuantity"></param>
+        /// <param name="current"></param>
+        /// <param name="targetQuantity"></param>
+        /// <param name="target"></param>
+        /// <param name="remainingQuantity"></param>
+        /// <param name="remaining"></param>
+        internal TimerElapsedEventArgs(TimerRequest request,
+            TimeQuantity elapsedQuantity, TimeSpan elapsed,
+            TimeQuantity currentQuantity, TimeSpan current,
+            TimeQuantity targetQuantity, TimeSpan target,
+            TimeQuantity remainingQuantity, TimeSpan remaining)
+            : base(request, elapsedQuantity, elapsed, currentQuantity, current)
         {
-            TotalRemaining = totalRemaining;
-            TotalRemainingQuantity = totalRemainingQuantity;
+            Target = target;
+            TargetQuantity = targetQuantity;
+            //TODO: may even be able to do a simple calculation for any of these...
+            Remaining = remaining;
+            RemainingQuantity = remainingQuantity;
         }
     }
 }

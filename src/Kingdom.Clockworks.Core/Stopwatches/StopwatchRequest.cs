@@ -35,7 +35,7 @@ namespace Kingdom.Clockworks.Stopwatches
         }
 
         /// <summary>
-        /// Default Constructor
+        /// Constructor
         /// </summary>
         /// <param name="direction"></param>
         /// <param name="steps"></param>

@@ -5,3 +5,4 @@ packages/
 *.DotSettings
 *.user
 TestResults/
+*.Caches/

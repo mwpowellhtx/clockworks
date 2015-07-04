@@ -3,6 +3,7 @@ using Kingdom.Clockworks.Units;
 
 namespace Kingdom.Clockworks
 {
+    //TODO: decide whether TimeSpans or TimeQuantity (since I've adopted that) is the thing to use...
     /// <summary>
     /// 
     /// </summary>
@@ -16,27 +17,42 @@ namespace Kingdom.Clockworks
         public readonly TRequest Request;
 
         /// <summary>
+        /// Gets the Elapsed <see cref="TimeSpan"/>.
+        /// </summary>
+        public readonly TimeSpan Elapsed;
+
+        /// <summary>
+        /// Gets the ElapsedQuantity.
+        /// </summary>
+        public readonly TimeQuantity ElapsedQuantity;
+
+        /// <summary>
         /// Gets the CurrentElapsed <see cref="TimeSpan"/>.
         /// </summary>
-        public readonly TimeSpan CurrentElapsed;
+        public readonly TimeSpan Current;
 
         /// <summary>
         /// Gets the IntervalQuantity.
         /// </summary>
-        public readonly TimeQuantity IntervalQuantity;
+        public readonly TimeQuantity CurrentQuantity;
 
         /// <summary>
         /// Internal Constructor
         /// </summary>
         /// <param name="request"></param>
-        /// <param name="intervalQuantity"></param>
-        /// <param name="currentElapsed"></param>
+        /// <param name="elapsedQuantity"></param>
+        /// <param name="elapsed"></param>
+        /// <param name="currentQuantity"></param>
+        /// <param name="current"></param>
         protected ElapsedEventArgsBase(TRequest request,
-            TimeQuantity intervalQuantity, TimeSpan currentElapsed)
+            TimeQuantity elapsedQuantity, TimeSpan elapsed,
+            TimeQuantity currentQuantity, TimeSpan current)
         {
             Request = request;
-            IntervalQuantity = intervalQuantity;
-            CurrentElapsed = currentElapsed;
+            ElapsedQuantity = elapsedQuantity;
+            Elapsed = elapsed;
+            CurrentQuantity = currentQuantity;
+            Current = current;
         }
     }
 }

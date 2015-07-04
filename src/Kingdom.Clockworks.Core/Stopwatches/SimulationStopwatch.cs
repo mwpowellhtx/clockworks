@@ -32,7 +32,7 @@ namespace Kingdom.Clockworks.Stopwatches
 
         #endregion
 
-        #region Steppable Stopwatch Members
+        #region Steppable Clock Members
 
         /// <summary>
         /// Returns a created <see cref="StopwatchRequest"/> given <paramref name="direction"/>,
@@ -57,13 +57,14 @@ namespace Kingdom.Clockworks.Stopwatches
         protected override StopwatchElapsedEventArgs GetNextEventArgs(StopwatchRequest request)
         {
             // The important moving parts are tucked away in their single areas of responsibility.
-            var intervalQuantity = IntervalRatio.ToTimeQuantity()
+            var currentQuantity = IntervalRatio.ToTimeQuantity()
                 .ToTimeQuantity(TimeUnit.Millisecond)*request.Steps;
 
-            var current = TimeSpan.FromMilliseconds(intervalQuantity.Value);
+            var current = TimeSpan.FromMilliseconds(currentQuantity.Value);
 
-            return new StopwatchElapsedEventArgs(request, intervalQuantity, current,
-                _elapsedQuantity += intervalQuantity, _elapsed += current);
+            return new StopwatchElapsedEventArgs(request,
+                _elapsedQuantity += currentQuantity, _elapsed += current,
+                currentQuantity, current);
         }
 
         #endregion

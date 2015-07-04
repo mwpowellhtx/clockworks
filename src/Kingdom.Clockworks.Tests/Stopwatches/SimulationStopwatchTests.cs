@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Kingdom.Clockworks.Units;
@@ -7,77 +6,41 @@ using NUnit.Framework;
 
 namespace Kingdom.Clockworks.Stopwatches
 {
-    public class SimulationStopwatchTests : TimeableClockTestFixtureBase
+    /// <summary>
+    /// Extends the <see cref="TimeableClockTestFixtureBase{TClock, TRequest, TElapsedEventArgs}"/>
+    /// to support the <see cref="SimulationStopwatch"/> and supporting cast of types.
+    /// </summary>
+    public class SimulationStopwatchTests
+        : TimeableClockTestFixtureBase<
+            SimulationStopwatch
+            , StopwatchRequest
+            , StopwatchElapsedEventArgs>
     {
+        /// <summary>
+        /// Returns a created <see cref="StopwatchRequest"/> given the arguments.
+        /// </summary>
+        /// <param name="direction"></param>
+        /// <param name="steps"></param>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        protected override StopwatchRequest MakeRequest(RunningDirection? direction = null,
+            int steps = 1, RequestType type = RequestType.Instantaneous)
+        {
+            return new StopwatchRequest(direction, steps, type);
+        }
+
         //TODO: may capture these items into a SimulationStopwatchFiture of sorts...
 
         /// <summary>
-        /// 
+        /// Makes the arrangements supporting the
+        /// <see cref="TimeableClockTestFixtureBase{SimulationStopwatch, StopwatchRequest, StopwatchElapsedEventArgs}.Elapsed_events_yield_expected_event_counts"/>
+        /// tests.
         /// </summary>
-        /// <param name="interval"></param>
+        /// <param name="stopwatch"></param>
         /// <param name="durationSeconds"></param>
-        [Test]
-        [TestCase(100, 1d)]
-        [TestCase(250, 3d)]
-        [TestCase(500, 5d)]
-        [TestCase(750, 7d)]
-        public void Elapsed_events_yield_expected_event_counts(int interval, double durationSeconds)
+        protected override void MakeElapsedEventYieldArrangements(SimulationStopwatch stopwatch, double durationSeconds)
         {
-            var expectedEventCount = GetEstimatedEventCount(interval, durationSeconds);
-            var actualEventCount = 0;
-
-            RunClockScenario<SimulationStopwatch>(ssw =>
-            {
-                ssw.Elapsed += (sender, e) => actualEventCount++;
-                ssw.Start(interval);
-                Thread.Sleep(TimeSpan.FromSeconds(durationSeconds));
-            });
-
-            Assert.That(actualEventCount, Is.EqualTo(expectedEventCount).Within(1));
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="intervalSecondsPerSecond"></param>
-        /// <param name="numeratorUnit"></param>
-        /// <param name="denominatorUnit"></param>
-        [Test]
-        [Combinatorial]
-        public void Stopwatch_interval_unit_ratios_are_consistent(
-            [TimeQuantityValues] double intervalSecondsPerSecond,
-            [TimeUnitValues] TimeUnit numeratorUnit,
-            [TimeUnitValues] TimeUnit denominatorUnit)
-        {
-            var expectedUnits = new[]
-            {
-                TimeUnit.Millisecond,
-                TimeUnit.Second,
-                TimeUnit.Minute,
-                TimeUnit.Hour
-            };
-
-            RunClockScenario<SimulationStopwatch>(ssw =>
-            {
-                var sswIntervalSecondsPerSecond = ssw[TimeUnit.Second, TimeUnit.Second];
-                Assert.That(sswIntervalSecondsPerSecond, Is.EqualTo(1d).Within(Epsilon));
-                Assert.That(sswIntervalSecondsPerSecond, Is.EqualTo(ssw.SecondsPerSecond));
-
-                // Just be sure that the before and after scaled ratios are the consistent.
-                var scaledInterval = GetRawTimePerTime(intervalSecondsPerSecond, numeratorUnit, denominatorUnit);
-                ssw[numeratorUnit, denominatorUnit] = scaledInterval;
-
-                Assert.That(ssw[numeratorUnit, denominatorUnit], Is.EqualTo(GetTimePerTime(
-                    intervalSecondsPerSecond, numeratorUnit, denominatorUnit)).Within(Epsilon));
-
-                foreach (var numUnit in expectedUnits)
-                {
-                    foreach (var denomUnit in expectedUnits)
-                    {
-                        VerifyUnitPerUnitProperties(ssw, intervalSecondsPerSecond, numUnit, denomUnit);
-                    }
-                }
-            });
+            // Nothing to do for timer purposes.
         }
 
         /// <summary>
@@ -94,6 +57,7 @@ namespace Kingdom.Clockworks.Stopwatches
         {
             return Task.Run(() =>
             {
+                //TODO: It's one thing for Stopwatch to free-run like this, but we would want for the Timer range to be somewhat controlled
                 var scaledStopwatchInterval = stopwatchInterval.ToTimeQuantity(numeratorUnit)/
                                               1d.ToTimeQuantity(denominatorUnit);
 
@@ -107,18 +71,18 @@ namespace Kingdom.Clockworks.Stopwatches
                 // Elapsed is less meaningful because the TimeSpan just does not have the precision necessary.
                 var elapsed = TimeSpan.Zero;
 
-                RunClockScenario<SimulationStopwatch>(ssw =>
+                RunClockScenario(stopwatch =>
                 {
-                    ssw[numeratorUnit, denominatorUnit] = stopwatchInterval;
+                    stopwatch[numeratorUnit, denominatorUnit] = stopwatchInterval;
 
-                    ssw.Elapsed += (sender, e) =>
+                    stopwatch.Elapsed += (sender, e) =>
                     {
-                        quantitySum += e.IntervalQuantity;
-                        elapsed += e.CurrentElapsed;
+                        quantitySum += e.CurrentQuantity;
+                        elapsed += e.Current;
                         eventCount++;
                     };
 
-                    ssw.Start(timerInterval);
+                    stopwatch.Start(timerInterval);
 
                     Thread.Sleep(TimeSpan.FromSeconds(durationSeconds));
                 });
@@ -159,273 +123,109 @@ namespace Kingdom.Clockworks.Stopwatches
                 numeratorUnit, denominatorUnit);
         }
 
-        #region Increment and Decrement Members
+        #region Overloaded Operators
+
+        ///// <summary>
+        ///// Verifies that the <paramref name="e"/> outcomes are accurate.
+        ///// </summary>
+        ///// <param name="e"></param>
+        ///// <param name="expectedElapsedMilliseconds"></param>
+        //protected override void VerifyElapsedEventResults(StopwatchElapsedEventArgs e, double expectedElapsedMilliseconds)
+        //{
+        //    base.VerifyElapsedEventResults(e, expectedElapsedMilliseconds);
+        //}
 
         /// <summary>
-        /// Verifies that the "star"-ncrement operations function correctly.
+        /// Returns whether <paramref name="a"/> Equals <paramref name="b"/>.
         /// </summary>
-        /// <param name="intervalSecondsPerSecond"></param>
-        /// <param name="expectedRequest"></param>
-        /// <param name="e"></param>
-        private static void VerifyStarNcrementRequest(double intervalSecondsPerSecond,
-            StopwatchRequest expectedRequest, StopwatchElapsedEventArgs e)
+        /// <param name="a"></param>
+        /// <param name="b"></param>
+        /// <returns></returns>
+        protected override bool Equals(StopwatchRequest a, StopwatchRequest b)
         {
-            Assert.That(expectedRequest, Is.Not.Null);
-
-            // TODO: in and of themselves these really deserve a dedicated StopwatchRequestsTests suite...
-            // TODO: however, for the same of establishing "SameAs", this may be interesting...
-            Assert.That(expectedRequest.Equals(expectedRequest));
-            Assert.That(e.Request.Equals(e.Request));
-            Assert.That(((ISteppableRequest) expectedRequest).Equals(expectedRequest));
-            Assert.That(((ISteppableRequest) e.Request).Equals(e.Request));
-
-            // We establish that they should equal the other, but that they should not be the same.
-            Assert.That(e.Request, Is.Not.SameAs(expectedRequest));
-            Assert.That(e.Request.Equals(expectedRequest));
-            Assert.That(((ISteppableRequest) e.Request).Equals(expectedRequest));
-
-            //TODO: we're probably a little too intwined with the subject being tested... but this is a decent enough start...
-            var expectedElapsedMilliseconds = (intervalSecondsPerSecond.ToTimeQuantity()
-                .ToTimeQuantity(TimeUnit.Millisecond)*expectedRequest.Steps).Value;
-
-            // It so happens that we're expecting the one interval, also in total.
-            Assert.That(e.IntervalQuantity.Value, Is.EqualTo(expectedElapsedMilliseconds).Within(Epsilon));
-            Assert.That(e.TotalElapsedQuantity.Value, Is.EqualTo(expectedElapsedMilliseconds).Within(Epsilon));
+            return a.Equals(b);
         }
 
         /// <summary>
-        /// Verifies the outcome regardless whether <see cref="ISteppableClock.Increment()"/>,
-        /// <see cref="ISteppableClock.Decrement()"/>, or one of its neighbors were involved.
+        /// Implement this method in order to expose the prefix <see cref="SimulationStopwatch.op_Increment"/>
+        /// operator. Technically the language handles this for us, and it should, but this gives us a code
+        /// level handshake that indeed the operator was available and it did.
         /// </summary>
-        /// <param name="intervalSecondsPerSecond"></param>
-        /// <param name="expectedRequest"></param>
-        /// <param name="theAction"></param>
-        private static void MakeSureStarNcrementCorrect(double intervalSecondsPerSecond,
-            StopwatchRequest expectedRequest, Action<SimulationStopwatch> theAction)
-        {
-            Assert.That(theAction, Is.Not.Null);
-
-            /* I am really loathe to take on too many in the way of dependencies for a test
-             * suite, but this particular set of tests does really lend itself to listening
-             * reactively, in an observable manner, for one event outcomes. */
-
-            RunClockScenario<SimulationStopwatch>(ssw =>
-            {
-                ssw.SecondsPerSecond = intervalSecondsPerSecond;
-
-                var observableElapsed = Observable.FromEventPattern<StopwatchElapsedEventArgs>(
-                    handler => ssw.Elapsed += handler, handler => ssw.Elapsed -= handler)
-                    .Select(p => p.EventArgs);
-
-                // ReSharper disable once AccessToModifiedClosure
-                using (observableElapsed.Subscribe(e => VerifyStarNcrementRequest(
-                    intervalSecondsPerSecond, expectedRequest, e)))
-                {
-                    theAction(ssw);
-                }
-            });
-        }
-
-        /// <summary>
-        /// Makes sure that the <see cref="SimulationStopwatch.Increment(int,RequestType)"/> method
-        /// works correctly.
-        /// </summary>
-        /// <param name="intervalSecondsPerSecond"></param>
-        /// <param name="steps"></param>
-        /// <param name="type"></param>
-        [Test]
-        [Combinatorial]
-        public void Make_sure_increment_method_correct(
-            [TimeQuantityValues] double intervalSecondsPerSecond,
-            [StepValues] int steps, [RequestTypeValues] RequestType type)
-        {
-            MakeSureStarNcrementCorrect(intervalSecondsPerSecond,
-                new StopwatchRequest(RunningDirection.Forward, steps, type),
-                sw => sw.Increment(steps, type));
-        }
-
-        /// <summary>
-        /// Makes sure that the <see cref="SimulationStopwatch.Decrement(int,RequestType)"/> method
-        /// works correctly.
-        /// </summary>
-        /// <param name="intervalSecondsPerSecond"></param>
-        /// <param name="steps"></param>
-        /// <param name="type"></param>
-        [Test]
-        [Combinatorial]
-        public void Make_sure_decrement_method_correct(
-            [TimeQuantityValues] double intervalSecondsPerSecond,
-            [StepValues] int steps, [RequestTypeValues] RequestType type)
-        {
-            MakeSureStarNcrementCorrect(intervalSecondsPerSecond,
-                new StopwatchRequest(RunningDirection.Backward, steps, type),
-                sw => sw.Decrement(steps, type));
-        }
-
-        /// <summary>
-        /// Makes sure that the <see cref="SimulationStopwatch.Increment()"/> method works correctly.
-        /// </summary>
-        /// <param name="intervalSecondsPerSecond"></param>
-        [Test]
-        [Combinatorial]
-        public void Make_sure_increment_method_no_args_correct(
-            [TimeQuantityValues] double intervalSecondsPerSecond)
-        {
-            MakeSureStarNcrementCorrect(intervalSecondsPerSecond,
-                new StopwatchRequest(RunningDirection.Forward),
-                sw => sw.Increment());
-        }
-
-        /// <summary>
-        /// Makes sure that the <see cref="SimulationStopwatch.Decrement()"/> method works correctly.
-        /// </summary>
-        /// <param name="intervalSecondsPerSecond"></param>
-        [Test]
-        [Combinatorial]
-        public void Make_sure_decrement_method_no_args_correct(
-            [TimeQuantityValues] double intervalSecondsPerSecond)
-        {
-            MakeSureStarNcrementCorrect(intervalSecondsPerSecond,
-                new StopwatchRequest(RunningDirection.Backward),
-                sw => sw.Decrement());
-        }
-
-        /// <summary>
-        /// Makes sure that the <see cref="SimulationStopwatch.op_Increment"/> operator postfix form works correctly.
-        /// </summary>
-        /// <param name="intervalSecondsPerSecond"></param>
+        /// <param name="stopwatch"></param>
+        /// <returns></returns>
         /// <a href="!:http://msdn.microsoft.com/en-us/library/36x43w8w.aspx"> ++ Operator (C# Reference) </a>
-        [Test]
-        [Combinatorial]
-        public void Make_sure_increment_operator_postfix_correct(
-            [TimeQuantityValues] double intervalSecondsPerSecond)
+        protected override SimulationStopwatch PrefixIncrementOperator(SimulationStopwatch stopwatch)
         {
-            // ReSharper disable once RedundantAssignment
-            MakeSureStarNcrementCorrect(intervalSecondsPerSecond,
-                new StopwatchRequest(RunningDirection.Forward),
-                sw => sw++);
+            return ++stopwatch;
         }
 
         /// <summary>
-        /// Makes sure that the <see cref="SimulationStopwatch.op_Increment"/> operator prefix form works correctly.
+        /// Implement this method in order to expose the postfix <see cref="SimulationStopwatch.op_Increment"/>
+        /// operator. Technically the language handles this for us, and it should, but this gives us a code
+        /// level handshake that indeed the operator was available and it did.
         /// </summary>
-        /// <param name="intervalSecondsPerSecond"></param>
+        /// <param name="stopwatch"></param>
+        /// <returns></returns>
         /// <a href="!:http://msdn.microsoft.com/en-us/library/36x43w8w.aspx"> ++ Operator (C# Reference) </a>
-        [Test]
-        [Combinatorial]
-        public void Make_sure_increment_operator_prefix_correct(
-            [TimeQuantityValues] double intervalSecondsPerSecond)
+        protected override SimulationStopwatch PostfixIncrementOperator(SimulationStopwatch stopwatch)
         {
             // ReSharper disable once RedundantAssignment
-            MakeSureStarNcrementCorrect(intervalSecondsPerSecond,
-                new StopwatchRequest(RunningDirection.Forward),
-                sw => ++sw);
+            return stopwatch++;
         }
 
         /// <summary>
-        /// Makes sure that the <see cref="SimulationStopwatch.op_Decrement"/> operator postfix form works correctly.
+        /// Implement this method in order to expose the prefix <see cref="SimulationStopwatch.op_Decrement"/>
+        /// operator. Technically the language handles this for us, and it should, but this gives us a code
+        /// level handshake that indeed the operator was available and it did.
         /// </summary>
-        /// <param name="intervalSecondsPerSecond"></param>
+        /// <param name="stopwatch"></param>
+        /// <returns></returns>
         /// <a href="!:http://msdn.microsoft.com/en-us/library/wc3z3k8c.aspx"> -- Operator (C# Reference) </a>
-        [Test]
-        [Combinatorial]
-        public void Make_sure_decrement_operator_postfix_correct(
-            [TimeQuantityValues] double intervalSecondsPerSecond)
+        protected override SimulationStopwatch PrefixDecrementOperator(SimulationStopwatch stopwatch)
         {
-            // ReSharper disable once RedundantAssignment
-            MakeSureStarNcrementCorrect(intervalSecondsPerSecond,
-                new StopwatchRequest(RunningDirection.Backward),
-                sw => sw--);
+            return --stopwatch;
         }
 
         /// <summary>
-        /// Makes sure that the <see cref="SimulationStopwatch.op_Decrement"/> operator prefix form works correctly.
+        /// Implement this method in order to expose the postfix <see cref="SimulationStopwatch.op_Decrement"/>
+        /// operator. Technically the language handles this for us, and it should, but this gives us a code
+        /// level handshake that indeed the operator was available and it did.
         /// </summary>
-        /// <param name="intervalSecondsPerSecond"></param>
+        /// <param name="stopwatch"></param>
+        /// <returns></returns>
         /// <a href="!:http://msdn.microsoft.com/en-us/library/wc3z3k8c.aspx"> -- Operator (C# Reference) </a>
-        [Test]
-        [Combinatorial]
-        public void Make_sure_decrement_operator_prefix_correct(
-            [TimeQuantityValues] double intervalSecondsPerSecond)
+        protected override SimulationStopwatch PostfixDecrementOperator(SimulationStopwatch stopwatch)
         {
             // ReSharper disable once RedundantAssignment
-            MakeSureStarNcrementCorrect(intervalSecondsPerSecond,
-                new StopwatchRequest(RunningDirection.Backward),
-                sw => --sw);
+            return stopwatch--;
         }
 
         /// <summary>
-        /// Makes sure that the <see cref="SimulationStopwatch.op_Addition"/> operator works correctly.
+        /// Implement this method in order to expose the <see cref="SimulationStopwatch.op_Addition"/>
+        /// assignment operator. Technically the language handles this for us, and it should, but this gives
+        /// us a code level handshake that indeed the operator was available and it did.
         /// </summary>
-        /// <param name="intervalSecondsPerSecond"></param>
+        /// <param name="stopwatch"></param>
         /// <param name="steps"></param>
-        /// <a href="!:http://msdn.microsoft.com/en-us/library/k1a63xkz.aspx"> + Operator (C# Reference) </a>
-        [Test]
-        [Combinatorial]
-        public void Make_sure_addition_operator_correct(
-            [TimeQuantityValues] double intervalSecondsPerSecond,
-            [StepValues] int steps)
-        {
-            MakeSureStarNcrementCorrect(intervalSecondsPerSecond,
-                new StopwatchRequest(RunningDirection.Forward, steps),
-                sw => Assert.That(sw + steps, Is.SameAs(sw)));
-        }
-
-        /// <summary>
-        /// Makes sure that the <see cref="SimulationStopwatch.op_Addition"/> assignment operator
-        /// works correctly. Technically, if the binary operator works the unary assignment should
-        /// work as well, but we will do this for sake of being thorough since it takes hardly any
-        /// time at all to support.
-        /// </summary>
-        /// <param name="intervalSecondsPerSecond"></param>
-        /// <param name="steps"></param>
+        /// <returns></returns>
         /// <a href="!:http://msdn.microsoft.com/en-us/library/sa7629ew.aspx"> += Operator (C# Reference) </a>
-        [Test]
-        [Combinatorial]
-        public void Make_sure_addition_assignment_operator_correct(
-            [TimeQuantityValues] double intervalSecondsPerSecond,
-            [StepValues] int steps)
+        protected override SimulationStopwatch AdditionAssignmentOperator(SimulationStopwatch stopwatch, int steps)
         {
-            MakeSureStarNcrementCorrect(intervalSecondsPerSecond,
-                new StopwatchRequest(RunningDirection.Forward, steps),
-                sw => Assert.That(sw += steps, Is.SameAs(sw)));
+            return stopwatch += steps;
         }
 
         /// <summary>
-        /// Makes sure that the <see cref="SimulationStopwatch.op_Subtraction"/> operator works correctly.
+        /// Implement this method in order to expose the <see cref="SimulationStopwatch.op_Subtraction"/>
+        /// assignment operator. Technically the language handles this for us, and it should, but this gives
+        /// us a code level handshake that indeed the operator was available and it did.
         /// </summary>
-        /// <param name="intervalSecondsPerSecond"></param>
+        /// <param name="stopwatch"></param>
         /// <param name="steps"></param>
-        /// <a href="!:http://msdn.microsoft.com/en-us/library/wch5w409.aspx"> - Operator (C# Reference) </a>
-        [Test]
-        [Combinatorial]
-        public void Make_sure_subtraction_operator_correct(
-            [TimeQuantityValues] double intervalSecondsPerSecond,
-            [StepValues] int steps)
-        {
-            MakeSureStarNcrementCorrect(intervalSecondsPerSecond,
-                new StopwatchRequest(RunningDirection.Backward, steps),
-                sw => Assert.That(sw - steps, Is.SameAs(sw)));
-        }
-
-        /// <summary>
-        /// Makes sure that the <see cref="SimulationStopwatch.op_Subtraction"/> assignment operator
-        /// works correctly. Technically, if the binary operator works the unary assignment should
-        /// work as well, but we will do this for sake of being thorough since it takes hardly any
-        /// time at all to support.
-        /// </summary>
-        /// <param name="intervalSecondsPerSecond"></param>
-        /// <param name="steps"></param>
+        /// <returns></returns>
         /// <a href="!:http://msdn.microsoft.com/en-us/library/2y9zhhx1.aspx"> -= Operator (C# Reference) </a>
-        [Test]
-        [Combinatorial]
-        public void Make_sure_subtraction_assignment_operator_correct(
-            [TimeQuantityValues] double intervalSecondsPerSecond,
-            [StepValues] int steps)
+        protected override SimulationStopwatch SubtractionAssignmentOperator(SimulationStopwatch stopwatch, int steps)
         {
-            MakeSureStarNcrementCorrect(intervalSecondsPerSecond,
-                new StopwatchRequest(RunningDirection.Backward, steps),
-                sw => Assert.That(sw -= steps, Is.SameAs(sw)));
+            return stopwatch -= steps;
         }
 
         #endregion
