@@ -1,6 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reactive.Linq;
 using System.Reflection;
 using System.Threading;
@@ -10,7 +8,7 @@ using NUnit.Framework;
 namespace Kingdom.Clockworks
 {
     /// <summary>
-    /// 
+    /// Provides basic timeable clock test opportunities.
     /// </summary>
     /// <typeparam name="TClock"></typeparam>
     /// <typeparam name="TRequest"></typeparam>
@@ -425,33 +423,15 @@ namespace Kingdom.Clockworks
         }
 
         /// <summary>
-        /// Invokes the operator as instructed via the <paramref name="parts"/> and <paramref name="args"/>.
+        /// Provides post operator invocation handling.
         /// </summary>
         /// <param name="theClock"></param>
-        /// <param name="parts"></param>
-        /// <param name="args"></param>
+        /// <param name="expectedClock"></param>
         /// <returns></returns>
-        /// <a href="!:http://stackoverflow.com/questions/3016429/reflection-and-operator-overloads-in-c-sharp">
-        /// reflection-and-operator-overloads-in-c-sharp</a>
-        private static TClock InvokeOperator(TClock theClock, IEnumerable<OperatorPart> parts, params object[] args)
+        public static TClock PostOperatorInvocation(TClock theClock, TClock expectedClock)
         {
-            var name = parts.Select(p => p.ToString()).Aggregate(@"op_", (g, x) => g + x);
-            const BindingFlags flags = BindingFlags.Public | BindingFlags.Static;
-            var clockType = typeof (TClock);
-            var staticArgs = new object[] {theClock}.Concat(args).ToArray();
-            var staticArgTypes = staticArgs.Select(a => a.GetType()).ToArray();
-            var op = clockType.GetMethod(name, flags, Type.DefaultBinder, staticArgTypes, null);
-
-            Assert.That(op, Is.Not.Null, @"Unable to identify the operator named {0} with {1} binding flags and {2} arguments",
-                name, flags, string.Join(@", ", staticArgTypes.Select(t => t.FullName)));
-
-            //TODO: may want to specify the expected argument types...
-            //var result2 = clockType.InvokeMember(name, flags, Type.DefaultBinder, null, staticArgs);
-            //var result = clockType.InvokeMember(name, flags, Type.DefaultBinder, null, staticArgs);
-            var result = op.Invoke(null, staticArgs);
-            Assert.That(result, Is.Not.Null);
-            Assert.That(result, Is.InstanceOf<TClock>());
-            Assert.That(result, Is.SameAs(theClock));
+            Assert.That(theClock, Is.Not.Null);
+            Assert.That(theClock, Is.SameAs(expectedClock));
             return theClock;
         }
 
@@ -467,8 +447,9 @@ namespace Kingdom.Clockworks
         {
             var parts = new[] {OperatorPart.Increment};
             var request = MakeRequest(RunningDirection.Forward);
-            MakeSureStarNcrementCorrect(intervalSecondsPerSecond,
-                request, c => InvokeOperator(c, parts));
+
+            MakeSureStarNcrementCorrect(intervalSecondsPerSecond, request,
+                c => InvokeOperator(c, parts, x => PostOperatorInvocation(x as TClock, c), c));
         }
 
         /// <summary>
@@ -529,8 +510,9 @@ namespace Kingdom.Clockworks
         {
             var parts = new[] {OperatorPart.Decrement};
             var request = MakeRequest(RunningDirection.Backward);
-            MakeSureStarNcrementCorrect(intervalSecondsPerSecond,
-                request, c => InvokeOperator(c, parts));
+
+            MakeSureStarNcrementCorrect(intervalSecondsPerSecond, request,
+                c => InvokeOperator(c, parts, x => PostOperatorInvocation(x as TClock, c), c));
         }
 
         /// <summary>
@@ -593,8 +575,9 @@ namespace Kingdom.Clockworks
         {
             var parts = new[] {OperatorPart.Addition};
             var request = MakeRequest(RunningDirection.Forward, steps);
-            MakeSureStarNcrementCorrect(intervalSecondsPerSecond,
-                request, c => InvokeOperator(c, parts, steps));
+
+            MakeSureStarNcrementCorrect(intervalSecondsPerSecond, request,
+                c => InvokeOperator(c, parts, x => PostOperatorInvocation(x as TClock, c), c, steps));
         }
 
         /// <summary>
@@ -639,8 +622,9 @@ namespace Kingdom.Clockworks
         {
             var parts = new[] {OperatorPart.Subtraction};
             var request = MakeRequest(RunningDirection.Backward, steps);
-            MakeSureStarNcrementCorrect(intervalSecondsPerSecond,
-                request, c => InvokeOperator(c, parts, steps));
+
+            MakeSureStarNcrementCorrect(intervalSecondsPerSecond, request,
+                c => InvokeOperator(c, parts, x => PostOperatorInvocation(x as TClock, c), c, steps));
         }
 
         /// <summary>
