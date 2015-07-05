@@ -2,6 +2,7 @@
 
 namespace Kingdom.Unitworks.Units
 {
+    //TODO: Equals(object) ? GetHashCode() ?
     /// <summary>
     /// Represents a quantity in the dimension of time.
     /// </summary>
@@ -159,6 +160,9 @@ namespace Kingdom.Unitworks.Units
         /// <a href="!:http://msdn.microsoft.com/en-us/library/53k8ybth.aspx"> == Operator (C# Reference) </a>
         public static bool operator ==(TimeQuantity a, TimeQuantity b)
         {
+            //TODO: may even want to defer to a Comparable pattern...
+            if (ReferenceEquals(a, null) && ReferenceEquals(b, null)) return true;
+            if (ReferenceEquals(a, null) || ReferenceEquals(b, null)) return false;
             return a.ToTimeQuantity().Value.Equals(b.ToTimeQuantity().Value);
         }
 
@@ -171,6 +175,8 @@ namespace Kingdom.Unitworks.Units
         /// <a href="!:http://msdn.microsoft.com/en-us/library/3tz250sf.aspx"> != Operator (C# Reference) </a>
         public static bool operator !=(TimeQuantity a, TimeQuantity b)
         {
+            if (ReferenceEquals(a, null) && ReferenceEquals(b, null)) return false;
+            if (ReferenceEquals(a, null) || ReferenceEquals(b, null)) return true;
             return !a.ToTimeQuantity().Value.Equals(b.ToTimeQuantity().Value);
         }
 
@@ -183,6 +189,8 @@ namespace Kingdom.Unitworks.Units
         /// <a href="!:http://msdn.microsoft.com/en-us/library/yxk8751b.aspx"> &gt; Operator (C# Reference) </a>
         public static bool operator >(TimeQuantity a, TimeQuantity b)
         {
+            //TODO: these might even be exceptions... or defer to Comparable...
+            if (ReferenceEquals(a, null) || ReferenceEquals(b, null)) return false;
             return a.ToTimeQuantity().Value > b.ToTimeQuantity().Value;
         }
 
@@ -195,6 +203,7 @@ namespace Kingdom.Unitworks.Units
         /// <a href="!:http://msdn.microsoft.com/en-us/library/z5wecxwa.aspx"> &lt; Operator (C# Reference) </a>
         public static bool operator <(TimeQuantity a, TimeQuantity b)
         {
+            if (ReferenceEquals(a, null) || ReferenceEquals(b, null)) return false;
             return a.ToTimeQuantity().Value < b.ToTimeQuantity().Value;
         }
 
@@ -207,6 +216,7 @@ namespace Kingdom.Unitworks.Units
         /// <a href="!:http://msdn.microsoft.com/en-us/library/a59bsyk4.aspx"> &gt;= Operator (C# Reference) </a>
         public static bool operator >=(TimeQuantity a, TimeQuantity b)
         {
+            if (ReferenceEquals(a, null) || ReferenceEquals(b, null)) return false;
             return a.ToTimeQuantity().Value >= b.ToTimeQuantity().Value;
         }
 
@@ -219,6 +229,7 @@ namespace Kingdom.Unitworks.Units
         /// <a href="!:http://msdn.microsoft.com/en-us/library/hx063734.aspx"> &lt;= Operator (C# Reference) </a>
         public static bool operator <=(TimeQuantity a, TimeQuantity b)
         {
+            if (ReferenceEquals(a, null) || ReferenceEquals(b, null)) return false;
             return a.ToTimeQuantity().Value <= b.ToTimeQuantity().Value;
         }
 
