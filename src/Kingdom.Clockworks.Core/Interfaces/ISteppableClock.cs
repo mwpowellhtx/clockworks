@@ -43,14 +43,18 @@
         /// Increments the timeable clock given a number of <paramref name="steps"/> and <paramref name="type"/>.
         /// </summary>
         /// <param name="steps"></param>
+        /// <param name="millisecondsPerStep">Represents the milliseconds per step.</param>
         /// <param name="type"></param>
-        void Increment(int steps, RequestType type = RequestType.Continuous);
+        void Increment(int steps, double millisecondsPerStep = TimeableClockBase.OneSecondMilliseconds,
+            RequestType type = RequestType.Continuous);
 
         /// <summary>
         /// Decrements the timeable clock given a number of <paramref name="steps"/> and <paramref name="type"/>.
         /// </summary>
         /// <param name="steps"></param>
+        /// <param name="millisecondsPerStep">Represents the milliseconds per step.</param>
         /// <param name="type"></param>
-        void Decrement(int steps, RequestType type = RequestType.Continuous);
+        void Decrement(int steps, double millisecondsPerStep = TimeableClockBase.OneSecondMilliseconds,
+            RequestType type = RequestType.Continuous);
     }
 }

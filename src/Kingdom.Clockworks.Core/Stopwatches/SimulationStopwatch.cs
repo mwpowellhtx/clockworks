@@ -27,7 +27,11 @@ namespace Kingdom.Clockworks.Stopwatches
         /// </summary>
         protected override StopwatchRequest StartingRequest
         {
-            get { return new StopwatchRequest(RunningDirection.Forward, 1, RequestType.Continuous); }
+            get
+            {
+                return new StopwatchRequest(RunningDirection.Forward,
+                    MillisecondsPerStep, One, RequestType.Continuous);
+            }
         }
 
         #endregion
@@ -39,13 +43,15 @@ namespace Kingdom.Clockworks.Stopwatches
         /// <paramref name="steps"/>, and <paramref name="type"/>.
         /// </summary>
         /// <param name="direction"></param>
+        /// <param name="millisecondsPerStep"></param>
         /// <param name="steps"></param>
         /// <param name="type"></param>
         /// <returns></returns>
         protected override StopwatchRequest CreateRequest(RunningDirection? direction = null,
-            int steps = 1, RequestType type = RequestType.Continuous)
+            double millisecondsPerStep = OneSecondMilliseconds, int steps = One,
+            RequestType type = RequestType.Continuous)
         {
-            return new StopwatchRequest(direction, steps, type);
+            return new StopwatchRequest(direction, millisecondsPerStep, steps, type);
         }
 
         /// <summary>
@@ -58,8 +64,8 @@ namespace Kingdom.Clockworks.Stopwatches
         {
             //TODO: need to pick up the Timer Intervals: plus some understanding what to do with a "default" timer interval request
             // The important moving parts are tucked away in their single areas of responsibility.
-            var currentQuantity = MillisecondsPerStep.ToTimeQuantity(TimeUnit.Millisecond)
-                                  *IntervalRatio*request.Steps;
+            var currentQuantity = request.GetIntervalCandidate(MillisecondsPerStep)
+                .ToTimeQuantity(TimeUnit.Millisecond)*IntervalRatio*request.Steps;
 
             var current = TimeSpan.FromMilliseconds(currentQuantity.Value);
 
@@ -102,7 +108,7 @@ namespace Kingdom.Clockworks.Stopwatches
         /// <returns></returns>
         public static SimulationStopwatch operator +(SimulationStopwatch stopwatch, int steps)
         {
-            stopwatch.Increment(steps, RequestType.Instantaneous);
+            stopwatch.Increment(steps, stopwatch.MillisecondsPerStep, RequestType.Instantaneous);
             return stopwatch;
         }
 
@@ -114,7 +120,7 @@ namespace Kingdom.Clockworks.Stopwatches
         /// <returns></returns>
         public static SimulationStopwatch operator -(SimulationStopwatch stopwatch, int steps)
         {
-            stopwatch.Decrement(steps, RequestType.Instantaneous);
+            stopwatch.Decrement(steps, stopwatch.MillisecondsPerStep, RequestType.Instantaneous);
             return stopwatch;
         }
 

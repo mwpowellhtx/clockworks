@@ -38,13 +38,15 @@ namespace Kingdom.Clockworks.Timers
         /// Constructor
         /// </summary>
         /// <param name="direction"></param>
+        /// <param name="millisecondsPerStep"></param>
         /// <param name="steps"></param>
         /// <param name="type"></param>
         public TimerRequest(
             RunningDirection? direction = null,
-            int steps = 1,
+            double millisecondsPerStep = OneSecondMilliseconds,
+            int steps = One,
             RequestType type = RequestType.Instantaneous)
-            : base(direction, steps, type)
+            : base(direction, millisecondsPerStep, steps, type)
         {
         }
 

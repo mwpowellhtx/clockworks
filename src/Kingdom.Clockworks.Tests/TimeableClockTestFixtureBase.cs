@@ -23,11 +23,13 @@ namespace Kingdom.Clockworks
         /// Returns a created <typeparamref name="TRequest"/> given the arguments.
         /// </summary>
         /// <param name="direction"></param>
+        /// <param name="millisecondsPerStep"></param>
         /// <param name="steps"></param>
         /// <param name="type"></param>
         /// <returns></returns>
         protected abstract TRequest MakeRequest(RunningDirection? direction = null,
-            int steps = 1, RequestType type = RequestType.Instantaneous);
+            double millisecondsPerStep = OneSecondMilliseconds, int steps = One,
+            RequestType type = RequestType.Instantaneous);
 
         /// <summary>
         /// Runs the timer <paramref name="scenario"/>.
@@ -425,8 +427,8 @@ namespace Kingdom.Clockworks
         /// <param name="intervalSecondsPerSecond"></param>
         /// <param name="expectedRequest"></param>
         /// <param name="e"></param>
-        protected void VerifyStarNcrementRequest(double intervalSecondsPerSecond, TRequest expectedRequest,
-            TElapsedEventArgs e)
+        protected void VerifyStarNcrementRequest(double intervalSecondsPerSecond,
+            TRequest expectedRequest, TElapsedEventArgs e)
         {
             Assert.That(expectedRequest, Is.Not.Null);
 
@@ -447,8 +449,10 @@ namespace Kingdom.Clockworks
             Assert.That(Equals((ISteppableRequest) e.Request, (ISteppableRequest) expectedRequest));
 
             //TODO: we're probably a little too intwined with the subject being tested... but this is a decent enough start...
-            var expectedElapsedMilliseconds = (intervalSecondsPerSecond.ToTimeQuantity()
-                .ToTimeQuantity(TimeUnit.Millisecond)*expectedRequest.Steps).Value;
+            var expectedElapsed = intervalSecondsPerSecond*expectedRequest.MillisecondsPerStep
+                .ToTimeQuantity(TimeUnit.Millisecond).ToTimeQuantity()*expectedRequest.Steps;
+
+            var expectedElapsedMilliseconds = expectedElapsed.ToTimeQuantity(TimeUnit.Millisecond).Value;
 
             VerifyElapsedEventResults(e, expectedElapsedMilliseconds);
         }
@@ -458,10 +462,12 @@ namespace Kingdom.Clockworks
         /// </summary>
         /// <param name="theClock"></param>
         /// <param name="intervalSecondsPerSecond"></param>
+        /// <param name="millisecondsPerStep"></param>
         protected virtual void InitializeStarNcrementClock(TClock theClock,
-            double intervalSecondsPerSecond)
+            double intervalSecondsPerSecond, double millisecondsPerStep)
         {
             theClock.SecondsPerSecond = intervalSecondsPerSecond;
+            theClock.MillisecondsPerStep = millisecondsPerStep;
         }
 
         /// <summary>
@@ -469,10 +475,11 @@ namespace Kingdom.Clockworks
         /// <see cref="ISteppableClock.Decrement()"/>, or one of its neighbors were involved.
         /// </summary>
         /// <param name="intervalSecondsPerSecond"></param>
+        /// <param name="millisecondsPerStep"></param>
         /// <param name="expectedRequest"></param>
         /// <param name="theAction"></param>
         protected void MakeSureStarNcrementCorrect(double intervalSecondsPerSecond,
-            TRequest expectedRequest, Action<TClock> theAction)
+            double millisecondsPerStep, TRequest expectedRequest, Action<TClock> theAction)
         {
             Assert.That(theAction, Is.Not.Null);
 
@@ -482,7 +489,7 @@ namespace Kingdom.Clockworks
 
             RunClockScenario(clock =>
             {
-                InitializeStarNcrementClock(clock, intervalSecondsPerSecond);
+                InitializeStarNcrementClock(clock, intervalSecondsPerSecond, millisecondsPerStep);
 
                 var observableElapsed = Observable.FromEventPattern<TElapsedEventArgs>(
                     handler => clock.Elapsed += handler, handler => clock.Elapsed -= handler)
@@ -498,52 +505,62 @@ namespace Kingdom.Clockworks
         }
 
         /// <summary>
-        /// Makes sure that the <see cref="ISteppableClock.Increment(int,RequestType)"/> method
+        /// Makes sure that the <see cref="ISteppableClock.Increment(int,double,RequestType)"/> method
         /// works correctly.
         /// </summary>
         /// <param name="intervalSecondsPerSecond"></param>
+        /// <param name="millisecondsPerStep"></param>
         /// <param name="steps"></param>
         /// <param name="type"></param>
         [Test]
         [Combinatorial]
         public void Make_sure_increment_method_correct(
             [TimeQuantityValues] double intervalSecondsPerSecond,
+            [TimePerStepValues] double millisecondsPerStep,
             [StepValues] int steps, [RequestTypeValues] RequestType type)
         {
-            var request = MakeRequest(RunningDirection.Forward, steps, type);
-            MakeSureStarNcrementCorrect(intervalSecondsPerSecond,
-                request, c => c.Increment(steps, type));
+            var request = MakeRequest(RunningDirection.Forward, millisecondsPerStep,
+                steps, type);
+
+            MakeSureStarNcrementCorrect(intervalSecondsPerSecond, millisecondsPerStep,
+                request, c => c.Increment(steps, millisecondsPerStep, type));
         }
 
         /// <summary>
-        /// Makes sure that the <see cref="ISteppableClock.Decrement(int,RequestType)"/> method
+        /// Makes sure that the <see cref="ISteppableClock.Decrement(int,double,RequestType)"/> method
         /// works correctly.
         /// </summary>
         /// <param name="intervalSecondsPerSecond"></param>
+        /// <param name="millisecondsPerStep"></param>
         /// <param name="steps"></param>
         /// <param name="type"></param>
         [Test]
         [Combinatorial]
         public void Make_sure_decrement_method_correct(
             [TimeQuantityValues] double intervalSecondsPerSecond,
+            [TimePerStepValues] double millisecondsPerStep,
             [StepValues] int steps, [RequestTypeValues] RequestType type)
         {
-            var request = MakeRequest(RunningDirection.Backward, steps, type);
-            MakeSureStarNcrementCorrect(intervalSecondsPerSecond,
-                request, c => c.Decrement(steps, type));
+            var request = MakeRequest(RunningDirection.Backward, millisecondsPerStep,
+                steps, type);
+
+            MakeSureStarNcrementCorrect(intervalSecondsPerSecond, millisecondsPerStep,
+                request, c => c.Decrement(steps, millisecondsPerStep, type));
         }
 
         /// <summary>
         /// Makes sure that the <see cref="ISteppableClock.Increment()"/> method works correctly.
         /// </summary>
         /// <param name="intervalSecondsPerSecond"></param>
+        /// <param name="millisecondsPerStep"></param>
         [Test]
         [Combinatorial]
         public void Make_sure_increment_method_no_args_correct(
-            [TimeQuantityValues] double intervalSecondsPerSecond)
+            [TimeQuantityValues] double intervalSecondsPerSecond,
+            [TimePerStepValues] double millisecondsPerStep)
         {
-            var request = MakeRequest(RunningDirection.Forward);
-            MakeSureStarNcrementCorrect(intervalSecondsPerSecond,
+            var request = MakeRequest(RunningDirection.Forward, millisecondsPerStep);
+            MakeSureStarNcrementCorrect(intervalSecondsPerSecond, millisecondsPerStep,
                 request, c => c.Increment());
         }
 
@@ -551,13 +568,15 @@ namespace Kingdom.Clockworks
         /// Makes sure that the <see cref="ISteppableClock.Decrement()"/> method works correctly.
         /// </summary>
         /// <param name="intervalSecondsPerSecond"></param>
+        /// <param name="millisecondsPerStep"></param>
         [Test]
         [Combinatorial]
         public void Make_sure_decrement_method_no_args_correct(
-            [TimeQuantityValues] double intervalSecondsPerSecond)
+            [TimeQuantityValues] double intervalSecondsPerSecond,
+            [TimePerStepValues] double millisecondsPerStep)
         {
-            var request = MakeRequest(RunningDirection.Backward);
-            MakeSureStarNcrementCorrect(intervalSecondsPerSecond,
+            var request = MakeRequest(RunningDirection.Backward, millisecondsPerStep);
+            MakeSureStarNcrementCorrect(intervalSecondsPerSecond, millisecondsPerStep,
                 request, c => c.Decrement());
         }
 
@@ -578,16 +597,18 @@ namespace Kingdom.Clockworks
         /// Makes sure that the increment operator works correctly.
         /// </summary>
         /// <param name="intervalSecondsPerSecond"></param>
+        /// <param name="millisecondsPerStep"></param>
         /// <a href="!:http://msdn.microsoft.com/en-us/library/36x43w8w.aspx"> ++ Operator (C# Reference) </a>
         [Test]
         [Combinatorial]
         public void Make_sure_increment_operator_correct(
-            [TimeQuantityValues] double intervalSecondsPerSecond)
+            [TimeQuantityValues] double intervalSecondsPerSecond,
+            [TimePerStepValues] double millisecondsPerStep)
         {
             var parts = new[] {OperatorPart.Increment};
-            var request = MakeRequest(RunningDirection.Forward);
+            var request = MakeRequest(RunningDirection.Forward, millisecondsPerStep);
 
-            MakeSureStarNcrementCorrect(intervalSecondsPerSecond, request,
+            MakeSureStarNcrementCorrect(intervalSecondsPerSecond, millisecondsPerStep, request,
                 c => InvokeOperator(c, parts, x => PostOperatorInvocation(x as TClock, c), c));
         }
 
@@ -611,47 +632,53 @@ namespace Kingdom.Clockworks
         /// Makes sure that the increment operator postfix form works correctly.
         /// </summary>
         /// <param name="intervalSecondsPerSecond"></param>
+        /// <param name="millisecondsPerStep"></param>
         /// <a href="!:http://msdn.microsoft.com/en-us/library/36x43w8w.aspx"> ++ Operator (C# Reference) </a>
         [Test]
         [Combinatorial]
         public void Make_sure_increment_operator_postfix_correct(
-            [TimeQuantityValues] double intervalSecondsPerSecond)
+            [TimeQuantityValues] double intervalSecondsPerSecond,
+            [TimePerStepValues] double millisecondsPerStep)
         {
-            var request = MakeRequest(RunningDirection.Forward);
-            MakeSureStarNcrementCorrect(intervalSecondsPerSecond, request,
-                c => Assert.That(PostfixIncrementOperator(c), Is.SameAs(c)));
+            var request = MakeRequest(RunningDirection.Forward, millisecondsPerStep);
+            MakeSureStarNcrementCorrect(intervalSecondsPerSecond, millisecondsPerStep,
+                request, c => Assert.That(PostfixIncrementOperator(c), Is.SameAs(c)));
         }
 
         /// <summary>
         /// Makes sure that the increment operator prefix form works correctly.
         /// </summary>
         /// <param name="intervalSecondsPerSecond"></param>
+        /// <param name="millisecondsPerStep"></param>
         /// <a href="!:http://msdn.microsoft.com/en-us/library/36x43w8w.aspx"> ++ Operator (C# Reference) </a>
         [Test]
         [Combinatorial]
         public void Make_sure_increment_operator_prefix_correct(
-            [TimeQuantityValues] double intervalSecondsPerSecond)
+            [TimeQuantityValues] double intervalSecondsPerSecond,
+            [TimePerStepValues] double millisecondsPerStep)
         {
-            var request = MakeRequest(RunningDirection.Forward);
-            MakeSureStarNcrementCorrect(intervalSecondsPerSecond, request,
-                c => Assert.That(PrefixIncrementOperator(c), Is.SameAs(c)));
+            var request = MakeRequest(RunningDirection.Forward, millisecondsPerStep);
+            MakeSureStarNcrementCorrect(intervalSecondsPerSecond, millisecondsPerStep,
+                request, c => Assert.That(PrefixIncrementOperator(c), Is.SameAs(c)));
         }
 
         /// <summary>
         /// Makes sure that the decrement operator works correctly.
         /// </summary>
         /// <param name="intervalSecondsPerSecond"></param>
+        /// <param name="millisecondsPerStep"></param>
         /// <a href="!:http://msdn.microsoft.com/en-us/library/wc3z3k8c.aspx"> -- Operator (C# Reference) </a>
         [Test]
         [Combinatorial]
         public void Make_sure_decrement_operator_correct(
-            [TimeQuantityValues] double intervalSecondsPerSecond)
+            [TimeQuantityValues] double intervalSecondsPerSecond,
+            [TimePerStepValues] double millisecondsPerStep)
         {
             var parts = new[] {OperatorPart.Decrement};
-            var request = MakeRequest(RunningDirection.Backward);
+            var request = MakeRequest(RunningDirection.Backward, millisecondsPerStep);
 
-            MakeSureStarNcrementCorrect(intervalSecondsPerSecond, request,
-                c => InvokeOperator(c, parts, x => PostOperatorInvocation(x as TClock, c), c));
+            MakeSureStarNcrementCorrect(intervalSecondsPerSecond, millisecondsPerStep,
+                request, c => InvokeOperator(c, parts, x => PostOperatorInvocation(x as TClock, c), c));
         }
 
         /// <summary>
@@ -674,48 +701,53 @@ namespace Kingdom.Clockworks
         /// Makes sure that the decrement operator postfix form works correctly.
         /// </summary>
         /// <param name="intervalSecondsPerSecond"></param>
+        /// <param name="millisecondsPerStep"></param>
         /// <a href="!:http://msdn.microsoft.com/en-us/library/wc3z3k8c.aspx"> -- Operator (C# Reference) </a>
         [Test]
         [Combinatorial]
         public void Make_sure_decrement_operator_postfix_correct(
-            [TimeQuantityValues] double intervalSecondsPerSecond)
+            [TimeQuantityValues] double intervalSecondsPerSecond,
+            [TimePerStepValues] double millisecondsPerStep)
         {
-            var request = MakeRequest(RunningDirection.Backward);
-            MakeSureStarNcrementCorrect(intervalSecondsPerSecond, request,
-                c => Assert.That(PostfixDecrementOperator(c), Is.SameAs(c)));
+            var request = MakeRequest(RunningDirection.Backward, millisecondsPerStep);
+            MakeSureStarNcrementCorrect(intervalSecondsPerSecond, millisecondsPerStep,
+                request, c => Assert.That(PostfixDecrementOperator(c), Is.SameAs(c)));
         }
 
         /// <summary>
         /// Makes sure that the decrement operator prefix form works correctly.
         /// </summary>
         /// <param name="intervalSecondsPerSecond"></param>
+        /// <param name="millisecondsPerStep"></param>
         /// <a href="!:http://msdn.microsoft.com/en-us/library/wc3z3k8c.aspx"> -- Operator (C# Reference) </a>
         [Test]
         [Combinatorial]
         public void Make_sure_decrement_operator_prefix_correct(
-            [TimeQuantityValues] double intervalSecondsPerSecond)
+            [TimeQuantityValues] double intervalSecondsPerSecond,
+            [TimePerStepValues] double millisecondsPerStep)
         {
-            var request = MakeRequest(RunningDirection.Backward);
-            MakeSureStarNcrementCorrect(intervalSecondsPerSecond, request,
-                c => Assert.That(PrefixDecrementOperator(c), Is.SameAs(c)));
+            var request = MakeRequest(RunningDirection.Backward, millisecondsPerStep);
+            MakeSureStarNcrementCorrect(intervalSecondsPerSecond, millisecondsPerStep,
+                request, c => Assert.That(PrefixDecrementOperator(c), Is.SameAs(c)));
         }
 
         /// <summary>
         /// Makes sure that the addition operator works correctly.
         /// </summary>
         /// <param name="intervalSecondsPerSecond"></param>
+        /// <param name="millisecondsPerStep"></param>
         /// <param name="steps"></param>
         /// <a href="!:http://msdn.microsoft.com/en-us/library/k1a63xkz.aspx"> + Operator (C# Reference) </a>
         [Test]
         [Combinatorial]
         public void Make_sure_addition_operator_correct(
             [TimeQuantityValues] double intervalSecondsPerSecond,
+            [TimePerStepValues] double millisecondsPerStep,
             [StepValues] int steps)
         {
             var parts = new[] {OperatorPart.Addition};
-            var request = MakeRequest(RunningDirection.Forward, steps);
-
-            MakeSureStarNcrementCorrect(intervalSecondsPerSecond, request,
+            var request = MakeRequest(RunningDirection.Forward, millisecondsPerStep, steps);
+            MakeSureStarNcrementCorrect(intervalSecondsPerSecond, millisecondsPerStep, request,
                 c => InvokeOperator(c, parts, x => PostOperatorInvocation(x as TClock, c), c, steps));
         }
 
@@ -734,16 +766,18 @@ namespace Kingdom.Clockworks
         /// for sake of being thorough since it takes hardly any time at all to support.
         /// </summary>
         /// <param name="intervalSecondsPerSecond"></param>
+        /// <param name="millisecondsPerStep"></param>
         /// <param name="steps"></param>
         /// <a href="!:http://msdn.microsoft.com/en-us/library/sa7629ew.aspx"> += Operator (C# Reference) </a>
         [Test]
         [Combinatorial]
         public void Make_sure_addition_assignment_operator_correct(
             [TimeQuantityValues] double intervalSecondsPerSecond,
+            [TimePerStepValues] double millisecondsPerStep,
             [StepValues] int steps)
         {
-            var request = MakeRequest(RunningDirection.Forward, steps);
-            MakeSureStarNcrementCorrect(intervalSecondsPerSecond, request,
+            var request = MakeRequest(RunningDirection.Forward, millisecondsPerStep, steps);
+            MakeSureStarNcrementCorrect(intervalSecondsPerSecond, millisecondsPerStep, request,
                 c => Assert.That(AdditionAssignmentOperator(c, steps), Is.SameAs(c)));
         }
 
@@ -751,18 +785,20 @@ namespace Kingdom.Clockworks
         /// Makes sure that the subtraction operator works correctly.
         /// </summary>
         /// <param name="intervalSecondsPerSecond"></param>
+        /// <param name="millisecondsPerStep"></param>
         /// <param name="steps"></param>
         /// <a href="!:http://msdn.microsoft.com/en-us/library/wch5w409.aspx"> - Operator (C# Reference) </a>
         [Test]
         [Combinatorial]
         public void Make_sure_subtraction_operator_correct(
             [TimeQuantityValues] double intervalSecondsPerSecond,
+            [TimePerStepValues] double millisecondsPerStep,
             [StepValues] int steps)
         {
             var parts = new[] {OperatorPart.Subtraction};
-            var request = MakeRequest(RunningDirection.Backward, steps);
+            var request = MakeRequest(RunningDirection.Backward, millisecondsPerStep, steps);
 
-            MakeSureStarNcrementCorrect(intervalSecondsPerSecond, request,
+            MakeSureStarNcrementCorrect(intervalSecondsPerSecond, millisecondsPerStep, request,
                 c => InvokeOperator(c, parts, x => PostOperatorInvocation(x as TClock, c), c, steps));
         }
 
@@ -781,16 +817,18 @@ namespace Kingdom.Clockworks
         /// sake of being thorough since it takes hardly any time at all to support.
         /// </summary>
         /// <param name="intervalSecondsPerSecond"></param>
+        /// <param name="millisecondsPerStep"></param>
         /// <param name="steps"></param>
         /// <a href="!:http://msdn.microsoft.com/en-us/library/2y9zhhx1.aspx"> -= Operator (C# Reference) </a>
         [Test]
         [Combinatorial]
         public void Make_sure_subtraction_assignment_operator_correct(
             [TimeQuantityValues] double intervalSecondsPerSecond,
+            [TimePerStepValues] double millisecondsPerStep,
             [StepValues] int steps)
         {
-            var request = MakeRequest(RunningDirection.Backward, steps);
-            MakeSureStarNcrementCorrect(intervalSecondsPerSecond, request,
+            var request = MakeRequest(RunningDirection.Backward, millisecondsPerStep, steps);
+            MakeSureStarNcrementCorrect(intervalSecondsPerSecond, millisecondsPerStep, request,
                 c => Assert.That(SubtractionAssignmentOperator(c, steps), Is.SameAs(c)));
         }
 

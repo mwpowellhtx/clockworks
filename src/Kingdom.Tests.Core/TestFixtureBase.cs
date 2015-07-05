@@ -10,6 +10,17 @@ namespace Kingdom
     public abstract class TestFixtureBase
     {
         /// <summary>
+        /// One: 1
+        /// </summary>
+        protected const int One = 1;
+
+        /// <summary>
+        /// OneSecondMilliseconds: 1000d
+        /// </summary>
+        /// <see cref="One"/>
+        protected const double OneSecondMilliseconds = One*1000d;
+
+        /// <summary>
         /// 1e-2
         /// </summary>
         protected const double Epsilon = 1e-2;

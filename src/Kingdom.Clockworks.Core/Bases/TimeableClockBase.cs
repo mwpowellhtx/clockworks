@@ -44,9 +44,39 @@ namespace Kingdom.Clockworks
         protected abstract void ProtectedTimerCallback(object state);
 
         /// <summary>
-        /// Keeps track of the <see cref="_timer"/> interval.
+        /// TimerIntervalQuantity backing field.
         /// </summary>
-        protected TimeSpan TimerIntervalTimeSpan { get; set; }
+        private TimeQuantity _timerIntervalQuantity;
+
+        /// <summary>
+        /// Gets or sets the TimerIntervalQuantity.
+        /// Sets in terms of <see cref="TimeUnit.Millisecond"/> or Null.
+        /// </summary>
+        protected TimeQuantity TimerIntervalQuantity
+        {
+            get { return _timerIntervalQuantity; }
+            set
+            {
+                _timerIntervalQuantity = value == null
+                    ? null
+                    : value.ToTimeQuantity(TimeUnit.Millisecond);
+            }
+        }
+
+        /// <summary>
+        /// Gets the TimerIntervalMilliseconds if possible.
+        /// Gets Null if there is no interval currently set.
+        /// </summary>
+        /// <see cref="TimerIntervalQuantity"/>
+        protected double? TimerIntervalMilliseconds
+        {
+            get
+            {
+                return _timerIntervalQuantity == null
+                    ? (double?) null
+                    : _timerIntervalQuantity.Value;
+            }
+        }
 
         /// <summary>
         /// Timer backing field.
@@ -441,7 +471,7 @@ namespace Kingdom.Clockworks
         /// </summary>
         public void Increment()
         {
-            Increment(1, RequestType.Instantaneous);
+            Increment(One, MillisecondsPerStep, RequestType.Instantaneous);
         }
 
         /// <summary>
@@ -449,22 +479,37 @@ namespace Kingdom.Clockworks
         /// </summary>
         public void Decrement()
         {
-            Decrement(1, RequestType.Instantaneous);
+            Decrement(One, MillisecondsPerStep, RequestType.Instantaneous);
         }
+
+        /// <summary>
+        /// One: 1
+        /// </summary>
+        protected const int One = 1;
+
+        /// <summary>
+        /// OneSecondMilliseconds: 1000d
+        /// </summary>
+        /// <see cref="One"/>
+        protected internal const double OneSecondMilliseconds = One*1000d;
 
         /// <summary>
         /// Increments the timerable clock given a number of <paramref name="steps"/> and <paramref name="type"/>.
         /// </summary>
         /// <param name="steps"></param>
+        /// <param name="millisecondsPerStep">Represents the milliseconds per step.</param>
         /// <param name="type"></param>
-        public abstract void Increment(int steps, RequestType type = RequestType.Continuous);
+        public abstract void Increment(int steps, double millisecondsPerStep = OneSecondMilliseconds,
+            RequestType type = RequestType.Continuous);
 
         /// <summary>
         /// Decrements the timerable clock given a number of <paramref name="steps"/> and <paramref name="type"/>.
         /// </summary>
         /// <param name="steps"></param>
+        /// <param name="millisecondsPerStep">Represents the milliseconds per step.</param>
         /// <param name="type"></param>
-        public abstract void Decrement(int steps, RequestType type = RequestType.Continuous);
+        public abstract void Decrement(int steps, double millisecondsPerStep = OneSecondMilliseconds,
+            RequestType type = RequestType.Continuous);
 
         #endregion
 
@@ -540,7 +585,7 @@ namespace Kingdom.Clockworks
                 lock (this)
                 {
                     //TODO: Timeout + Direction? Timeout represents whether the _timer is moving or not.
-                    return Timeout.Infinite != (long) TimerIntervalTimeSpan.TotalMilliseconds
+                    return TimerIntervalMilliseconds.HasValue
                            && (_lastRequest != null && _lastRequest.WillRun);
                 }
             }
@@ -706,11 +751,13 @@ namespace Kingdom.Clockworks
         /// <paramref name="steps"/>, and <paramref name="type"/>.
         /// </summary>
         /// <param name="direction"></param>
+        /// <param name="millisecondsPerStep"></param>
         /// <param name="steps"></param>
         /// <param name="type"></param>
         /// <returns></returns>
         protected abstract TRequest CreateRequest(RunningDirection? direction = null,
-            int steps = 1, RequestType type = RequestType.Continuous);
+            double millisecondsPerStep = OneSecondMilliseconds, int steps = One,
+            RequestType type = RequestType.Continuous);
 
         /* TODO: TBD: increment/decrement? Direction? continuous/latching? or leave the previous state alone?
          * "Next" almost needs to include Direction + steps and that's it. Some of which is internal state,
@@ -720,12 +767,14 @@ namespace Kingdom.Clockworks
         /// Increments the timerable clock given a number of <paramref name="steps"/> and <paramref name="type"/>.
         /// </summary>
         /// <param name="steps"></param>
+        /// <param name="millisecondsPerStep"> Represents the milliseconds per step.</param>
         /// <param name="type"></param>
-        public override void Increment(int steps, RequestType type = RequestType.Continuous)
+        public override void Increment(int steps, double millisecondsPerStep = OneSecondMilliseconds,
+            RequestType type = RequestType.Continuous)
         {
             lock (this)
             {
-                Next(GetNextRequest(CreateRequest(RunningDirection.Forward, steps, type)));
+                Next(CreateRequest(RunningDirection.Forward, millisecondsPerStep, steps, type));
             }
         }
 
@@ -733,12 +782,14 @@ namespace Kingdom.Clockworks
         /// Decrements the timerable clock given a number of <paramref name="steps"/> and <paramref name="type"/>.
         /// </summary>
         /// <param name="steps"></param>
+        /// <param name="millisecondsPerStep">Represents the milliseconds per step.</param>
         /// <param name="type"></param>
-        public override void Decrement(int steps, RequestType type = RequestType.Continuous)
+        public override void Decrement(int steps, double millisecondsPerStep = OneSecondMilliseconds,
+            RequestType type = RequestType.Continuous)
         {
             lock (this)
             {
-                Next(GetNextRequest(CreateRequest(RunningDirection.Backward, steps, type)));
+                Next(CreateRequest(RunningDirection.Backward, millisecondsPerStep, steps, type));
             }
         }
 
@@ -762,7 +813,10 @@ namespace Kingdom.Clockworks
                     _requests.Push(StartingRequest);
                 }
 
-                TimerIntervalTimeSpan = interval;
+                TimerIntervalQuantity = interval.TotalMilliseconds < 0d
+                    ? null
+                    : interval.TotalMilliseconds.ToTimeQuantity();
+
                 TryChangeTimer(interval, interval);
             }
         }
@@ -775,6 +829,8 @@ namespace Kingdom.Clockworks
             lock (this)
             {
                 const int period = Timeout.Infinite;
+
+                TimerIntervalQuantity = null;
 
                 TryChangeTimer(period, period);
 

@@ -58,6 +58,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Attributes\DurationValuesAttribute.cs" />
+    <Compile Include="Attributes\NullableTimePerStepValuesAttribute.cs" />
     <Compile Include="Attributes\TimePerStepUnitValuesAttribute.cs" />
     <Compile Include="Attributes\TimePerStepValuesAttribute.cs" />
     <Compile Include="Attributes\RequestTypeValuesAttribute.cs" />

@@ -75,8 +75,8 @@ namespace Kingdom.Clockworks.Timers
             {
                 //TODO: need to pick up the Timer Intervals: plus some understanding what to do with a "default" timer interval request
                 // The important moving parts are tucked away in their single areas of responsibility.
-                var candidateQuantity = MillisecondsPerStep.ToTimeQuantity(TimeUnit.Millisecond)
-                                        *IntervalRatio*request.Steps;
+                var candidateQuantity = request.GetIntervalCandidate(MillisecondsPerStep)
+                    .ToTimeQuantity(TimeUnit.Millisecond)*IntervalRatio*request.Steps;
 
                 // Constrain the Candidate quantity by the Balance between here and Starting.
                 var remainingQuantity = Math.Max(0d, (_targetQuantity - _elapsedQuantity)
@@ -112,7 +112,11 @@ namespace Kingdom.Clockworks.Timers
         /// </summary>
         protected override TimerRequest StartingRequest
         {
-            get { return new TimerRequest(RunningDirection.Forward, 1, RequestType.Continuous); }
+            get
+            {
+                return new TimerRequest(RunningDirection.Forward,
+                    MillisecondsPerStep, 1, RequestType.Continuous);
+            }
         }
 
         #endregion
@@ -139,13 +143,15 @@ namespace Kingdom.Clockworks.Timers
         /// <paramref name="steps"/>, and <paramref name="type"/>.
         /// </summary>
         /// <param name="direction"></param>
+        /// <param name="millisecondsPerStep"></param>
         /// <param name="steps"></param>
         /// <param name="type"></param>
         /// <returns></returns>
         protected override TimerRequest CreateRequest(RunningDirection? direction = null,
-            int steps = 1, RequestType type = RequestType.Continuous)
+            double millisecondsPerStep = OneSecondMilliseconds, int steps = One,
+            RequestType type = RequestType.Continuous)
         {
-            return new TimerRequest(direction, steps, type);
+            return new TimerRequest(direction, millisecondsPerStep, steps, type);
         }
 
         #endregion
@@ -182,7 +188,7 @@ namespace Kingdom.Clockworks.Timers
         /// <returns></returns>
         public static SimulationTimer operator +(SimulationTimer timer, int steps)
         {
-            timer.Increment(steps, RequestType.Instantaneous);
+            timer.Increment(steps, timer.MillisecondsPerStep, RequestType.Instantaneous);
             return timer;
         }
 
@@ -194,7 +200,7 @@ namespace Kingdom.Clockworks.Timers
         /// <returns></returns>
         public static SimulationTimer operator -(SimulationTimer timer, int steps)
         {
-            timer.Decrement(steps, RequestType.Instantaneous);
+            timer.Decrement(steps, timer.MillisecondsPerStep, RequestType.Instantaneous);
             return timer;
         }
 

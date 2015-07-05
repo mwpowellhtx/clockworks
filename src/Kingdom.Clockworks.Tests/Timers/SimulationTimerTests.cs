@@ -16,13 +16,15 @@ namespace Kingdom.Clockworks.Timers
         /// Returns a created <see cref="TimerRequest"/> given the arguments.
         /// </summary>
         /// <param name="direction"></param>
+        /// <param name="millisecondsPerStep"></param>
         /// <param name="steps"></param>
         /// <param name="type"></param>
         /// <returns></returns>
         protected override TimerRequest MakeRequest(RunningDirection? direction = null,
-            int steps = 1, RequestType type = RequestType.Instantaneous)
+            double millisecondsPerStep = OneSecondMilliseconds, int steps = One,
+            RequestType type = RequestType.Instantaneous)
         {
-            return new TimerRequest(direction, steps, type);
+            return new TimerRequest(direction, millisecondsPerStep, steps, type);
         }
 
         /// <summary>
@@ -48,10 +50,12 @@ namespace Kingdom.Clockworks.Timers
         /// </summary>
         /// <param name="theTimer"></param>
         /// <param name="intervalSecondsPerSecond"></param>
+        /// <param name="millisecondsPerStep"></param>
         protected override void InitializeStarNcrementClock(SimulationTimer theTimer,
-            double intervalSecondsPerSecond)
+            double intervalSecondsPerSecond, double millisecondsPerStep)
         {
-            base.InitializeStarNcrementClock(theTimer, intervalSecondsPerSecond);
+            base.InitializeStarNcrementClock(theTimer, intervalSecondsPerSecond,
+                millisecondsPerStep);
 
             // Remember to reset in terms of milliseconds.
             var intervalQuantity = intervalSecondsPerSecond.ToTimeQuantity()

@@ -6,9 +6,25 @@
     public abstract class TimeableRequestBase
     {
         /// <summary>
+        /// One: 1
+        /// </summary>
+        protected const int One = 1;
+
+        /// <summary>
+        /// OneSecondMilliseconds: 1000d
+        /// </summary>
+        /// <see cref="One"/>
+        protected const double OneSecondMilliseconds = One*1000d;
+
+        /// <summary>
         /// Gets the Direction.
         /// </summary>
         public RunningDirection? Direction { get; private set; }
+
+        /// <summary>
+        /// MillisecondsPerStep backing field.
+        /// </summary>
+        public readonly double MillisecondsPerStep;
 
         /// <summary>
         /// Steps backing field.
@@ -47,14 +63,17 @@
         /// Protected Constructor
         /// </summary>
         /// <param name="direction"></param>
+        /// <param name="millisecondsPerStep"></param>
         /// <param name="steps"></param>
         /// <param name="type"></param>
         protected TimeableRequestBase(
             RunningDirection? direction = null,
-            int steps = 1,
+            double millisecondsPerStep = 1000d,
+            int steps = One,
             RequestType type = RequestType.Instantaneous)
         {
             Direction = direction;
+            MillisecondsPerStep = millisecondsPerStep;
             _steps = steps;
             _type = type;
         }
@@ -90,6 +109,18 @@
         public bool WillNotRun
         {
             get { return !WillRun; }
+        }
+
+        /// <summary>
+        /// Returns the <paramref name="candidateMilliseconds"/>, optionally scaled by
+        /// <see cref="_millisecondsPerStep"/>.
+        /// </summary>
+        /// <param name="candidateMilliseconds"></param>
+        /// <returns></returns>
+        public double GetIntervalCandidate(double candidateMilliseconds)
+        {
+            //TODO: not multiplying by _millisecondsPerStep, but rather double? timerIntervalRatio ... when ready...
+            return candidateMilliseconds*1d;
         }
 
         #region Equatable Members

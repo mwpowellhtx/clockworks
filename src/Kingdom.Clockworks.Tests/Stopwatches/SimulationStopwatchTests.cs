@@ -21,13 +21,15 @@ namespace Kingdom.Clockworks.Stopwatches
         /// Returns a created <see cref="StopwatchRequest"/> given the arguments.
         /// </summary>
         /// <param name="direction"></param>
+        /// <param name="millisecondsPerStep"></param>
         /// <param name="steps"></param>
         /// <param name="type"></param>
         /// <returns></returns>
         protected override StopwatchRequest MakeRequest(RunningDirection? direction = null,
-            int steps = 1, RequestType type = RequestType.Instantaneous)
+            double millisecondsPerStep = OneSecondMilliseconds, int steps = One,
+            RequestType type = RequestType.Instantaneous)
         {
-            return new StopwatchRequest(direction, steps, type);
+            return new StopwatchRequest(direction, millisecondsPerStep, steps, type);
         }
 
         //TODO: may capture these items into a SimulationStopwatchFiture of sorts...
