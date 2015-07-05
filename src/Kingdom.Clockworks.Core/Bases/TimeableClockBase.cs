@@ -15,11 +15,18 @@ namespace Kingdom.Clockworks
             , IStartableClock
             , ISteppableClock
     {
+        private static double VerifyPositive(double value)
+        {
+            if (value >= 0d) return value;
+            throw new ArgumentException(@"value must be positive", @"value");
+        }
+
         /// <summary>
         /// Protected Constructor
         /// </summary>
         protected TimeableClockBase()
         {
+            SecondsPerStep = 1d;
             IntervalRatio = 1d;
 
             const int defaultPeriod = Timeout.Infinite;
@@ -69,10 +76,19 @@ namespace Kingdom.Clockworks
         }
 
         /// <summary>
+        /// IntervalRatio backing field.
+        /// </summary>
+        private double _intervalRatio;
+
+        /// <summary>
         /// Represents the intenral interval ratio. This is always in terms of seconds per second.
         /// </summary>
         /// <see cref="SecondsPerSecond"/>
-        protected double IntervalRatio { get; private set; }
+        protected double IntervalRatio
+        {
+            get { lock (this) return _intervalRatio; }
+            private set { lock (this) _intervalRatio = VerifyPositive(value); }
+        }
 
         #endregion
 
@@ -350,6 +366,71 @@ namespace Kingdom.Clockworks
         #endregion
 
         #region Steppable Clock Members
+
+        #region Per Step Members
+
+        /// <summary>
+        /// TimePerStep backing field.
+        /// </summary>
+        private double _secondsPerStep;
+
+        /// <summary>
+        /// Returns the <see cref="SecondsPerStep"/> in terms of the <paramref name="unit"/>.
+        /// </summary>
+        /// <param name="unit"></param>
+        /// <returns></returns>
+        private double GetTimePerStep(TimeUnit unit)
+        {
+            lock (this) return SecondsPerStep.ToTimeQuantity().ToTimeQuantity(unit).Value;
+        }
+
+        /// <summary>
+        /// Sets the <see cref="SecondsPerStep"/> in terms of the <paramref name="unit"/>.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="unit"></param>
+        private void SetTimePerStep(double value, TimeUnit unit)
+        {
+            lock (this) SecondsPerStep = value.ToTimeQuantity(unit).ToTimeQuantity().Value;
+        }
+
+        /// <summary>
+        /// Gets or sets the Milliseconds per Step.
+        /// </summary>
+        public double MillisecondsPerStep
+        {
+            get { return GetTimePerStep(TimeUnit.Millisecond); }
+            set { SetTimePerStep(value, TimeUnit.Millisecond); }
+        }
+
+        /// <summary>
+        /// Gets or sets the Seconds per Step.
+        /// </summary>
+        public double SecondsPerStep
+        {
+            get { lock (this) return _secondsPerStep; }
+            set { lock (this) _secondsPerStep = VerifyPositive(value); }
+        }
+
+        /// <summary>
+        /// Gets or sets the Minutes per Step.
+        /// </summary>
+        public double MinutesPerStep
+        {
+            get { return GetTimePerStep(TimeUnit.Minute); }
+            set { SetTimePerStep(value, TimeUnit.Minute); }
+        }
+
+        /// <summary>
+        /// Gets or sets the Hours per Step.
+        /// </summary>
+        public double HoursPerStep
+        {
+            get { return GetTimePerStep(TimeUnit.Hour); }
+            set { SetTimePerStep(value, TimeUnit.Hour); }
+        }
+
+        #endregion
 
         /* TODO: TBD: increment/decrement? Direction? continuous/latching? or leave the previous state alone?
          * "Next" almost needs to include Direction + steps and that's it. Some of which is internal state,

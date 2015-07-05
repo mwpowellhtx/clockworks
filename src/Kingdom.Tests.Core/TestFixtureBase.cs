@@ -90,5 +90,31 @@ namespace Kingdom
             verify(obj);
             return obj;
         }
+
+        //TODO: this might go well as an NUnit extensions...
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="exception"></param>
+        /// <param name="maxLevel"></param>
+        /// <param name="includeInner"></param>
+        /// <returns></returns>
+        public static bool WasException<T>(this Exception exception, int maxLevel = 1, bool includeInner = false)
+            where T : Exception
+        {
+            for (var currentLevel = 0; currentLevel < maxLevel; currentLevel++)
+            {
+                if (exception == null) return false;
+
+                if (exception is T) return true;
+
+                if (!includeInner) break;
+
+                exception = exception.InnerException;
+            }
+
+            return false;
+        }
     }
 }

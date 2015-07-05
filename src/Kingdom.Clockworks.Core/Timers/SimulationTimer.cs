@@ -73,9 +73,10 @@ namespace Kingdom.Clockworks.Timers
         {
             lock (this)
             {
+                //TODO: need to pick up the Timer Intervals: plus some understanding what to do with a "default" timer interval request
                 // The important moving parts are tucked away in their single areas of responsibility.
-                var candidateQuantity = IntervalRatio.ToTimeQuantity()
-                    .ToTimeQuantity(TimeUnit.Millisecond)*request.Steps;
+                var candidateQuantity = MillisecondsPerStep.ToTimeQuantity(TimeUnit.Millisecond)
+                                        *IntervalRatio*request.Steps;
 
                 // Constrain the Candidate quantity by the Balance between here and Starting.
                 var remainingQuantity = Math.Max(0d, (_targetQuantity - _elapsedQuantity)

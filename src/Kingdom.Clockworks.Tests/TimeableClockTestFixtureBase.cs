@@ -200,6 +200,144 @@ namespace Kingdom.Clockworks
             Assert.That(actualValue, Is.EqualTo(expectedValue).Within(Epsilon));
         }
 
+        #region Per Step Members
+
+        /// <summary>
+        /// Returns the <see cref="PropertyInfo"></see> corresponding with
+        /// <typeparamref name="TClock"/> and <paramref name="unit"/>. <paramref name="desiredFlags"/>
+        /// may be whatever you need it to be, but for best results I suggest
+        /// <see cref="BindingFlags.GetProperty"/> or <see cref="BindingFlags.SetProperty"/>.
+        /// </summary>
+        /// <param name="unit"></param>
+        /// <param name="desiredFlags"></param>
+        /// <returns></returns>
+        private static PropertyInfo GetTimePerStepProperty(TimeUnit unit, BindingFlags desiredFlags)
+        {
+            Assert.That((int) desiredFlags, Is.GreaterThan(0));
+            var flags = desiredFlags | BindingFlags.Public | BindingFlags.Instance;
+
+            var name = string.Format(@"{0}sPerStep", unit);
+            var clockType = typeof (TClock);
+
+            var property = clockType.GetProperty(name, flags);
+            Assert.That(property, Is.Not.Null);
+
+            return property;
+        }
+
+        /// <summary>
+        /// Sets the TimePerStep given <paramref name="theClock"/>,
+        /// a <paramref name="value"/>, and desired <paramref name="unit"/>.
+        /// </summary>
+        /// <param name="theClock"></param>
+        /// <param name="value"></param>
+        /// <param name="unit"></param>
+        private static void SetTimePerStep(ISteppableClock theClock, double value, TimeUnit unit)
+        {
+            var property = GetTimePerStepProperty(unit, BindingFlags.SetProperty);
+            TestDelegate setter = () => property.SetValue(theClock, value);
+            Assert.That(setter, Throws.Nothing);
+        }
+
+        /// <summary>
+        /// Sets the TimePerStep given <paramref name="theClock"/>,
+        /// a <paramref name="value"/>, and desired <paramref name="unit"/>.
+        /// </summary>
+        /// <param name="theClock"></param>
+        /// <param name="value"></param>
+        /// <param name="unit"></param>
+        private static void SetTimePerStep<TException>(TClock theClock, double value, TimeUnit unit)
+            where TException : Exception
+        {
+            PropertyInfo property = null;
+            TestDelegate getter = () => property = GetTimePerStepProperty(unit, BindingFlags.SetProperty);
+            Assert.That(getter, Throws.Nothing);
+
+            try
+            {
+                property.SetValue(theClock, value);
+            }
+            catch (Exception ex)
+            {
+                Assert.That(ex.WasException<TException>(2, true));
+            }
+        }
+
+        /// <summary>
+        /// Returns the <paramref name="theClock"/> PerStep <paramref name="unit"/>.
+        /// </summary>
+        /// <param name="theClock"></param>
+        /// <param name="unit"></param>
+        /// <returns></returns>
+        private static double GetTimePerStep(TClock theClock, TimeUnit unit)
+        {
+            var property = GetTimePerStepProperty(unit, BindingFlags.GetProperty);
+
+            double? result = null;
+
+            TestDelegate getter = () =>
+            {
+                var value = property.GetValue(theClock);
+                Assert.That(value, Is.Not.Null);
+                Assert.That(value, Is.InstanceOf<double>());
+                result = (double) value;
+            };
+
+            Assert.That(getter, Throws.Nothing);
+
+            // ReSharper disable once PossibleInvalidOperationException
+            return result.Value;
+        }
+
+        /// <summary>
+        /// Test that setting and getting <see cref="TimeableClockBase.SecondsPerStep"/>
+        /// or one of its friends occurs consistently.
+        /// </summary>
+        /// <param name="timePerStep">The value to attempt to set in terms of the <paramref name="setUnit"/>.</param>
+        /// <param name="setUnit">The unit to use in the setter.</param>
+        /// <param name="getUnit">The unit to use in the getter.</param>
+        /// <see cref="TimeQuantity"></see>
+        [Test]
+        [Combinatorial]
+        public void Clock_set_time_per_step_is_gotten_consistently(
+            [TimePerStepValues] double timePerStep,
+            [TimePerStepUnitValues] TimeUnit setUnit,
+            [TimePerStepUnitValues] TimeUnit getUnit)
+        {
+            var expectedTimePerStep = timePerStep.ToTimeQuantity(setUnit).ToTimeQuantity(getUnit).Value;
+
+            RunClockScenario(clock =>
+            {
+                SetTimePerStep(clock, timePerStep, setUnit);
+                var actualTimePerStep = GetTimePerStep(clock, getUnit);
+                Assert.That(actualTimePerStep, Is.EqualTo(expectedTimePerStep).Within(Epsilon));
+            });
+        }
+
+        /// <summary>
+        /// Setting <see cref="TimeableClockBase.SecondsPerStep"/> or one of its friends to a
+        /// negative value should throw an <see cref="ArgumentException"/>.
+        /// </summary>
+        /// <param name="timePerStep">May be positive or negative. The test will ensure that a negative version of itself is used.</param>
+        /// <param name="setUnit">The unit to use in the setter.</param>
+        [Test]
+        [Combinatorial]
+        public void Clock_negative_time_per_step_throws_argument_ex(
+            [TimePerStepValues] double timePerStep,
+            [TimePerStepUnitValues] TimeUnit setUnit)
+        {
+            RunClockScenario(clock =>
+            {
+                // Yes this is intentionally negative.
+                var value = -Math.Abs(timePerStep);
+
+                // Should reject with an ArgumentException.
+                SetTimePerStep<ArgumentException>(clock, value, setUnit);
+            });
+        }
+
+        #endregion
+
         /// <summary>
         /// 
         /// </summary>
@@ -208,7 +346,7 @@ namespace Kingdom.Clockworks
         /// <param name="denominatorUnit"></param>
         [Test]
         [Combinatorial]
-        public void Stopwatch_interval_unit_ratios_are_consistent(
+        public void Clock_interval_unit_ratios_are_consistent(
             [TimeQuantityValues] double intervalSecondsPerSecond,
             [TimeUnitValues] TimeUnit numeratorUnit,
             [TimeUnitValues] TimeUnit denominatorUnit)

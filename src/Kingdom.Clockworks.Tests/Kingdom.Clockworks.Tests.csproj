@@ -58,6 +58,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Attributes\DurationValuesAttribute.cs" />
+    <Compile Include="Attributes\TimePerStepUnitValuesAttribute.cs" />
+    <Compile Include="Attributes\TimePerStepValuesAttribute.cs" />
     <Compile Include="Attributes\RequestTypeValuesAttribute.cs" />
     <Compile Include="Attributes\RunningDirectionValuesAttribute.cs" />
     <Compile Include="Attributes\StepValuesAttribute.cs" />

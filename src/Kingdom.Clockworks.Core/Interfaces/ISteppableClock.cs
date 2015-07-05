@@ -5,6 +5,30 @@
     /// </summary>
     public interface ISteppableClock
     {
+        #region Per Step Members
+
+        /// <summary>
+        /// Gets or sets the Milliseconds per Step.
+        /// </summary>
+        double MillisecondsPerStep { get; set; }
+
+        /// <summary>
+        /// Gets or sets the Seconds per Step.
+        /// </summary>
+        double SecondsPerStep { get; set; }
+
+        /// <summary>
+        /// Gets or sets the Minutes per Step.
+        /// </summary>
+        double MinutesPerStep { get; set; }
+
+        /// <summary>
+        /// Gets or sets the Hours per Step.
+        /// </summary>
+        double HoursPerStep { get; set; }
+
+        #endregion
+
         /// <summary>
         /// Increments the timeable clock by one <see cref="RequestType.Instantaneous"/> step.
         /// </summary>

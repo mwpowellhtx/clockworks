@@ -56,9 +56,10 @@ namespace Kingdom.Clockworks.Stopwatches
         /// <returns></returns>
         protected override StopwatchElapsedEventArgs GetNextEventArgs(StopwatchRequest request)
         {
+            //TODO: need to pick up the Timer Intervals: plus some understanding what to do with a "default" timer interval request
             // The important moving parts are tucked away in their single areas of responsibility.
-            var currentQuantity = IntervalRatio.ToTimeQuantity()
-                .ToTimeQuantity(TimeUnit.Millisecond)*request.Steps;
+            var currentQuantity = MillisecondsPerStep.ToTimeQuantity(TimeUnit.Millisecond)
+                                  *IntervalRatio*request.Steps;
 
             var current = TimeSpan.FromMilliseconds(currentQuantity.Value);
 
