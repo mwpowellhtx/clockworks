@@ -1,16 +1,15 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Kingdom.Unitworks;
 using NUnit.Framework;
 
-namespace Kingdom.Clockworks.Units
+namespace Kingdom.Unitworks.Units
 {
     /// <summary>
     /// This is a key fixture. If these tests fail to work correctly then ther rest
     /// of the time components really do not matter that much.
     /// </summary>
-    public class TimeConverterTests : ClockworksTestFixtureBase 
+    public class TimeConverterTests : UnitsTestFixtureBase 
     {
         /// <summary>
         /// Runs a <see cref="TimeConverter"/> <paramref name="scenario"/>.

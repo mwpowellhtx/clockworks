@@ -1,6 +1,5 @@
-using Kingdom.Unitworks;
 
-namespace Kingdom.Clockworks.Units
+namespace Kingdom.Unitworks.Units
 {
     /// <summary>
     /// Derives from the base <see cref="TimeQuantity"/> for test purposes.

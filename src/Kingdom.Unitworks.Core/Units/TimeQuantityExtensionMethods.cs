@@ -1,4 +1,4 @@
-﻿namespace Kingdom.Clockworks.Units
+﻿namespace Kingdom.Unitworks.Units
 {
     /// <summary>
     /// Time quantity extension methods.

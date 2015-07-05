@@ -1,6 +1,4 @@
-﻿using Kingdom.Unitworks;
-
-namespace Kingdom.Clockworks.Units
+﻿namespace Kingdom.Unitworks.Units
 {
     /// <summary>
     /// 

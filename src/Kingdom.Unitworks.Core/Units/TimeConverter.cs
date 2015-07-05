@@ -1,8 +1,7 @@
 using System;
 using System.Linq;
-using Kingdom.Unitworks;
 
-namespace Kingdom.Clockworks.Units
+namespace Kingdom.Unitworks.Units
 {
     /// <summary>
     /// Represents a time units converter.

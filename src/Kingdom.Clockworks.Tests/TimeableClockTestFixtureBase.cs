@@ -2,7 +2,8 @@ using System;
 using System.Reactive.Linq;
 using System.Reflection;
 using System.Threading;
-using Kingdom.Clockworks.Units;
+using Kingdom.Unitworks;
+using Kingdom.Unitworks.Units;
 using NUnit.Framework;
 
 namespace Kingdom.Clockworks

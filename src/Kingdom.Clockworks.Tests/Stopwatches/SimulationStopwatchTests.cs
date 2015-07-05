@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Kingdom.Clockworks.Units;
+using Kingdom.Unitworks;
+using Kingdom.Unitworks.Units;
 using NUnit.Framework;
 
 namespace Kingdom.Clockworks.Stopwatches

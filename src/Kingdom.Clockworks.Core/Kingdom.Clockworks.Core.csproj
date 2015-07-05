@@ -65,10 +65,6 @@
     <Compile Include="Timers\SimulationTimer.cs" />
     <Compile Include="Timers\TimerElapsedEventArgs.cs" />
     <Compile Include="Timers\TimerRequest.cs" />
-    <Compile Include="Units\TimeConverter.cs" />
-    <Compile Include="Units\TimeQuantity.cs" />
-    <Compile Include="Units\TimeQuantityExtensionMethods.cs" />
-    <Compile Include="Units\TimeUnit.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Kingdom.Clockworks.Core.nuspec" />

@@ -1,7 +1,6 @@
 ﻿using System;
-using Kingdom.Unitworks;
 
-namespace Kingdom.Clockworks.Units
+namespace Kingdom.Unitworks.Units
 {
     /// <summary>
     /// Represents a quantity in the dimension of time.

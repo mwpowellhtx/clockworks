@@ -1,13 +1,27 @@
 ﻿using System;
 using NUnit.Framework;
 
-namespace Kingdom.Clockworks.Units
+namespace Kingdom.Unitworks.Units
 {
     /// <summary>
     /// Time quantity test fixture.
     /// </summary>
-    public class TimeQuantityTests : ClockworksTestFixtureBase
+    public class TimeQuantityTests : UnitsTestFixtureBase
     {
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="TA"></typeparam>
+        /// <typeparam name="TB"></typeparam>
+        /// <param name="a"></param>
+        /// <param name="b"></param>
+        /// <param name="scenario"></param>
+        private void RunQuantityScenario<TA, TB>(TA a, TB b, Action<TA, TB> scenario)
+        {
+            Assert.That(scenario, Is.Not.Null);
+            scenario(a, b);
+        }
+
         /// <summary>
         /// Tests that the <see cref="TimeQuantity"/> unit converter has been initialized correctly.
         /// </summary>

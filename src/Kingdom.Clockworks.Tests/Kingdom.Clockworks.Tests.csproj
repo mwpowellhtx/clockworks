@@ -65,13 +65,10 @@
     <Compile Include="Attributes\TimerIntervalValuesAttribute.cs" />
     <Compile Include="Timers\SimulationTimerTests.cs" />
     <Compile Include="TimeableClockTestFixtureBase.cs" />
-    <Compile Include="Units\TimeConverterTests.cs" />
     <Compile Include="SystemClockFixture.cs" />
     <Compile Include="SystemClockInstanceTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ClockworksTestFixtureBase.cs" />
-    <Compile Include="Units\TimeQuantityFixture.cs" />
-    <Compile Include="Units\TimeQuantityTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -88,6 +85,10 @@
     <ProjectReference Include="..\Kingdom.Unitworks.Core\Kingdom.Unitworks.Core.csproj">
       <Project>{896580BE-A134-4512-8B3B-6287A560ADB1}</Project>
       <Name>Kingdom.Unitworks.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Kingdom.Unitworks.Tests\Kingdom.Unitworks.Tests.csproj">
+      <Project>{074D109A-E0AC-466A-89A9-5B8133CDBC05}</Project>
+      <Name>Kingdom.Unitworks.Tests</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
