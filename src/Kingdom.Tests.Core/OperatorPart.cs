@@ -1,5 +1,12 @@
-﻿namespace Kingdom
+﻿using System.Collections.Generic;
+using System.Linq;
+using NUnit.Framework;
+
+namespace Kingdom
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public enum OperatorPart
     {
         /// <summary>
@@ -31,7 +38,7 @@
         /// <summary>
         /// 
         /// </summary>
-        Multiplication,
+        Multiply,
 
         /// <summary>
         /// 
@@ -51,12 +58,12 @@
         /// <summary>
         /// 
         /// </summary>
-        GreaterThanOrEqualTo,
+        GreaterThanOrEqual,
 
         /// <summary>
         /// 
         /// </summary>
-        LessThanOrEqualTo,
+        LessThanOrEqual,
 
         /// <summary>
         /// 
@@ -67,5 +74,26 @@
         /// 
         /// </summary>
         Inequality,
+    }
+
+    /// <summary>
+    /// <see cref="OperatorPart"/> extension methods.
+    /// </summary>
+    public static class OperatorPartExtensionMethods
+    {
+        /// <summary>
+        /// Returns the member name from the <paramref name="parts"/>.
+        /// </summary>
+        /// <param name="parts"></param>
+        /// <returns></returns>
+        public static string GetMemberName(this IEnumerable<OperatorPart> parts)
+        {
+            Assert.That(parts, Is.Not.Null);
+            // ReSharper disable PossibleMultipleEnumeration
+            {
+                CollectionAssert.IsNotEmpty(parts);
+                return parts.Aggregate(@"op_", (g, x) => g + x.ToString());
+            }
+        }
     }
 }

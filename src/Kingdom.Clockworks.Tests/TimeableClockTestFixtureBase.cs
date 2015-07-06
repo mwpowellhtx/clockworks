@@ -609,7 +609,7 @@ namespace Kingdom.Clockworks
             var request = MakeRequest(RunningDirection.Forward, millisecondsPerStep);
 
             MakeSureStarNcrementCorrect(intervalSecondsPerSecond, millisecondsPerStep, request,
-                c => InvokeOperator(c, parts, x => PostOperatorInvocation(x as TClock, c), c));
+                c => InvokeOperator<TClock, TClock>(parts, x => PostOperatorInvocation(x as TClock, c), c));
         }
 
         /// <summary>
@@ -677,8 +677,8 @@ namespace Kingdom.Clockworks
             var parts = new[] {OperatorPart.Decrement};
             var request = MakeRequest(RunningDirection.Backward, millisecondsPerStep);
 
-            MakeSureStarNcrementCorrect(intervalSecondsPerSecond, millisecondsPerStep,
-                request, c => InvokeOperator(c, parts, x => PostOperatorInvocation(x as TClock, c), c));
+            MakeSureStarNcrementCorrect(intervalSecondsPerSecond, millisecondsPerStep, request,
+                c => InvokeOperator<TClock, TClock>(parts, x => PostOperatorInvocation(x as TClock, c), c));
         }
 
         /// <summary>
@@ -748,7 +748,7 @@ namespace Kingdom.Clockworks
             var parts = new[] {OperatorPart.Addition};
             var request = MakeRequest(RunningDirection.Forward, millisecondsPerStep, steps);
             MakeSureStarNcrementCorrect(intervalSecondsPerSecond, millisecondsPerStep, request,
-                c => InvokeOperator(c, parts, x => PostOperatorInvocation(x as TClock, c), c, steps));
+                c => InvokeOperator<TClock, TClock>(parts, x => PostOperatorInvocation(x as TClock, c), c, steps));
         }
 
         /// <summary>
@@ -799,7 +799,7 @@ namespace Kingdom.Clockworks
             var request = MakeRequest(RunningDirection.Backward, millisecondsPerStep, steps);
 
             MakeSureStarNcrementCorrect(intervalSecondsPerSecond, millisecondsPerStep, request,
-                c => InvokeOperator(c, parts, x => PostOperatorInvocation(x as TClock, c), c, steps));
+                c => InvokeOperator<TClock, TClock>(parts, x => PostOperatorInvocation(x as TClock, c), c, steps));
         }
 
         /// <summary>

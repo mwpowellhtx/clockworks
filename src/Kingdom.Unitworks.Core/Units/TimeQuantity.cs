@@ -134,12 +134,16 @@ namespace Kingdom.Unitworks.Units
             return new TimeQuantity(a.Unit, factor*a.Value);
         }
 
+        //TODO: in and of itself, not worth repackaging Clockworks; however, these sorts of "patches" might be a sufficient reason to capture "Unitworks" as a separate package apart from Clockworks: just need to be careful to capture the proper reference/versions
         /// <summary>
         /// Division operator overload.
         /// </summary>
         /// <param name="a"></param>
         /// <param name="b"></param>
         /// <returns></returns>
+        /// <a href="!:http://en.wikipedia.org/wiki/IEEE_floating_point">IEEE floating point</a>
+        /// <a href="!:http://msdn.microsoft.com/en-us/library/system.double.negativeinfinity.aspx">System.Double.NegativeInfinity</a>
+        /// <a href="!:http://msdn.microsoft.com/en-us/library/system.double.positiveinfinity.aspx">System.Double.PositiveInfinity</a>
         public static double operator /(TimeQuantity a, TimeQuantity b)
         {
             var aPart = Converter.Convert(a.Value, a.Unit, BaseUnit);
@@ -149,7 +153,7 @@ namespace Kingdom.Unitworks.Units
 
         #endregion
 
-        #region Logical Operator Overloads
+        #region Relational Operator Overloads
 
         /// <summary>
         /// Equality operator overload.
