@@ -1,4 +1,6 @@
-﻿namespace Kingdom.Unitworks.Units
+﻿using System;
+
+namespace Kingdom.Unitworks.Units
 {
     /// <summary>
     /// Time quantity extension methods.
@@ -38,6 +40,28 @@
             result.Unit = unit.Value;
 
             return result;
+        }
+
+        /// <summary>
+        /// Returns a <see cref="TimeSpan"/> corresponding to the <paramref name="quantity"/> and <paramref name="unit"/>.
+        /// </summary>
+        /// <param name="quantity"></param>
+        /// <param name="unit"></param>
+        /// <returns></returns>
+        public static TimeSpan ToTimeSpan(this TimeQuantity quantity, TimeUnit unit = TimeUnit.Millisecond)
+        {
+            return TimeSpan.FromMilliseconds(quantity.ToTimeQuantity(unit).Value);
+        }
+
+        /// <summary>
+        /// Returns a <see cref="TimeQuantity"/> corresponding to the <paramref name="timeSpan"/> in the desired <paramref name="unit"/>.
+        /// </summary>
+        /// <param name="timeSpan"></param>
+        /// <param name="unit"></param>
+        /// <returns></returns>
+        public static TimeQuantity ToTimeQuantity(this TimeSpan timeSpan, TimeUnit unit = TimeUnit.Millisecond)
+        {
+            return timeSpan.TotalMilliseconds.ToTimeQuantity(TimeUnit.Millisecond).ToTimeQuantity(unit);
         }
     }
 }
