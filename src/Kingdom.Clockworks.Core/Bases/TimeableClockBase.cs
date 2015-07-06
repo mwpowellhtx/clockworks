@@ -797,6 +797,7 @@ namespace Kingdom.Clockworks
 
         #region Startable Clock Members
 
+        //TODO: thin-ify the "start/stop" interface especially as relates to TimerIntervalQuantity
         /// <summary>
         /// Starts the timeable clock timer running with specified <paramref name="interval"/>.
         /// </summary>
@@ -805,9 +806,7 @@ namespace Kingdom.Clockworks
         {
             lock (this)
             {
-                var request = GetNextRequest();
-
-                if (request.WillNotRun)
+                if (GetNextRequest().WillNotRun)
                 {
                     _requests.Clear();
                     _requests.Push(StartingRequest);
