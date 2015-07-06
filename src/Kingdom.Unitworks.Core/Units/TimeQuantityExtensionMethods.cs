@@ -43,14 +43,13 @@ namespace Kingdom.Unitworks.Units
         }
 
         /// <summary>
-        /// Returns a <see cref="TimeSpan"/> corresponding to the <paramref name="quantity"/> and <paramref name="unit"/>.
+        /// Returns a <see cref="TimeSpan"/> corresponding to the <paramref name="quantity"/>.
         /// </summary>
         /// <param name="quantity"></param>
-        /// <param name="unit"></param>
         /// <returns></returns>
-        public static TimeSpan ToTimeSpan(this TimeQuantity quantity, TimeUnit unit = TimeUnit.Millisecond)
+        public static TimeSpan ToTimeSpan(this TimeQuantity quantity)
         {
-            return TimeSpan.FromMilliseconds(quantity.ToTimeQuantity(unit).Value);
+            return TimeSpan.FromMilliseconds(quantity.ToTimeQuantity(TimeUnit.Millisecond).Value);
         }
 
         /// <summary>

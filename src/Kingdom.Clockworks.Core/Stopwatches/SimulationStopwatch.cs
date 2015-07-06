@@ -67,11 +67,10 @@ namespace Kingdom.Clockworks.Stopwatches
             var currentQuantity = request.GetIntervalCandidate(MillisecondsPerStep)
                 .ToTimeQuantity(TimeUnit.Millisecond)*IntervalRatio*request.Steps;
 
-            var current = TimeSpan.FromMilliseconds(currentQuantity.Value);
+            _elapsed += TimeSpan.FromMilliseconds(currentQuantity.Value);
 
             return new StopwatchElapsedEventArgs(request,
-                _elapsedQuantity += currentQuantity, _elapsed += current,
-                currentQuantity, current);
+                _elapsedQuantity += currentQuantity, currentQuantity);
         }
 
         #endregion

@@ -23,47 +23,6 @@ namespace Kingdom.Clockworks.Timers
         #region Internal Timer Concerns
 
         /// <summary>
-        /// Returns a <see cref="TimeSpan"/> factory.
-        /// </summary>
-        /// <param name="unit"></param>
-        /// <returns></returns>
-        private static Func<double, TimeSpan> GetTimeSpanFactory(TimeUnit unit)
-        {
-            switch (unit)
-            {
-                case TimeUnit.Day:
-                    return TimeSpan.FromDays;
-
-                case TimeUnit.Hour:
-                    return TimeSpan.FromHours;
-
-                case TimeUnit.Minute:
-                    return TimeSpan.FromMinutes;
-
-                case TimeUnit.Second:
-                    return TimeSpan.FromSeconds;
-
-                case TimeUnit.Millisecond:
-                    return TimeSpan.FromMilliseconds;
-            }
-
-            // Which indeed quantities such as "Weeks" are definitely unsupported...
-            throw new InvalidOperationException(
-                string.Format(@"Unsupported time unit {0}", unit));
-        }
-
-        /// <summary>
-        /// Gets the remaining <see cref="TimeSpan"/> given a <paramref name="quantity"/>.
-        /// </summary>
-        /// <param name="quantity"></param>
-        /// <returns></returns>
-        private static TimeSpan GetTimeSpan(TimeQuantity quantity)
-        {
-            var factory = GetTimeSpanFactory(quantity.Unit);
-            return factory(quantity.Value);
-        }
-
-        /// <summary>
         /// Returns an event args to substantiate the next raised
         /// <see cref="TimeableClockBase{TRequest,TElapsedEventArgs}.Elapsed"/> event.
         /// </summary>
@@ -86,16 +45,13 @@ namespace Kingdom.Clockworks.Timers
                 var currentQuantity = Math.Min(candidateQuantity.Value, remainingQuantity.Value)
                     .ToTimeQuantity(TimeUnit.Millisecond);
 
-                var current = TimeSpan.FromMilliseconds(currentQuantity.Value);
+                _elapsed += TimeSpan.FromMilliseconds(currentQuantity.Value);
 
                 // Disengate the timer from running if exceeding the Starting spec.
                 if (_elapsedQuantity + currentQuantity >= _targetQuantity) Stop();
 
-                return new TimerElapsedEventArgs(request,
-                    _elapsedQuantity += currentQuantity, _elapsed += current,
-                    currentQuantity, current,
-                    _targetQuantity, GetTimeSpan(_targetQuantity),
-                    remainingQuantity, GetTimeSpan(remainingQuantity));
+                return new TimerElapsedEventArgs(request, _elapsedQuantity += currentQuantity,
+                    currentQuantity, _targetQuantity, remainingQuantity);
             }
         }
 

@@ -17,9 +17,17 @@ namespace Kingdom.Clockworks
         public readonly TRequest Request;
 
         /// <summary>
+        /// Elapsed backing field.
+        /// </summary>
+        private TimeSpan? _elapsed;
+
+        /// <summary>
         /// Gets the Elapsed <see cref="TimeSpan"/>.
         /// </summary>
-        public readonly TimeSpan Elapsed;
+        public TimeSpan Elapsed
+        {
+            get { return (_elapsed ?? (_elapsed = ElapsedQuantity.ToTimeSpan())).Value; }
+        }
 
         /// <summary>
         /// Gets the ElapsedQuantity.
@@ -27,9 +35,17 @@ namespace Kingdom.Clockworks
         public readonly TimeQuantity ElapsedQuantity;
 
         /// <summary>
+        /// Current backing field.
+        /// </summary>
+        private TimeSpan? _current;
+
+        /// <summary>
         /// Gets the CurrentElapsed <see cref="TimeSpan"/>.
         /// </summary>
-        public readonly TimeSpan Current;
+        public TimeSpan Current
+        {
+            get { return (_current ?? (_current = CurrentQuantity.ToTimeSpan())).Value; }
+        }
 
         /// <summary>
         /// Gets the IntervalQuantity.
@@ -41,18 +57,13 @@ namespace Kingdom.Clockworks
         /// </summary>
         /// <param name="request"></param>
         /// <param name="elapsedQuantity"></param>
-        /// <param name="elapsed"></param>
         /// <param name="currentQuantity"></param>
-        /// <param name="current"></param>
         protected ElapsedEventArgsBase(TRequest request,
-            TimeQuantity elapsedQuantity, TimeSpan elapsed,
-            TimeQuantity currentQuantity, TimeSpan current)
+            TimeQuantity elapsedQuantity, TimeQuantity currentQuantity)
         {
             Request = request;
             ElapsedQuantity = elapsedQuantity;
-            Elapsed = elapsed;
             CurrentQuantity = currentQuantity;
-            Current = current;
         }
     }
 }
