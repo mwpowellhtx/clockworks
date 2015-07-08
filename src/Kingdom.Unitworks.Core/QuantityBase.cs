@@ -6,7 +6,7 @@ namespace Kingdom.Unitworks
     /// Represents a dimensionless <typeparamref name="TValue"/>.
     /// </summary>
     /// <typeparam name="TValue"></typeparam>
-    public abstract class QuantityBase<TValue>
+    public abstract class QuantityBase<TValue> : ICloneable
     {
         /// <summary>
         /// Gets or sets the Value.
@@ -47,6 +47,16 @@ namespace Kingdom.Unitworks
         {
             return string.Format(@"{0}", Value);
         }
+
+        #region Cloneable Members
+
+        /// <summary>
+        /// Returns a Clone of this object.
+        /// </summary>
+        /// <returns></returns>
+        public abstract object Clone();
+
+        #endregion
     }
 
     /// <summary>

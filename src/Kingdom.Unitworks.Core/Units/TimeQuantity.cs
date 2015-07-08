@@ -6,7 +6,7 @@ namespace Kingdom.Unitworks.Units
     /// <summary>
     /// Represents a quantity in the dimension of time.
     /// </summary>
-    public class TimeQuantity : QuantityBase<TimeUnit, double>, ICloneable
+    public class TimeQuantity : QuantityBase<TimeUnit, double>
     {
         /// <summary>
         /// Gets the BaseUnit, which all calculations wlil be expressed in terms of.
@@ -245,7 +245,7 @@ namespace Kingdom.Unitworks.Units
         /// Returns a Clone of this object.
         /// </summary>
         /// <returns></returns>
-        public object Clone()
+        public override object Clone()
         {
             return new TimeQuantity(Unit, Value);
         }
