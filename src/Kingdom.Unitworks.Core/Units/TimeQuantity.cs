@@ -6,7 +6,7 @@ namespace Kingdom.Unitworks.Units
     /// <summary>
     /// Represents a quantity in the dimension of time.
     /// </summary>
-    public class TimeQuantity : QuantityBase<TimeUnit, double>
+    public class TimeQuantity : QuantityBase<TimeUnit, double>, ICloneable
     {
         /// <summary>
         /// Gets the BaseUnit, which all calculations wlil be expressed in terms of.
@@ -235,6 +235,19 @@ namespace Kingdom.Unitworks.Units
         {
             if (ReferenceEquals(a, null) || ReferenceEquals(b, null)) return false;
             return a.ToTimeQuantity().Value <= b.ToTimeQuantity().Value;
+        }
+
+        #endregion
+
+        #region Cloneable Members
+
+        /// <summary>
+        /// Returns a Clone of this object.
+        /// </summary>
+        /// <returns></returns>
+        public object Clone()
+        {
+            return new TimeQuantity(Unit, Value);
         }
 
         #endregion
