@@ -45,12 +45,19 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Attributes\MassQuantityValuesAttribute.cs" />
+    <Compile Include="Attributes\MassUnitValuesAttribute.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Units\MassConverterTests.cs" />
+    <Compile Include="Units\MassQuantityFixture.cs" />
+    <Compile Include="Units\MassQuantityTests.cs" />
+    <Compile Include="Units\MassUnitTestFixtureBase.cs" />
     <Compile Include="Units\TimeConverterTests.cs" />
     <Compile Include="Units\TimeQuantityFixture.cs" />
     <Compile Include="Units\TimeQuantityTests.cs" />
     <Compile Include="Attributes\TimeQuantityValuesAttribute.cs" />
     <Compile Include="Attributes\TimeUnitValuesAttribute.cs" />
+    <Compile Include="Units\TimeUnitTestFixtureBase.cs" />
     <Compile Include="Units\UnitsTestFixtureBase.cs" />
   </ItemGroup>
   <ItemGroup>

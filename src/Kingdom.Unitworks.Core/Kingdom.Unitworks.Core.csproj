@@ -47,6 +47,11 @@
     <Compile Include="UnitConversionExtensionMethods.cs" />
     <Compile Include="UnitConverter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Units\IQuantity.cs" />
+    <Compile Include="Units\MassConverter.cs" />
+    <Compile Include="Units\MassQuantity.cs" />
+    <Compile Include="Units\MassQuantityExtensionMethods.cs" />
+    <Compile Include="Units\MassUnit.cs" />
     <Compile Include="Units\TimeConverter.cs" />
     <Compile Include="Units\TimeQuantity.cs" />
     <Compile Include="Units\TimeQuantityExtensionMethods.cs" />

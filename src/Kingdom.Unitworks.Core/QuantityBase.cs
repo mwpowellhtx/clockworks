@@ -1,4 +1,5 @@
 ﻿using System;
+using Kingdom.Unitworks.Units;
 
 namespace Kingdom.Unitworks
 {
@@ -64,9 +65,23 @@ namespace Kingdom.Unitworks
     /// </summary>
     /// <typeparam name="TDimension">Typically provided as as an enumerated type, the values of which are considered the units.</typeparam>
     /// <typeparam name="TValue">Represents the value of the quantity itself.</typeparam>
-    public abstract class QuantityBase<TDimension, TValue> : QuantityBase<TValue>
+    public abstract class QuantityBase<TDimension, TValue> : QuantityBase<TValue>, IQuantity<TDimension>
         where TValue : struct, IComparable, IComparable<TValue>, IEquatable<TValue>, IConvertible
     {
+        /// <summary>
+        /// 
+        /// </summary>
+        TDimension IQuantity<TDimension>.BaseUnit
+        {
+            get { return GetBaseUnit(); }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        protected abstract TDimension GetBaseUnit();
+
         /// <summary>
         /// Unit backing field.
         /// </summary>

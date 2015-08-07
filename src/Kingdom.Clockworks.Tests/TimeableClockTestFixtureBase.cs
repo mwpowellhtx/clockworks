@@ -14,7 +14,7 @@ namespace Kingdom.Clockworks
     /// <typeparam name="TClock"></typeparam>
     /// <typeparam name="TRequest"></typeparam>
     /// <typeparam name="TElapsedEventArgs"></typeparam>
-    public abstract class TimeableClockTestFixtureBase<TClock, TRequest, TElapsedEventArgs> : ClockworksTestFixtureBase
+    public abstract class TimeableClockTestFixtureBase<TClock, TRequest, TElapsedEventArgs> : TimeUnitTestFixtureBase
         where TClock : TimeableClockBase<TRequest, TElapsedEventArgs>, new()
         where TRequest : TimeableRequestBase
         where TElapsedEventArgs : ElapsedEventArgsBase<TRequest>

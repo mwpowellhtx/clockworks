@@ -9,11 +9,20 @@ namespace Kingdom.Unitworks.Units
     public class TimeQuantity : QuantityBase<TimeUnit, double>
     {
         /// <summary>
-        /// Gets the BaseUnit, which all calculations wlil be expressed in terms of.
+        /// Gets the BaseUnit, which all calculations will be expressed in terms of.
         /// </summary>
         public static TimeUnit BaseUnit
         {
             get { return Converter.BaseUnit; }
+        }
+
+        /// <summary>
+        /// Gets the BaseUnit.
+        /// </summary>
+        /// <returns></returns>
+        protected override TimeUnit GetBaseUnit()
+        {
+            return Converter.BaseUnit;
         }
 
         /// <summary>

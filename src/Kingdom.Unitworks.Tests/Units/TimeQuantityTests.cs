@@ -8,7 +8,7 @@ namespace Kingdom.Unitworks.Units
     /// <summary>
     /// Time quantity test fixture.
     /// </summary>
-    public class TimeQuantityTests : UnitsTestFixtureBase
+    public class TimeQuantityTests : TimeUnitTestFixtureBase
     {
         /// <summary>
         /// Tests that the <see cref="TimeQuantity"/> unit converter has been initialized correctly.
@@ -32,7 +32,7 @@ namespace Kingdom.Unitworks.Units
         [Test]
         public void Ctor_default()
         {
-            new TimeQuantityFixture().Verify();
+            new TimeQuantityFixture().Verify<TimeUnit, TimeQuantity>();
         }
 
         /// <summary>
@@ -43,7 +43,7 @@ namespace Kingdom.Unitworks.Units
         [Combinatorial]
         public void Ctor_TimeUnit([TimeUnitValues] TimeUnit unit)
         {
-            new TimeQuantityFixture(unit).Verify(unit);
+            new TimeQuantityFixture(unit).Verify<TimeUnit, TimeQuantity>(unit);
         }
 
         /// <summary>
@@ -54,7 +54,7 @@ namespace Kingdom.Unitworks.Units
         [Combinatorial]
         public void Ctor_double([TimeQuantityValues] double value)
         {
-            new TimeQuantityFixture(value).Verify(value: value);
+            new TimeQuantityFixture(value).Verify<TimeUnit, TimeQuantity>(value: value);
         }
 
         /// <summary>
@@ -67,7 +67,7 @@ namespace Kingdom.Unitworks.Units
         public void Ctor_TimeUnit_double([TimeUnitValues] TimeUnit unit,
             [TimeQuantityValues] double value)
         {
-            new TimeQuantityFixture(unit, value).Verify(unit, value);
+            new TimeQuantityFixture(unit, value).Verify<TimeUnit, TimeQuantity>(unit, value);
         }
 
         #endregion
@@ -155,7 +155,7 @@ namespace Kingdom.Unitworks.Units
             var expectedValue = ConvertFromBase(aUnit, aBase + bBase);
 
             VerifyOperator<TimeQuantity>(OperatorPart.Addition, a, b)
-                .Verify(aUnit, expectedValue, Epsilon);
+                .Verify<TimeUnit, TimeQuantity>(aUnit, expectedValue, Epsilon);
         }
 
         /// <summary>
@@ -180,7 +180,7 @@ namespace Kingdom.Unitworks.Units
             var expectedValue = ConvertFromBase(aUnit, aBase - bBase);
 
             VerifyOperator<TimeQuantity>(OperatorPart.Subtraction, a, b)
-                .Verify(aUnit, expectedValue, Epsilon);
+                .Verify<TimeUnit, TimeQuantity>(aUnit, expectedValue, Epsilon);
         }
 
         /// <summary>
@@ -203,7 +203,7 @@ namespace Kingdom.Unitworks.Units
             var expectedValue = ConvertFromBase(unit, aBase*factor);
 
             VerifyOperator<TimeQuantity>(OperatorPart.Multiply, a, factor)
-                .Verify(unit, expectedValue, Epsilon);
+                .Verify<TimeUnit, TimeQuantity>(unit, expectedValue, Epsilon);
         }
 
         /// <summary>
@@ -226,7 +226,7 @@ namespace Kingdom.Unitworks.Units
             var expectedValue = ConvertFromBase(unit, factor*aBase);
 
             VerifyOperator<TimeQuantity>(OperatorPart.Multiply, factor, a)
-                .Verify(unit, expectedValue, Epsilon);
+                .Verify<TimeUnit, TimeQuantity>(unit, expectedValue, Epsilon);
         }
 
         /// <summary>
@@ -244,8 +244,11 @@ namespace Kingdom.Unitworks.Units
         {
             Assert.That(bValue, Is.Not.EqualTo(0d));
 
-            var a = aValue.ToTimeQuantity(aUnit).Verify(aUnit, aValue);
-            var b = bValue.ToTimeQuantity(bUnit).Verify(bUnit, bValue);
+            var a = aValue.ToTimeQuantity(aUnit)
+                .Verify<TimeUnit, TimeQuantity>(aUnit, aValue);
+
+            var b = bValue.ToTimeQuantity(bUnit)
+                .Verify<TimeUnit, TimeQuantity>(bUnit, bValue);
 
             var aBase = ConvertToBase(a.Unit, a.Value);
             var bBase = ConvertToBase(b.Unit, b.Value);
@@ -394,40 +397,5 @@ namespace Kingdom.Unitworks.Units
         }
 
         #endregion
-    }
-
-    /// <summary>
-    /// 
-    /// </summary>
-    internal static class TimeQuantityExtensionMethods
-    {
-        /// <summary>
-        /// Performs basic verification on the <paramref name="quantity"/>.
-        /// </summary>
-        /// <typeparam name="TQuantity"></typeparam>
-        /// <param name="quantity"></param>
-        /// <param name="unit"></param>
-        /// <param name="value"></param>
-        /// <param name="epsilon"></param>
-        /// <param name="verify"></param>
-        /// <returns>The given <paramref name="quantity"/>.</returns>
-        public static TQuantity Verify<TQuantity>(this TQuantity quantity, TimeUnit? unit = null,
-            double value = default(double), double? epsilon = null, Action<TQuantity> verify = null)
-            where TQuantity : TimeQuantity
-        {
-            unit = unit ?? TimeQuantity.BaseUnit;
-            verify = verify ?? (x => { });
-
-            Assert.That(quantity, Is.Not.Null);
-            Assert.That(quantity.Unit, Is.EqualTo(unit.Value));
-
-            Assert.That(quantity.Value, epsilon.HasValue
-                ? Is.EqualTo(value).Within(epsilon.Value)
-                : Is.EqualTo(value));
-
-            verify(quantity);
-
-            return quantity;
-        }
     }
 }
