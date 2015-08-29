@@ -57,6 +57,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Attributes\CommonsTimeValuesAttribute.cs" />
     <Compile Include="Attributes\DurationValuesAttribute.cs" />
     <Compile Include="Attributes\NullableTimePerStepValuesAttribute.cs" />
     <Compile Include="Attributes\TimePerStepUnitValuesAttribute.cs" />
@@ -86,7 +87,7 @@
       <Name>Kingdom.Tests.Core</Name>
     </ProjectReference>
     <ProjectReference Include="..\Kingdom.Unitworks.Core\Kingdom.Unitworks.Core.csproj">
-      <Project>{896580BE-A134-4512-8B3B-6287A560ADB1}</Project>
+      <Project>{896580be-a134-4512-8b3b-6287a560adb1}</Project>
       <Name>Kingdom.Unitworks.Core</Name>
     </ProjectReference>
     <ProjectReference Include="..\Kingdom.Unitworks.Tests\Kingdom.Unitworks.Tests.csproj">

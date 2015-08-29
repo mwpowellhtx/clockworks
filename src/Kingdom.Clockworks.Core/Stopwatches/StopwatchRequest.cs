@@ -1,4 +1,5 @@
 using System;
+using Kingdom.Unitworks;
 
 namespace Kingdom.Clockworks.Stopwatches
 {
@@ -38,15 +39,12 @@ namespace Kingdom.Clockworks.Stopwatches
         /// Constructor
         /// </summary>
         /// <param name="direction"></param>
-        /// <param name="millisecondsPerStep"></param>
+        /// <param name="timePerStepQty"></param>
         /// <param name="steps"></param>
         /// <param name="type"></param>
-        public StopwatchRequest(
-            RunningDirection? direction = null,
-            double millisecondsPerStep = OneSecondMilliseconds,
-            int steps = One,
-            RequestType type = RequestType.Instantaneous)
-            : base(direction, millisecondsPerStep, steps, type)
+        public StopwatchRequest(RunningDirection? direction = null, IQuantity timePerStepQty = null,
+            int steps = 1, RequestType type = RequestType.Instantaneous)
+            : base(direction, timePerStepQty, steps, type)
         {
         }
 

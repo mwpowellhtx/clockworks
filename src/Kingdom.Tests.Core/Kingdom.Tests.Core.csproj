@@ -46,6 +46,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Attributes\RelationalOperatorPartValuesAttribute.cs" />
+    <Compile Include="Extensions\ExceptionExtensionMethods.cs" />
+    <Compile Include="Extensions\OperatorExtensionMethods.cs" />
     <Compile Include="OperatorPart.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TestFixtureBase.cs" />

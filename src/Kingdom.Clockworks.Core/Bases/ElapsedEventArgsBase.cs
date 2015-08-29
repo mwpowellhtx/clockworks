@@ -1,5 +1,5 @@
 ﻿using System;
-using Kingdom.Unitworks.Units;
+using Kingdom.Unitworks;
 
 namespace Kingdom.Clockworks
 {
@@ -26,13 +26,13 @@ namespace Kingdom.Clockworks
         /// </summary>
         public TimeSpan Elapsed
         {
-            get { return (_elapsed ?? (_elapsed = ElapsedQuantity.ToTimeSpan())).Value; }
+            get { return (_elapsed ?? (_elapsed = ElapsedQty.ToTimeSpan())).Value; }
         }
 
         /// <summary>
-        /// Gets the ElapsedQuantity.
+        /// Gets the ElapsedQty.
         /// </summary>
-        public readonly TimeQuantity ElapsedQuantity;
+        public readonly IQuantity ElapsedQty;
 
         /// <summary>
         /// Current backing field.
@@ -44,26 +44,26 @@ namespace Kingdom.Clockworks
         /// </summary>
         public TimeSpan Current
         {
-            get { return (_current ?? (_current = CurrentQuantity.ToTimeSpan())).Value; }
+            get { return (_current ?? (_current = CurrentQty.ToTimeSpan())).Value; }
         }
 
         /// <summary>
-        /// Gets the IntervalQuantity.
+        /// Gets the CurrentQty.
         /// </summary>
-        public readonly TimeQuantity CurrentQuantity;
+        public readonly IQuantity CurrentQty;
 
         /// <summary>
         /// Internal Constructor
         /// </summary>
         /// <param name="request"></param>
-        /// <param name="elapsedQuantity"></param>
-        /// <param name="currentQuantity"></param>
+        /// <param name="elapsedQty"></param>
+        /// <param name="currentQty"></param>
         protected ElapsedEventArgsBase(TRequest request,
-            TimeQuantity elapsedQuantity, TimeQuantity currentQuantity)
+            IQuantity elapsedQty, IQuantity currentQty)
         {
             Request = request;
-            ElapsedQuantity = elapsedQuantity;
-            CurrentQuantity = currentQuantity;
+            ElapsedQty = (IQuantity) elapsedQty.Clone();
+            CurrentQty = (IQuantity) currentQty.Clone();
         }
     }
 }

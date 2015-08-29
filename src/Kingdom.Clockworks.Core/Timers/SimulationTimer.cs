@@ -1,8 +1,9 @@
-﻿using System;
-using Kingdom.Unitworks.Units;
+﻿using Kingdom.Unitworks;
 
 namespace Kingdom.Clockworks.Timers
 {
+    using T = Unitworks.Dimensions.Systems.Commons.Time;
+
     /// <summary>
     /// Represents a simulation timer. This does not depend on a live system clock, but, rather,
     /// provides a stable internal clock source for purposes of incrementally moving in internal
@@ -10,14 +11,14 @@ namespace Kingdom.Clockworks.Timers
     /// </summary>
     public class SimulationTimer
         : TimeableClockBase<TimerRequest, TimerElapsedEventArgs>
-            , ISimulationTimer
+            , ISimulationTimer<TimerRequest>
     {
         /// <summary>
         /// Default Constructor
         /// </summary>
         public SimulationTimer()
         {
-            _targetQuantity = 0d.ToTimeQuantity(TimeUnit.Millisecond);
+            _targetTimeQty = Quantity.Zero(T.Millisecond);
         }
 
         #region Internal Timer Concerns
@@ -32,26 +33,28 @@ namespace Kingdom.Clockworks.Timers
         {
             lock (this)
             {
+                var ms = T.Millisecond;
                 //TODO: need to pick up the Timer Intervals: plus some understanding what to do with a "default" timer interval request
                 // The important moving parts are tucked away in their single areas of responsibility.
-                var candidateQuantity = request.GetIntervalCandidate(MillisecondsPerStep)
-                    .ToTimeQuantity(TimeUnit.Millisecond)*IntervalRatio*request.Steps;
+                var candidateQty = (Quantity) request.TimePerStepQty.ConvertTo(ms)*IntervalTimePerTimeQty*request.Steps;
 
                 // Constrain the Candidate quantity by the Balance between here and Starting.
-                var remainingQuantity = Math.Max(0d, (_targetQuantity - _elapsedQuantity)
-                    .ToTimeQuantity(TimeUnit.Millisecond).Value).ToTimeQuantity(TimeUnit.Millisecond);
+                var remainingQty = Quantity.Min(Quantity.Zero(ms), (Quantity) _targetTimeQty - _elapsedQty);
 
                 // Accepting the lesser of the two values within reach of the Starting spec.
-                var currentQuantity = Math.Min(candidateQuantity.Value, remainingQuantity.Value)
-                    .ToTimeQuantity(TimeUnit.Millisecond);
+                var currentQty = Quantity.Min(candidateQty, remainingQty).ConvertTo(T.Millisecond);
 
-                _elapsed += TimeSpan.FromMilliseconds(currentQuantity.Value);
+                _elapsedQty += (Quantity) currentQty;
 
                 // Disengate the timer from running if exceeding the Starting spec.
-                if (_elapsedQuantity + currentQuantity >= _targetQuantity) Stop();
+                if ((_elapsedQty + (Quantity) currentQty).ConvertTo(T.Millisecond).Value
+                    >= _targetTimeQty.ConvertTo(T.Millisecond).Value)
+                {
+                    //TODO: TBD: would be much better to have logical operators implemented on the qty itself...
+                    Stop();
+                }
 
-                return new TimerElapsedEventArgs(request, _elapsedQuantity += currentQuantity,
-                    currentQuantity, _targetQuantity, remainingQuantity);
+                return new TimerElapsedEventArgs(request, _elapsedQty, currentQty, _targetTimeQty, remainingQty);
             }
         }
 
@@ -70,8 +73,7 @@ namespace Kingdom.Clockworks.Timers
         {
             get
             {
-                return new TimerRequest(RunningDirection.Forward,
-                    MillisecondsPerStep, 1, RequestType.Continuous);
+                return new TimerRequest(RunningDirection.Forward, TimePerStepQty, 1, RequestType.Continuous);
             }
         }
 
@@ -79,15 +81,22 @@ namespace Kingdom.Clockworks.Timers
 
         #region Timer Members
 
-        private TimeQuantity _targetQuantity;
+        private IQuantity _targetTimeQty;
 
         /// <summary>
-        /// Gets or sets the TargetMilliseconds.
+        /// Gets or sets the TargetTimeQty.
         /// </summary>
-        public double TargetMilliseconds
+        public IQuantity TargetTimeQty
         {
-            get { lock (this) return _targetQuantity.ToTimeQuantity(TimeUnit.Millisecond).Value; }
-            set { lock (this) _targetQuantity = value.ToTimeQuantity(TimeUnit.Millisecond); }
+            get { lock (this) return _targetTimeQty; }
+            set
+            {
+                lock (this)
+                {
+                    var ms = T.Millisecond;
+                    _targetTimeQty = (value ?? Quantity.Zero(ms)).ConvertTo(ms);
+                }
+            }
         }
 
         #endregion
@@ -99,15 +108,14 @@ namespace Kingdom.Clockworks.Timers
         /// <paramref name="steps"/>, and <paramref name="type"/>.
         /// </summary>
         /// <param name="direction"></param>
-        /// <param name="millisecondsPerStep"></param>
+        /// <param name="timePerStepQty"></param>
         /// <param name="steps"></param>
         /// <param name="type"></param>
         /// <returns></returns>
         protected override TimerRequest CreateRequest(RunningDirection? direction = null,
-            double millisecondsPerStep = OneSecondMilliseconds, int steps = One,
-            RequestType type = RequestType.Continuous)
+            IQuantity timePerStepQty = null, int steps = 1, RequestType type = RequestType.Continuous)
         {
-            return new TimerRequest(direction, millisecondsPerStep, steps, type);
+            return new TimerRequest(direction, timePerStepQty, steps, type);
         }
 
         #endregion
@@ -144,7 +152,7 @@ namespace Kingdom.Clockworks.Timers
         /// <returns></returns>
         public static SimulationTimer operator +(SimulationTimer timer, int steps)
         {
-            timer.Increment(steps, timer.MillisecondsPerStep, RequestType.Instantaneous);
+            timer.Increment(steps, timer.TimePerStepQty, RequestType.Instantaneous);
             return timer;
         }
 
@@ -156,7 +164,7 @@ namespace Kingdom.Clockworks.Timers
         /// <returns></returns>
         public static SimulationTimer operator -(SimulationTimer timer, int steps)
         {
-            timer.Decrement(steps, timer.MillisecondsPerStep, RequestType.Instantaneous);
+            timer.Decrement(steps, timer.TimePerStepQty, RequestType.Instantaneous);
             return timer;
         }
 

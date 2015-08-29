@@ -1,5 +1,5 @@
 ﻿using System;
-using Kingdom.Unitworks.Units;
+using Kingdom.Unitworks;
 
 namespace Kingdom.Clockworks
 {
@@ -7,7 +7,7 @@ namespace Kingdom.Clockworks
     /// Provides a way of measuring the stopwatch behavior.
     /// </summary>
     /// <typeparam name="TRequest"></typeparam>
-    public interface IMeasurableClock<TRequest>
+    public interface IMeasurableClock<out TRequest>
         where TRequest : TimeableRequestBase
     {
         /// <summary>
@@ -16,9 +16,9 @@ namespace Kingdom.Clockworks
         TimeSpan Elapsed { get; }
 
         /// <summary>
-        /// Gets the ElapsedQuantity <see cref="TimeQuantity"/>.
+        /// Gets the ElapsedQuantity <see cref="IQuantity"/>.
         /// </summary>
-        TimeQuantity ElapsedQuantity { get; }
+        IQuantity ElapsedQty { get; }
 
         /// <summary>
         /// Gets whether the stopwatch IsRunning.

@@ -1,4 +1,4 @@
-﻿using Kingdom.Unitworks.Units;
+﻿using Kingdom.Unitworks;
 
 namespace Kingdom.Clockworks.Stopwatches
 {
@@ -11,11 +11,11 @@ namespace Kingdom.Clockworks.Stopwatches
         /// Internal Constructor
         /// </summary>
         /// <param name="request"></param>
-        /// <param name="elapsedQuantity"></param>
-        /// <param name="currentQuantity"></param>
+        /// <param name="elapsedQty"></param>
+        /// <param name="currentQty"></param>
         internal StopwatchElapsedEventArgs(StopwatchRequest request,
-            TimeQuantity elapsedQuantity, TimeQuantity currentQuantity)
-            : base(request, elapsedQuantity, currentQuantity)
+            IQuantity elapsedQty, IQuantity currentQty)
+            : base(request, elapsedQty, currentQty)
         {
         }
     }

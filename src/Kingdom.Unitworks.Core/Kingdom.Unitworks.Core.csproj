@@ -41,11 +41,81 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Constants.cs" />
+    <Compile Include="Dimensions\Conversions\BaseDimensionUnitConversion.cs" />
+    <Compile Include="Dimensions\Conversions\DerivedUnitConversion.cs" />
+    <Compile Include="Dimensions\Conversions\IBaseDimensionUnitConversion.cs" />
+    <Compile Include="Dimensions\Conversions\IDerivedUnitConversion.cs" />
+    <Compile Include="Dimensions\Conversions\IUnitConversion.cs" />
+    <Compile Include="Dimensions\Conversions\UnitConversionBase.cs" />
+    <Compile Include="Dimensions\AccelerationBase.cs" />
+    <Compile Include="Dimensions\AreaBase.cs" />
+    <Compile Include="Dimensions\BaseDimension.cs" />
+    <Compile Include="Dimensions\DerivedDimension.cs" />
+    <Compile Include="Dimensions\Dimension.cs" />
+    <Compile Include="Dimensions\Dimension.Registration.cs" />
+    <Compile Include="Dimensions\Dimensionless.cs" />
+    <Compile Include="Dimensions\EnergyBase.cs" />
+    <Compile Include="Dimensions\ForceBase.cs" />
+    <Compile Include="Dimensions\FrequencyBase.cs" />
+    <Compile Include="Dimensions\IAcceleration.cs" />
+    <Compile Include="Dimensions\IAngle.cs" />
+    <Compile Include="Dimensions\IArea.cs" />
+    <Compile Include="Dimensions\IBaseDimension.cs" />
+    <Compile Include="Dimensions\IDerivedDimension.cs" />
+    <Compile Include="Dimensions\IDimension.cs" />
+    <Compile Include="Dimensions\IDimensionless.cs" />
+    <Compile Include="Dimensions\IEnergy.cs" />
+    <Compile Include="Dimensions\IForce.cs" />
+    <Compile Include="Dimensions\IFrequency.cs" />
+    <Compile Include="Dimensions\ILength.cs" />
+    <Compile Include="Dimensions\IMass.cs" />
+    <Compile Include="Dimensions\IPrefix.cs" />
+    <Compile Include="Dimensions\IPressure.cs" />
+    <Compile Include="Dimensions\ISteradian.cs" />
+    <Compile Include="Dimensions\ITemperature.cs" />
+    <Compile Include="Dimensions\ITime.cs" />
+    <Compile Include="Dimensions\IVelocity.cs" />
+    <Compile Include="Dimensions\SteradianBase.cs" />
+    <Compile Include="Dimensions\Systems\CGS\Area.cs" />
+    <Compile Include="Dimensions\Systems\CGS\Length.cs" />
+    <Compile Include="Dimensions\Systems\CGS\Mass.cs" />
+    <Compile Include="Dimensions\Systems\Commons\Frequency.cs" />
+    <Compile Include="Dimensions\Systems\Commons\Prefix.cs" />
+    <Compile Include="Dimensions\Systems\Commons\Time.cs" />
+    <Compile Include="Dimensions\Systems\SI\Acceleration.cs" />
+    <Compile Include="Dimensions\Systems\SI\Angle.cs" />
+    <Compile Include="Dimensions\Systems\SI\Area.cs" />
+    <Compile Include="Dimensions\Systems\SI\Energy.cs" />
+    <Compile Include="Dimensions\Systems\SI\Force.cs" />
+    <Compile Include="Dimensions\Systems\SI\Length.cs" />
+    <Compile Include="Dimensions\Systems\SI\Mass.cs" />
+    <Compile Include="Dimensions\Systems\SI\Pressure.cs" />
+    <Compile Include="Dimensions\Systems\SI\Steradian.cs" />
+    <Compile Include="Dimensions\Systems\SI\Temperature.cs" />
+    <Compile Include="Dimensions\Systems\SI\Velocity.cs" />
+    <Compile Include="Dimensions\Systems\US\Acceleration.cs" />
+    <Compile Include="Dimensions\Systems\US\Angle.cs" />
+    <Compile Include="Dimensions\Systems\US\Area.cs" />
+    <Compile Include="Dimensions\Systems\US\Energy.cs" />
+    <Compile Include="Dimensions\Systems\US\Force.cs" />
+    <Compile Include="Dimensions\Systems\US\Length.cs" />
+    <Compile Include="Dimensions\Systems\US\Mass.cs" />
+    <Compile Include="Dimensions\Systems\US\Steradian.cs" />
+    <Compile Include="Dimensions\Systems\US\Temperature.cs" />
+    <Compile Include="Dimensions\Systems\US\Velocity.cs" />
+    <Compile Include="Extensions\TrigonometricExtensionMethods.cs" />
+    <Compile Include="Dimensions\VelocityBase.cs" />
+    <Compile Include="Exceptions\Dimensions\IncompatibleDimensionsException.cs" />
+    <Compile Include="IQuantity.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Quantity.cs" />
+    <Compile Include="Quantity.Logical.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Kingdom.Unitworks.Core.nuspec" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

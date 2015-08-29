@@ -1,12 +1,17 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Kingdom.Unitworks.Units;
+using Kingdom.Unitworks;
+using Kingdom.Unitworks.Dimensions;
 
 namespace Kingdom.Clockworks
 {
+    using T = Unitworks.Dimensions.Systems.Commons.Time;
+
     /// <summary>
     /// 
     /// </summary>
@@ -26,8 +31,7 @@ namespace Kingdom.Clockworks
         /// </summary>
         protected TimeableClockBase()
         {
-            SecondsPerStep = 1d;
-            IntervalRatio = 1d;
+            TimePerStepQty = new Quantity(1d, T.Second);
 
             const int defaultPeriod = Timeout.Infinite;
             _timer = new Timer(ProtectedTimerCallback, null, defaultPeriod, defaultPeriod);
@@ -46,35 +50,30 @@ namespace Kingdom.Clockworks
         /// <summary>
         /// TimerIntervalQuantity backing field.
         /// </summary>
-        private TimeQuantity _timerIntervalQuantity;
+        private IQuantity _timerIntervalQty;
 
         /// <summary>
         /// Gets or sets the TimerIntervalQuantity.
-        /// Sets in terms of <see cref="TimeUnit.Millisecond"/> or Null.
+        /// Sets in terms of <see cref="T.Millisecond"/> or Null.
         /// </summary>
-        protected TimeQuantity TimerIntervalQuantity
+        protected IQuantity TimerIntervalQty
         {
-            get { return _timerIntervalQuantity; }
-            set
-            {
-                _timerIntervalQuantity = value == null
-                    ? null
-                    : value.ToTimeQuantity(TimeUnit.Millisecond);
-            }
+            get { return _timerIntervalQty; }
+            set { _timerIntervalQty = value; }
         }
 
         /// <summary>
         /// Gets the TimerIntervalMilliseconds if possible.
         /// Gets Null if there is no interval currently set.
         /// </summary>
-        /// <see cref="TimerIntervalQuantity"/>
+        /// <see cref="TimerIntervalQty"/>
         protected double? TimerIntervalMilliseconds
         {
             get
             {
-                return _timerIntervalQuantity == null
+                return _timerIntervalQty == null
                     ? (double?) null
-                    : _timerIntervalQuantity.Value;
+                    : _timerIntervalQty.Value;
             }
         }
 
@@ -103,217 +102,6 @@ namespace Kingdom.Clockworks
         protected bool TryChangeTimer(TimeSpan dueTime, TimeSpan period)
         {
             return _timer.Change(dueTime, period);
-        }
-
-        /// <summary>
-        /// IntervalRatio backing field.
-        /// </summary>
-        private double _intervalRatio;
-
-        /// <summary>
-        /// Represents the intenral interval ratio. This is always in terms of seconds per second.
-        /// </summary>
-        /// <see cref="SecondsPerSecond"/>
-        protected double IntervalRatio
-        {
-            get { lock (this) return _intervalRatio; }
-            private set { lock (this) _intervalRatio = VerifyPositive(value); }
-        }
-
-        #endregion
-
-        #region Scaleable Clock Members
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="numeratorUnit"></param>
-        /// <param name="denominatorUnit"></param>
-        /// <returns></returns>
-        private double GetScaledIntervalTime(
-            TimeUnit numeratorUnit = TimeUnit.Second,
-            TimeUnit denominatorUnit = TimeUnit.Second)
-        {
-            lock (this)
-            {
-                // Remember the base "units" are SecondsPerSecond.
-                var num = IntervalRatio.ToTimeQuantity().ToTimeQuantity(numeratorUnit);
-                var denom = 1d.ToTimeQuantity().ToTimeQuantity(denominatorUnit);
-                return num/denom;
-            }
-        }
-
-        /// <summary>
-        /// Gets or sets the <see cref="SecondsPerSecond"/> given the ratio described
-        /// by <paramref name="numeratorUnit"/> and <paramref name="denominatorUnit"/>.
-        /// </summary>
-        /// <param name="numeratorUnit"></param>
-        /// <param name="denominatorUnit"></param>
-        /// <returns></returns>
-        public double this[TimeUnit numeratorUnit, TimeUnit denominatorUnit]
-        {
-            get { return GetScaledIntervalTime(numeratorUnit, denominatorUnit); }
-            set { SecondsPerSecond = value.ToTimeQuantity(numeratorUnit)/1d.ToTimeQuantity(denominatorUnit); }
-        }
-
-        /// <summary>
-        /// Gets the MillisecondsPerMillisecond.
-        /// </summary>
-        /// <see cref="TimeUnit.Millisecond"/>
-        public double MillisecondsPerMillisecond
-        {
-            get { return GetScaledIntervalTime(TimeUnit.Millisecond, TimeUnit.Millisecond); }
-        }
-
-        /// <summary>
-        /// Gets the SecondsPerMillisecond.
-        /// </summary>
-        /// <see cref="TimeUnit.Millisecond"/>
-        /// <see cref="TimeUnit.Second"/>
-        public double SecondsPerMillisecond
-        {
-            get { return GetScaledIntervalTime(TimeUnit.Second, TimeUnit.Millisecond); }
-        }
-
-        /// <summary>
-        /// Gets the MinutesPerMillisecond.
-        /// </summary>
-        /// <see cref="TimeUnit.Minute"/>
-        /// <see cref="TimeUnit.Millisecond"/>
-        public double MinutesPerMillisecond
-        {
-            get { return GetScaledIntervalTime(TimeUnit.Minute, TimeUnit.Millisecond); }
-        }
-
-        /// <summary>
-        /// Gets the HoursPerMillisecond.
-        /// </summary>
-        /// <see cref="TimeUnit.Hour"/>
-        /// <see cref="TimeUnit.Millisecond"/>
-        public double HoursPerMillisecond
-        {
-            get { return GetScaledIntervalTime(TimeUnit.Hour, TimeUnit.Millisecond); }
-        }
-
-        /// <summary>
-        /// Gets the MillisecondsPerSecond.
-        /// </summary>
-        /// <see cref="TimeUnit.Millisecond"/>
-        /// <see cref="TimeUnit.Second"/>
-        public double MillisecondsPerSecond
-        {
-            get { return GetScaledIntervalTime(TimeUnit.Millisecond); }
-        }
-
-        //TODO: per second? or per steps? remember, the component I am forgetting about is the timer period in calculating elapsed parts... which is either instant (per request) or timed (with timer component)
-        /// <summary>
-        /// Gets the SecondsPerSecond. This is considered the base unit of measure for the
-        /// timerable clock. All other calculations are performed with this unit of measure
-        /// at its core.
-        /// </summary>
-        /// <see cref="TimeUnit.Second"/>
-        public double SecondsPerSecond
-        {
-            get { return GetScaledIntervalTime(); }
-            set { IntervalRatio = value; }
-        }
-
-        /// <summary>
-        /// Gets the MinutesPerSecond.
-        /// </summary>
-        /// <see cref="TimeUnit.Minute"/>
-        /// <see cref="TimeUnit.Second"/>
-        public double MinutesPerSecond
-        {
-            get { return GetScaledIntervalTime(TimeUnit.Minute); }
-        }
-
-        /// <summary>
-        /// Gets the HoursPerSecond.
-        /// </summary>
-        /// <see cref="TimeUnit.Hour"/>
-        /// <see cref="TimeUnit.Second"/>
-        public double HoursPerSecond
-        {
-            get { return GetScaledIntervalTime(TimeUnit.Hour); }
-        }
-
-        /// <summary>
-        /// Gets the MillisecondsPerMinute.
-        /// </summary>
-        /// <see cref="TimeUnit.Millisecond"/>
-        /// <see cref="TimeUnit.Minute"/>
-        public double MillisecondsPerMinute
-        {
-            get { return GetScaledIntervalTime(TimeUnit.Millisecond, TimeUnit.Minute); }
-        }
-
-        /// <summary>
-        /// Gets the SecondsPerMinute.
-        /// </summary>
-        /// <see cref="TimeUnit.Second"/>
-        /// <see cref="TimeUnit.Minute"/>
-        public double SecondsPerMinute
-        {
-            get { return GetScaledIntervalTime(TimeUnit.Second, TimeUnit.Minute); }
-        }
-
-        /// <summary>
-        /// Gets the SecondsPerMinute.
-        /// </summary>
-        /// <see cref="TimeUnit.Minute"/>
-        public double MinutesPerMinute
-        {
-            get { return GetScaledIntervalTime(TimeUnit.Minute, TimeUnit.Minute); }
-        }
-
-        /// <summary>
-        /// Gets the HoursPerMinute.
-        /// </summary>
-        /// <see cref="TimeUnit.Hour"/>
-        /// <see cref="TimeUnit.Minute"/>
-        public double HoursPerMinute
-        {
-            get { return GetScaledIntervalTime(TimeUnit.Hour, TimeUnit.Minute); }
-        }
-
-        /// <summary>
-        /// Gets the MillisecondsPerHour.
-        /// </summary>
-        /// <see cref="TimeUnit.Millisecond"/>
-        /// <see cref="TimeUnit.Hour"/>
-        public double MillisecondsPerHour
-        {
-            get { return GetScaledIntervalTime(TimeUnit.Millisecond, TimeUnit.Hour); }
-        }
-
-        /// <summary>
-        /// Gets the SecondsPerHour.
-        /// </summary>
-        /// <see cref="TimeUnit.Second"/>
-        /// <see cref="TimeUnit.Hour"/>
-        public double SecondsPerHour
-        {
-            get { return GetScaledIntervalTime(TimeUnit.Second, TimeUnit.Hour); }
-        }
-
-        /// <summary>
-        /// Gets the MinutesPerHour.
-        /// </summary>
-        /// <see cref="TimeUnit.Minute"/>
-        /// <see cref="TimeUnit.Hour"/>
-        public double MinutesPerHour
-        {
-            get { return GetScaledIntervalTime(TimeUnit.Minute, TimeUnit.Hour); }
-        }
-
-        /// <summary>
-        /// Gets the HoursPerHour.
-        /// </summary>
-        /// <see cref="TimeUnit.Hour"/>
-        public double HoursPerHour
-        {
-            get { return GetScaledIntervalTime(TimeUnit.Hour, TimeUnit.Hour); }
         }
 
         #endregion
@@ -372,13 +160,7 @@ namespace Kingdom.Clockworks
         /// Gets or sets the Elapsed <see cref="TimeSpan"/>.
         /// </summary>
         // ReSharper disable once InconsistentNaming
-        protected TimeSpan _elapsed;
-
-        /// <summary>
-        /// Gets or sets the ElapsedQuantity.
-        /// </summary>
-        // ReSharper disable once InconsistentNaming
-        protected TimeQuantity _elapsedQuantity;
+        protected IQuantity _elapsedQty;
 
         /// <summary>
         /// Resets the timeable clock.
@@ -388,8 +170,7 @@ namespace Kingdom.Clockworks
         {
             lock (this)
             {
-                _elapsed = TimeSpan.Zero;
-                _elapsedQuantity = elapsedMilliseconds.ToTimeQuantity(TimeUnit.Millisecond);
+                _elapsedQty = new Quantity(elapsedMilliseconds, T.Millisecond);
             }
         }
 
@@ -399,65 +180,12 @@ namespace Kingdom.Clockworks
 
         #region Per Step Members
 
-        /// <summary>
-        /// TimePerStep backing field.
-        /// </summary>
-        private double _secondsPerStep;
+        private IQuantity _timePerStepQty;
 
-        /// <summary>
-        /// Returns the <see cref="SecondsPerStep"/> in terms of the <paramref name="unit"/>.
-        /// </summary>
-        /// <param name="unit"></param>
-        /// <returns></returns>
-        private double GetTimePerStep(TimeUnit unit)
+        public IQuantity TimePerStepQty
         {
-            lock (this) return SecondsPerStep.ToTimeQuantity().ToTimeQuantity(unit).Value;
-        }
-
-        /// <summary>
-        /// Sets the <see cref="SecondsPerStep"/> in terms of the <paramref name="unit"/>.
-        /// </summary>
-        /// <param name="value"></param>
-        /// <param name="unit"></param>
-        private void SetTimePerStep(double value, TimeUnit unit)
-        {
-            lock (this) SecondsPerStep = value.ToTimeQuantity(unit).ToTimeQuantity().Value;
-        }
-
-        /// <summary>
-        /// Gets or sets the Milliseconds per Step.
-        /// </summary>
-        public double MillisecondsPerStep
-        {
-            get { return GetTimePerStep(TimeUnit.Millisecond); }
-            set { SetTimePerStep(value, TimeUnit.Millisecond); }
-        }
-
-        /// <summary>
-        /// Gets or sets the Seconds per Step.
-        /// </summary>
-        public double SecondsPerStep
-        {
-            get { lock (this) return _secondsPerStep; }
-            set { lock (this) _secondsPerStep = VerifyPositive(value); }
-        }
-
-        /// <summary>
-        /// Gets or sets the Minutes per Step.
-        /// </summary>
-        public double MinutesPerStep
-        {
-            get { return GetTimePerStep(TimeUnit.Minute); }
-            set { SetTimePerStep(value, TimeUnit.Minute); }
-        }
-
-        /// <summary>
-        /// Gets or sets the Hours per Step.
-        /// </summary>
-        public double HoursPerStep
-        {
-            get { return GetTimePerStep(TimeUnit.Hour); }
-            set { SetTimePerStep(value, TimeUnit.Hour); }
+            get { return _timePerStepQty; }
+            set { _timePerStepQty = value; }
         }
 
         #endregion
@@ -471,7 +199,7 @@ namespace Kingdom.Clockworks
         /// </summary>
         public void Increment()
         {
-            Increment(One, MillisecondsPerStep, RequestType.Instantaneous);
+            Increment(1, _timePerStepQty, RequestType.Instantaneous);
         }
 
         /// <summary>
@@ -479,36 +207,25 @@ namespace Kingdom.Clockworks
         /// </summary>
         public void Decrement()
         {
-            Decrement(One, MillisecondsPerStep, RequestType.Instantaneous);
+            Decrement(1, _timePerStepQty, RequestType.Instantaneous);
         }
-
-        /// <summary>
-        /// One: 1
-        /// </summary>
-        protected const int One = 1;
-
-        /// <summary>
-        /// OneSecondMilliseconds: 1000d
-        /// </summary>
-        /// <see cref="One"/>
-        protected internal const double OneSecondMilliseconds = One*1000d;
 
         /// <summary>
         /// Increments the timerable clock given a number of <paramref name="steps"/> and <paramref name="type"/>.
         /// </summary>
         /// <param name="steps"></param>
-        /// <param name="millisecondsPerStep">Represents the milliseconds per step.</param>
+        /// <param name="timePerStepQty">Represents a time component per step.</param>
         /// <param name="type"></param>
-        public abstract void Increment(int steps, double millisecondsPerStep = OneSecondMilliseconds,
+        public abstract void Increment(int steps, IQuantity timePerStepQty = null,
             RequestType type = RequestType.Continuous);
 
         /// <summary>
         /// Decrements the timerable clock given a number of <paramref name="steps"/> and <paramref name="type"/>.
         /// </summary>
         /// <param name="steps"></param>
-        /// <param name="millisecondsPerStep">Represents the milliseconds per step.</param>
+        /// <param name="timePerStepQty">Represents a time component per step.</param>
         /// <param name="type"></param>
-        public abstract void Decrement(int steps, double millisecondsPerStep = OneSecondMilliseconds,
+        public abstract void Decrement(int steps, IQuantity timePerStepQty = null,
             RequestType type = RequestType.Continuous);
 
         #endregion
@@ -596,15 +313,15 @@ namespace Kingdom.Clockworks
         /// </summary>
         TimeSpan IMeasurableClock<TRequest>.Elapsed
         {
-            get { lock (this) return _elapsed; }
+            get { lock (this) return _elapsedQty.ToTimeSpan(); }
         }
 
         /// <summary>
-        /// Gets the ElapsedQuantity <see cref="TimeQuantity"/>.
+        /// Gets the ElapsedQuantity <see cref="IQuantity"/>.
         /// </summary>
-        TimeQuantity IMeasurableClock<TRequest>.ElapsedQuantity
+        IQuantity IMeasurableClock<TRequest>.ElapsedQty
         {
-            get { lock (this) return _elapsedQuantity; }
+            get { lock (this) return _elapsedQty; }
         }
 
         /// <summary>
@@ -622,8 +339,8 @@ namespace Kingdom.Clockworks
         /// </summary>
         protected TimeableClockBase()
         {
-            _elapsed = TimeSpan.Zero;
-            _elapsedQuantity = 0d.ToTimeQuantity(TimeUnit.Millisecond);
+            _elapsedQty = Quantity.Zero(T.Millisecond);
+            IntervalTimePerTimeQty = new Quantity(1d, T.Second, T.Second.Invert());
         }
 
         #region Internal Timer Concerns
@@ -751,30 +468,33 @@ namespace Kingdom.Clockworks
         /// <paramref name="steps"/>, and <paramref name="type"/>.
         /// </summary>
         /// <param name="direction"></param>
-        /// <param name="millisecondsPerStep"></param>
+        /// <param name="timePerStepQty"></param>
         /// <param name="steps"></param>
         /// <param name="type"></param>
         /// <returns></returns>
-        protected abstract TRequest CreateRequest(RunningDirection? direction = null,
-            double millisecondsPerStep = OneSecondMilliseconds, int steps = One,
-            RequestType type = RequestType.Continuous);
+        protected abstract TRequest CreateRequest(RunningDirection? direction = null, IQuantity timePerStepQty = null,
+            int steps = 1, RequestType type = RequestType.Continuous);
 
         /* TODO: TBD: increment/decrement? Direction? continuous/latching? or leave the previous state alone?
          * "Next" almost needs to include Direction + steps and that's it. Some of which is internal state,
          * or instantaneous, as necessary. */
 
+        private static IQuantity NormalizeTimePerStep(IQuantity quantity)
+        {
+            return quantity ?? new Quantity(1d, T.Millisecond);
+        }
+
         /// <summary>
         /// Increments the timerable clock given a number of <paramref name="steps"/> and <paramref name="type"/>.
         /// </summary>
         /// <param name="steps"></param>
-        /// <param name="millisecondsPerStep"> Represents the milliseconds per step.</param>
+        /// <param name="timePerStepQty">Represents a time component per step.</param>
         /// <param name="type"></param>
-        public override void Increment(int steps, double millisecondsPerStep = OneSecondMilliseconds,
-            RequestType type = RequestType.Continuous)
+        public override void Increment(int steps, IQuantity timePerStepQty = null, RequestType type = RequestType.Continuous)
         {
             lock (this)
             {
-                Next(CreateRequest(RunningDirection.Forward, millisecondsPerStep, steps, type));
+                Next(CreateRequest(RunningDirection.Forward, NormalizeTimePerStep(timePerStepQty), steps, type));
             }
         }
 
@@ -782,14 +502,13 @@ namespace Kingdom.Clockworks
         /// Decrements the timerable clock given a number of <paramref name="steps"/> and <paramref name="type"/>.
         /// </summary>
         /// <param name="steps"></param>
-        /// <param name="millisecondsPerStep">Represents the milliseconds per step.</param>
+        /// <param name="timePerStepQty">Represents a time component per step.</param>
         /// <param name="type"></param>
-        public override void Decrement(int steps, double millisecondsPerStep = OneSecondMilliseconds,
-            RequestType type = RequestType.Continuous)
+        public override void Decrement(int steps, IQuantity timePerStepQty = null, RequestType type = RequestType.Continuous)
         {
             lock (this)
             {
-                Next(CreateRequest(RunningDirection.Backward, millisecondsPerStep, steps, type));
+                Next(CreateRequest(RunningDirection.Backward, NormalizeTimePerStep(timePerStepQty), steps, type));
             }
         }
 
@@ -812,9 +531,11 @@ namespace Kingdom.Clockworks
                     _requests.Push(StartingRequest);
                 }
 
-                TimerIntervalQuantity = interval.TotalMilliseconds < 0d
+                var intervalMs = interval.TotalMilliseconds;
+
+                TimerIntervalQty = intervalMs < 0d
                     ? null
-                    : interval.TotalMilliseconds.ToTimeQuantity();
+                    : new Quantity(intervalMs, T.Millisecond);
 
                 TryChangeTimer(interval, interval);
             }
@@ -829,12 +550,58 @@ namespace Kingdom.Clockworks
             {
                 const int period = Timeout.Infinite;
 
-                TimerIntervalQuantity = null;
+                TimerIntervalQty = null;
 
                 TryChangeTimer(period, period);
 
                 if (GetNextRequest().WillRun) _requests.Clear();
             }
+        }
+
+        #endregion
+
+        #region Scaleable Clock Members
+
+        private IQuantity _intervalTimePerTimeQty = Quantity.Zero(T.Second, T.Second.Invert());
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public IQuantity IntervalTimePerTimeQty
+        {
+            get { return _intervalTimePerTimeQty; }
+            set
+            {
+                VerifyCompatibleDimensions(value.Dimensions);
+                _intervalTimePerTimeQty = (IQuantity)value.Clone();
+            }
+        }
+
+        private static IEnumerable<IDimension> ComparableDimensions = new[]
+        {
+            (ITime) T.Second.Clone(),
+            (ITime) T.Second.Invert()
+        };
+
+        private static void VerifyCompatibleDimensions(IEnumerable<IDimension> dimensions)
+        {
+            var simulatedTime = (ITime) dimensions.ElementAtOrDefault(0);
+            var perTime = (ITime) dimensions.ElementAtOrDefault(1);
+            VerifyCompatibleDimensions(simulatedTime, perTime);
+        }
+
+        private static void VerifyCompatibleDimensions(ITime simulatedTime, ITime perTimerTime)
+        {
+            var actualDimensions = new[] {simulatedTime, perTimerTime};
+
+            if (ComparableDimensions.AreCompatible(actualDimensions, true))
+                return;
+
+            var message = string.Format("Expecting dimensions {0} but was {1}.",
+                string.Join(" ", ComparableDimensions.Select(d => d.ToString())),
+                string.Join(" ", actualDimensions.Select(d => d.ToString())));
+
+            throw new IncompatibleDimensionsException(message);
         }
 
         #endregion

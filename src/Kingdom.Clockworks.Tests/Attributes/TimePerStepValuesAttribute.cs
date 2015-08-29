@@ -5,7 +5,17 @@ namespace Kingdom.Clockworks
     internal class TimePerStepValuesAttribute : ValuesAttribute
     {
         internal TimePerStepValuesAttribute()
-            : base(250d, 500d, 1000d, 1750d, 2500d)
+            : base(50d, 75d, 100d, 125d)
+        {
+        }
+    }
+
+
+    //TODO: this one was factored how?
+    internal class TimeQuantityValuesAttribute : ValuesAttribute
+    {
+        internal TimeQuantityValuesAttribute()
+            : base(100d, 200d, 300d)
         {
         }
     }

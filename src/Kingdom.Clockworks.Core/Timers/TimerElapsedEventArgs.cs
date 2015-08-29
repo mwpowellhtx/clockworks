@@ -1,5 +1,5 @@
 ﻿using System;
-using Kingdom.Unitworks.Units;
+using Kingdom.Unitworks;
 
 namespace Kingdom.Clockworks.Timers
 {
@@ -11,7 +11,7 @@ namespace Kingdom.Clockworks.Timers
         /// <summary>
         /// 
         /// </summary>
-        public readonly TimeQuantity TargetQuantity;
+        public readonly IQuantity TargetQuantity;
 
         /// <summary>
         /// Target backing field.
@@ -29,7 +29,7 @@ namespace Kingdom.Clockworks.Timers
         /// <summary>
         /// Gets the RemainingQuantity.
         /// </summary>
-        public readonly TimeQuantity RemainingQuantity;
+        public readonly IQuantity RemainingQuantity;
 
         /// <summary>
         /// Remaining backing field.
@@ -53,12 +53,12 @@ namespace Kingdom.Clockworks.Timers
         /// <param name="targetQuantity"></param>
         /// <param name="remainingQuantity"></param>
         internal TimerElapsedEventArgs(TimerRequest request,
-            TimeQuantity elapsedQuantity, TimeQuantity currentQuantity,
-            TimeQuantity targetQuantity, TimeQuantity remainingQuantity)
+            IQuantity elapsedQuantity, IQuantity currentQuantity,
+            IQuantity targetQuantity, IQuantity remainingQuantity)
             : base(request, elapsedQuantity, currentQuantity)
         {
-            TargetQuantity = targetQuantity;
-            RemainingQuantity = remainingQuantity;
+            TargetQuantity = (IQuantity) targetQuantity.Clone();
+            RemainingQuantity = (IQuantity) remainingQuantity.Clone();
         }
     }
 }

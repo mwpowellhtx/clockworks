@@ -1,20 +1,17 @@
-﻿using System;
+﻿using Kingdom.Unitworks;
 
 namespace Kingdom.Clockworks.Timers
 {
     /// <summary>
     /// Represents the sum total of simulation timer interfaces.
     /// </summary>
-    public interface ISimulationTimer
-        : IScaleableClock
-            , ISteppableClock
-            , IMeasurableClock<TimerRequest>
-            , IStartableClock
-            , IDisposable
+    public interface ISimulationTimer<out TRequest>
+        : IClockBase<TRequest>
+        where TRequest : TimeableRequestBase
     {
         /// <summary>
-        /// Gets or sets the TargetMilliseconds.
+        /// Gets or sets the TargetTimeQty.
         /// </summary>
-        double TargetMilliseconds { get; set; }
+        IQuantity TargetTimeQty { get; set; }
     }
 }

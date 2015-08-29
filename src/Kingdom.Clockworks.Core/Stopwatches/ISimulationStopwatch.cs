@@ -1,4 +1,4 @@
-﻿using System;
+﻿using Kingdom.Clockworks.Timers;
 
 namespace Kingdom.Clockworks.Stopwatches
 {
@@ -8,11 +8,7 @@ namespace Kingdom.Clockworks.Stopwatches
     /// Represents the sum total of simulation stopwatch interfaces.
     /// </summary>
     public interface ISimulationStopwatch
-        : IScaleableClock
-            , ISteppableClock
-            , IMeasurableClock<StopwatchRequest>
-            , IStartableClock
-            , IDisposable
+        : IClockBase<StopwatchRequest>
     {
     }
 }
