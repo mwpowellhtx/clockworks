@@ -20,7 +20,7 @@ namespace Kingdom.Unitworks.Trigonometric
         {
             get
             {
-                if (_qty == null)
+                if (ReferenceEquals(null, _qty))
                 {
                     _qty = _factory(_value, _dimensions);
                     Assert.That(_qty, Is.Not.Null);
