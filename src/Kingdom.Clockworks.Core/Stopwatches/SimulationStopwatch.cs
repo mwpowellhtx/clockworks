@@ -5,22 +5,40 @@ namespace Kingdom.Clockworks.Stopwatches
     using T = Unitworks.Dimensions.Systems.Commons.Time;
 
     /// <summary>
-    /// Represents a simulation stopwatch. This does not depend on a live system clock, but,
-    /// rather, provides a stable internal clock source for purposes of incrementally moving
-    /// in internal state.
+    /// Represents a stopwatch used for simulation purposes. This does not depend on a live system
+    /// clock, but rather provides a stable internal clock source for purposes of incrementally
+    /// changing internal moments in time. <see cref="RunningDirection.Forward"/> always counts
+    /// up away from zero.
     /// </summary>
     public class SimulationStopwatch
         : TimeableClockBase<StopwatchRequest, StopwatchElapsedEventArgs>
         , ISimulationStopwatch
     {
+        /// <summary>
+        /// Default Constructor
+        /// </summary>
+        public SimulationStopwatch()
+            : this(Quantity.Zero(T.Millisecond))
+        {
+        }
+
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="startingQty"></param>
+        public SimulationStopwatch(IQuantity startingQty)
+            : base(startingQty)
+        {
+        }
+
         #region Simulated Stopwatch Members
 
         /// <summary>
-        /// Gets the <see cref="StopwatchRequest.Default"/> request for the stopwatch.
+        /// Gets the <see cref="StopwatchRequest.DefaultRequest"/> request for the stopwatch.
         /// </summary>
         protected override StopwatchRequest DefaultRequest
         {
-            get { return StopwatchRequest.Default; }
+            get { return StopwatchRequest.DefaultRequest; }
         }
 
         /// <summary>
@@ -58,10 +76,13 @@ namespace Kingdom.Clockworks.Stopwatches
         /// <returns></returns>
         protected override StopwatchElapsedEventArgs GetNextEventArgs(StopwatchRequest request)
         {
-            //TODO: need to pick up the Timer Intervals: plus some understanding what to do with a "default" timer interval request
-            // The important moving parts are tucked away in their single areas of responsibility.
-            var currentQty = (Quantity) TimePerStepQty*IntervalTimePerTimeQty*request.Steps;
-            return new StopwatchElapsedEventArgs(request, _elapsedQty += currentQty, currentQty);
+            lock (this)
+            {
+                //TODO: need to pick up the Timer Intervals: plus some understanding what to do with a "default" timer interval request
+                // The important moving parts are tucked away in their single areas of responsibility.
+                var currentQty = (Quantity) TimePerStepQty*IntervalTimePerTimeQty*request.Steps;
+                return new StopwatchElapsedEventArgs(request, _elapsedQty += currentQty, currentQty);
+            }
         }
 
         #endregion

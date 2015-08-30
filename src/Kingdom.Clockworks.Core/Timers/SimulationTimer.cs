@@ -5,20 +5,56 @@ namespace Kingdom.Clockworks.Timers
     using T = Unitworks.Dimensions.Systems.Commons.Time;
 
     /// <summary>
-    /// Represents a simulation timer. This does not depend on a live system clock, but, rather,
-    /// provides a stable internal clock source for purposes of incrementally moving in internal
-    /// state.
+    /// Represents a timer used for simulation purposes. This does not depend on a live system
+    /// clock, but rather provides a stable internal clock source for purposes of incrementally
+    /// changing internal moments in time. <see cref="RunningDirection.Forward"/> always counts
+    /// down towards zero.
     /// </summary>
     public class SimulationTimer
         : TimeableClockBase<TimerRequest, TimerElapsedEventArgs>
             , ISimulationTimer<TimerRequest>
     {
         /// <summary>
+        /// CanBeNegative backing field.
+        /// </summary>
+        /// <see cref="CanBeNegative"/>
+        /// <see cref="CannotBeNegative"/>
+        private bool _canBeNegative;
+
+        /// <summary>
+        /// Gets or sets whether CanBeNegative.
+        /// </summary>
+        public bool CanBeNegative
+        {
+            get { return _canBeNegative; }
+            set { _canBeNegative = value; }
+        }
+
+        /// <summary>
+        /// Gets or sets whether CannotBeNegative.
+        /// </summary>
+        public bool CannotBeNegative
+        {
+            get { return !_canBeNegative; }
+            set { _canBeNegative = !value; }
+        }
+
+        /// <summary>
         /// Default Constructor
         /// </summary>
         public SimulationTimer()
+            : this(Quantity.Zero(T.Millisecond))
         {
-            _targetTimeQty = Quantity.Zero(T.Millisecond);
+        }
+
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="startingQty"></param>
+        public SimulationTimer(IQuantity startingQty)
+            : base(startingQty)
+        {
+            CanBeNegative = true;
         }
 
         #region Internal Timer Concerns
@@ -33,33 +69,27 @@ namespace Kingdom.Clockworks.Timers
         {
             lock (this)
             {
-                var ms = T.Millisecond;
-                //TODO: need to pick up the Timer Intervals: plus some understanding what to do with a "default" timer interval request
-                // The important moving parts are tucked away in their single areas of responsibility.
-                var candidateQty = (Quantity) request.TimePerStepQty.ConvertTo(ms)*IntervalTimePerTimeQty*request.Steps;
+                var candidateQty = (Quantity) request.TimePerStepQty*IntervalTimePerTimeQty*request.Steps;
 
-                // Constrain the Candidate quantity by the Balance between here and Starting.
-                var remainingQty = Quantity.Min(Quantity.Zero(ms), (Quantity) _targetTimeQty - _elapsedQty);
+                IQuantity remainingQty = (Quantity) StartingQty - _elapsedQty;
+                var currentQty = candidateQty;
 
-                // Accepting the lesser of the two values within reach of the Starting spec.
-                var currentQty = Quantity.Min(candidateQty, remainingQty).ConvertTo(T.Millisecond);
-
-                _elapsedQty += (Quantity) currentQty;
-
-                // Disengate the timer from running if exceeding the Starting spec.
-                if ((_elapsedQty + (Quantity) currentQty).ConvertTo(T.Millisecond).Value
-                    >= _targetTimeQty.ConvertTo(T.Millisecond).Value)
+                if (CannotBeNegative)
                 {
-                    //TODO: TBD: would be much better to have logical operators implemented on the qty itself...
-                    Stop();
+                    remainingQty = Quantity.Min(Quantity.Zero(T.Millisecond), remainingQty);
+                    currentQty = (Quantity) Quantity.Max(candidateQty, remainingQty);
                 }
 
-                return new TimerElapsedEventArgs(request, _elapsedQty, currentQty, _targetTimeQty, remainingQty);
+                if (CannotBeNegative && (Quantity) _elapsedQty + candidateQty >= StartingQty)
+                    Stop();
+
+                return new TimerElapsedEventArgs(request, _elapsedQty += currentQty,
+                    currentQty, StartingQty, remainingQty);
             }
         }
 
         /// <summary>
-        /// Gets the DefaultRequest <see cref="TimerRequest"/>.
+        /// Gets the <see cref="TimerRequest.DefaultRequest"/>.
         /// </summary>
         protected override TimerRequest DefaultRequest
         {
@@ -74,28 +104,6 @@ namespace Kingdom.Clockworks.Timers
             get
             {
                 return new TimerRequest(RunningDirection.Forward, TimePerStepQty, 1, RequestType.Continuous);
-            }
-        }
-
-        #endregion
-
-        #region Timer Members
-
-        private IQuantity _targetTimeQty;
-
-        /// <summary>
-        /// Gets or sets the TargetTimeQty.
-        /// </summary>
-        public IQuantity TargetTimeQty
-        {
-            get { lock (this) return _targetTimeQty; }
-            set
-            {
-                lock (this)
-                {
-                    var ms = T.Millisecond;
-                    _targetTimeQty = (value ?? Quantity.Zero(ms)).ConvertTo(ms);
-                }
             }
         }
 

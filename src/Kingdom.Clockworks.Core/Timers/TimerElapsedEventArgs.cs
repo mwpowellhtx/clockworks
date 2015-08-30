@@ -9,27 +9,28 @@ namespace Kingdom.Clockworks.Timers
     public class TimerElapsedEventArgs : ElapsedEventArgsBase<TimerRequest>
     {
         /// <summary>
-        /// 
+        /// Gets the StartingQty.
         /// </summary>
-        public readonly IQuantity TargetQuantity;
+        public readonly IQuantity StartingQty;
 
         /// <summary>
-        /// Target backing field.
+        /// Starting backing field.
         /// </summary>
-        private TimeSpan? _target;
+        private TimeSpan? _starting;
 
         /// <summary>
         /// gets the Target <see cref="TimeSpan"/>.
         /// </summary>
-        public TimeSpan Target
+        /// <see cref="StartingQty"/>
+        public TimeSpan Starting
         {
-            get { return (_target ?? (_target = TargetQuantity.ToTimeSpan())).Value; }
+            get { return (_starting ?? (_starting = StartingQty.ToTimeSpan())).Value; }
         }
 
         /// <summary>
-        /// Gets the RemainingQuantity.
+        /// Gets the RemainingQty.
         /// </summary>
-        public readonly IQuantity RemainingQuantity;
+        public readonly IQuantity RemainingQty;
 
         /// <summary>
         /// Remaining backing field.
@@ -41,24 +42,23 @@ namespace Kingdom.Clockworks.Timers
         /// </summary>
         public TimeSpan Remaining
         {
-            get { return (_remaining ?? (_remaining = RemainingQuantity.ToTimeSpan())).Value; }
+            get { return (_remaining ?? (_remaining = RemainingQty.ToTimeSpan())).Value; }
         }
 
         /// <summary>
         /// Internal Constructor
         /// </summary>
         /// <param name="request"></param>
-        /// <param name="elapsedQuantity"></param>
-        /// <param name="currentQuantity"></param>
-        /// <param name="targetQuantity"></param>
-        /// <param name="remainingQuantity"></param>
-        internal TimerElapsedEventArgs(TimerRequest request,
-            IQuantity elapsedQuantity, IQuantity currentQuantity,
-            IQuantity targetQuantity, IQuantity remainingQuantity)
-            : base(request, elapsedQuantity, currentQuantity)
+        /// <param name="elapsedQty"></param>
+        /// <param name="currentQty"></param>
+        /// <param name="startingQty"></param>
+        /// <param name="remainingQty"></param>
+        internal TimerElapsedEventArgs(TimerRequest request, IQuantity elapsedQty,
+            IQuantity currentQty, IQuantity startingQty, IQuantity remainingQty)
+            : base(request, elapsedQty, currentQty)
         {
-            TargetQuantity = (IQuantity) targetQuantity.Clone();
-            RemainingQuantity = (IQuantity) remainingQuantity.Clone();
+            StartingQty = (IQuantity) startingQty.Clone();
+            RemainingQty = (IQuantity) remainingQty.Clone();
         }
     }
 }

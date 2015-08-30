@@ -1,15 +1,30 @@
+using System.Linq;
 using Kingdom.Unitworks;
 using NUnit.Framework;
 
 namespace Kingdom.Clockworks.Timers
 {
+    using T = Unitworks.Dimensions.Systems.Commons.Time;
+
     public class SimulationTimerTests
         : TimeableClockTestFixtureBase<SimulationTimer, TimerRequest>
     {
-        protected override void VerifyDefaultClock(SimulationTimer timer)
+        protected override IQuantity CalculateEstimated(ChangeType change, int steps,
+            IQuantity intervalTimePerTimeQty, IQuantity timePerStepQty)
         {
-            base.VerifyDefaultClock(timer);
-            Assert.That(timer.TargetTimeQty.Equals(Quantity.Zero(timer.TargetTimeQty.Dimensions)));
+            var resultQty = (Quantity) intervalTimePerTimeQty*timePerStepQty*steps;
+
+            // Timers "increment" in the opposite direction, but the time away from zero is still the same quantity.
+            var changes = new[] {ChangeType.Increment, ChangeType.Addition};
+
+            if (changes.Any(x => (change & x) == x))
+                resultQty = -resultQty;
+
+            ////TODO: for now, we will allow negative.
+            //// Cannot be less than Zero.
+            //resultQty = (Quantity) Quantity.Max(Quantity.Zero(T.Millisecond), resultQty);
+
+            return resultQty;
         }
     }
 }

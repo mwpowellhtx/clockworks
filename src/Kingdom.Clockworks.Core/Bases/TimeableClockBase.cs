@@ -71,7 +71,7 @@ namespace Kingdom.Clockworks
         {
             get
             {
-                return _timerIntervalQty == null
+                return ReferenceEquals(null, _timerIntervalQty)
                     ? (double?) null
                     : _timerIntervalQty.Value;
             }
@@ -199,7 +199,7 @@ namespace Kingdom.Clockworks
         /// </summary>
         public void Increment()
         {
-            Increment(1, _timePerStepQty, RequestType.Instantaneous);
+            Increment(1, (IQuantity) _timePerStepQty.Clone(), RequestType.Instantaneous);
         }
 
         /// <summary>
@@ -207,7 +207,7 @@ namespace Kingdom.Clockworks
         /// </summary>
         public void Decrement()
         {
-            Decrement(1, _timePerStepQty, RequestType.Instantaneous);
+            Decrement(1, (IQuantity) _timePerStepQty.Clone(), RequestType.Instantaneous);
         }
 
         /// <summary>
@@ -264,6 +264,30 @@ namespace Kingdom.Clockworks
         where TElapsedEventArgs : EventArgs
     {
         #region Measurable Clock Members
+
+        /// <summary>
+        /// StartingQty backing field.
+        /// </summary>
+        private IQuantity _startingQty;
+
+        /// <summary>
+        /// Gets or sets the StartingQty.
+        /// </summary>
+        /// <see cref="Starting"/>
+        public virtual IQuantity StartingQty
+        {
+            get { return _startingQty; }
+            set { _startingQty = value; }
+        }
+
+        /// <summary>
+        /// Gets the Starting <see cref="TimeSpan"/>.
+        /// </summary>
+        /// <see cref="StartingQty"/>
+        public TimeSpan Starting
+        {
+            get { return _startingQty.ToTimeSpan(); }
+        }
 
         /// <summary>
         /// Elapsed event.
@@ -337,8 +361,10 @@ namespace Kingdom.Clockworks
         /// <summary>
         /// Protected Constructor
         /// </summary>
-        protected TimeableClockBase()
+        /// <param name="startingQty"></param>
+        protected TimeableClockBase(IQuantity startingQty)
         {
+            StartingQty = startingQty;
             _elapsedQty = Quantity.Zero(T.Millisecond);
             IntervalTimePerTimeQty = new Quantity(1d, T.Second, T.Second.Invert());
         }
@@ -356,7 +382,7 @@ namespace Kingdom.Clockworks
         /// <summary>
         /// Requests backing field.
         /// </summary>
-        private readonly ConcurrentStack<TRequest> _requests = new ConcurrentStack<TRequest>();
+        protected readonly ConcurrentStack<TRequest> Requests = new ConcurrentStack<TRequest>();
 
         /// <summary>
         /// Protected clock timer callback.
@@ -373,14 +399,24 @@ namespace Kingdom.Clockworks
         }
 
         /// <summary>
-        /// 
+        /// Returns the next <see cref="TRequest"/> from the <see cref="Requests"/>.
+        /// Pushes the request back onto the stack if it was continuous in nature.
+        /// Returns the <see cref="DefaultRequest"/> when one cannot be popped.
         /// </summary>
-        /// <param name="request"></param>
         /// <returns></returns>
-        private TRequest GetNextRequest(TRequest request)
+        private TRequest GetNextRequest()
         {
-            _requests.Push(request);
-            return GetNextRequest();
+            lock (this)
+            {
+                TRequest request;
+
+                var popped = Requests.TryPop(out request);
+
+                if (popped && request.IsContinuous)
+                    Requests.Push(request);
+
+                return request ?? DefaultRequest;
+            }
         }
 
         /// <summary>
@@ -435,29 +471,6 @@ namespace Kingdom.Clockworks
         /// LastRequest backing field.
         /// </summary>
         private TRequest _lastRequest;
-
-        /// <summary>
-        /// Returns the next <see cref="TRequest"/>.
-        /// </summary>
-        /// <returns></returns>
-        private TRequest GetNextRequest()
-        {
-            if (_requests.IsEmpty)
-                return _lastRequest = DefaultRequest;
-
-            TRequest request;
-
-            // ReSharper disable once RedundantAssignment
-            var popped = _requests.TryPop(out request);
-            Debug.Assert(popped);
-            Debug.Assert(request != null);
-
-            // Push it back onto the stack if continuous.
-            if (request.IsContinuous)
-                _requests.Push(request);
-
-            return _lastRequest = request;
-        }
 
         #endregion
 
@@ -527,8 +540,8 @@ namespace Kingdom.Clockworks
             {
                 if (GetNextRequest().WillNotRun)
                 {
-                    _requests.Clear();
-                    _requests.Push(StartingRequest);
+                    Requests.Clear();
+                    Requests.Push(StartingRequest);
                 }
 
                 var intervalMs = interval.TotalMilliseconds;
@@ -554,7 +567,8 @@ namespace Kingdom.Clockworks
 
                 TryChangeTimer(period, period);
 
-                if (GetNextRequest().WillRun) _requests.Clear();
+                if (GetNextRequest().WillRun)
+                    Requests.Clear();
             }
         }
 

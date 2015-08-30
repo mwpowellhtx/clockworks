@@ -1,17 +1,20 @@
-﻿using Kingdom.Unitworks;
-
-namespace Kingdom.Clockworks.Timers
+﻿namespace Kingdom.Clockworks.Timers
 {
     /// <summary>
-    /// Represents the sum total of simulation timer interfaces.
+    /// Represents a simulation timer interface.
     /// </summary>
     public interface ISimulationTimer<out TRequest>
         : IClockBase<TRequest>
         where TRequest : TimeableRequestBase
     {
         /// <summary>
-        /// Gets or sets the TargetTimeQty.
+        /// Gets or sets whether CanBeNegative.
         /// </summary>
-        IQuantity TargetTimeQty { get; set; }
+        bool CanBeNegative { get; set; }
+
+        /// <summary>
+        /// Gets or sets whether CannotBeNegative.
+        /// </summary>
+        bool CannotBeNegative { get; set; }
     }
 }

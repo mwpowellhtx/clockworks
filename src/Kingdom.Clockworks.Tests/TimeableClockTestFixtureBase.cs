@@ -1,38 +1,235 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using Kingdom.Clockworks.Timers;
 using Kingdom.Unitworks;
 using NUnit.Framework;
 
 namespace Kingdom.Clockworks
 {
+    using T = Unitworks.Dimensions.Systems.Commons.Time;
+
     public abstract class TimeableClockTestFixtureBase<TClock, TRequest> : TestFixtureBase
-        where TClock : IClockBase<TRequest>, new()
+        where TClock : class, IClockBase<TRequest>, new()
         where TRequest : TimeableRequestBase
     {
+        protected IQuantity StartingQty { get; set; }
+
+        public override void SetUp()
+        {
+            base.SetUp();
+
+            StartingQty = Quantity.Zero(T.Millisecond);
+        }
+
         protected TClock CreateClock()
         {
             var clock = new TClock();
-            VerifyDefaultClock(clock);
+            VerifyClock(clock);
             return clock;
         }
 
-        protected virtual void VerifyDefaultClock(TClock clock)
+        protected TClock CreateClock(IQuantity intervalTimePerTimeQty, IQuantity timePerStepQty)
         {
+            var clock = new TClock
+            {
+                StartingQty = StartingQty,
+                IntervalTimePerTimeQty = intervalTimePerTimeQty,
+                TimePerStepQty = timePerStepQty
+            };
+            VerifyClock(clock, intervalTimePerTimeQty, timePerStepQty);
+            return clock;
+        }
+
+        protected virtual void VerifyClock(TClock clock,
+            IQuantity intervalTimePerTimeQty = null,
+            IQuantity timePerStepQty = null)
+        {
+            intervalTimePerTimeQty
+                = intervalTimePerTimeQty
+                  ?? new Quantity(1, clock.IntervalTimePerTimeQty.Dimensions);
+
+            timePerStepQty
+                = timePerStepQty
+                  ?? new Quantity(1, clock.TimePerStepQty.Dimensions);
+
             Assert.That(clock, Is.Not.Null);
+            Assert.That(clock.StartingQty.Equals(StartingQty));
             Assert.That(clock.ElapsedQty.Equals(Quantity.Zero(clock.ElapsedQty.Dimensions)));
-            Assert.That(clock.TimePerStepQty.Equals(new Quantity(1, clock.TimePerStepQty.Dimensions)));
+            Assert.That(clock.TimePerStepQty.Equals(timePerStepQty));
             Assert.That(clock.CurrentRequest, Is.Null);
             Assert.That(clock.Elapsed, Is.EqualTo(TimeSpan.Zero));
-            Assert.That(clock.IntervalTimePerTimeQty.Equals(new Quantity(1, clock.IntervalTimePerTimeQty.Dimensions)));
+            Assert.That(clock.IntervalTimePerTimeQty.Equals(intervalTimePerTimeQty));
             Assert.That(clock.IsRunning, Is.False);
+        }
+
+        /// <summary>
+        /// Verifies that <paramref name="change"/> is <paramref name="expected"/>.
+        /// </summary>
+        /// <param name="change"></param>
+        /// <param name="expected"></param>
+        private static void VerifyChange(ChangeType change, params ChangeType[] expected)
+        {
+            // Perform this handshake that the changes are expected.
+            CollectionAssert.IsNotEmpty(expected);
+            Assert.That(expected.Any(x => change == x));
+        }
+
+        protected abstract IQuantity CalculateEstimated(ChangeType change, int steps,
+            IQuantity intervalTimePerTimeQty, IQuantity timePerStepQty);
+
+        protected virtual TClock ChangeClock(TClock clock, object obj, ChangeType change,
+            IEnumerable<Type> types, params object[] args)
+        {
+            Assert.That(clock, Is.Not.Null);
+
+            lock (clock)
+            {
+                var clockType = typeof (TClock);
+
+                var flags
+                    = BindingFlags.Public
+                      | (ReferenceEquals(obj, null)
+                          ? BindingFlags.Static
+                          : BindingFlags.Instance);
+
+                var methodName = change.GetMethodName();
+
+                var methodInfo = clockType.GetMethod(methodName, flags, Type.DefaultBinder, types.ToArray(), null);
+
+                methodInfo.Invoke(obj, args);
+
+                return clock;
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="clock"></param>
+        /// <param name="change"></param>
+        /// <param name="steps"></param>
+        /// <param name="timePerStepQty"></param>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        protected virtual TClock ChangeClock(TClock clock, ChangeType change, int steps,
+            IQuantity timePerStepQty, RequestType request = RequestType.Instantaneous)
+        {
+            VerifyChange(change, ChangeType.Increment, ChangeType.Decrement);
+            var types = new[] {typeof (int), typeof (IQuantity), typeof (RequestType)};
+            return ChangeClock(clock, clock, change, types, steps, timePerStepQty, request);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="clock"></param>
+        /// <param name="change"></param>
+        /// <returns></returns>
+        public virtual TClock ChangeClock(TClock clock, ChangeType change)
+        {
+            VerifyChange(change,
+                ChangeType.Operator | ChangeType.Increment,
+                ChangeType.Operator | ChangeType.Decrement);
+            var types = new[] {typeof (TClock)};
+            return ChangeClock(clock, null, change, types, clock);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="clock"></param>
+        /// <param name="change"></param>
+        /// <param name="steps"></param>
+        /// <returns></returns>
+        public virtual TClock ChangeClock(TClock clock, ChangeType change, int steps)
+        {
+            VerifyChange(change,
+                ChangeType.Operator | ChangeType.Addition,
+                ChangeType.Operator | ChangeType.Subtraction);
+            var types = new[] {typeof (TClock), typeof (int)};
+            return ChangeClock(clock, null, change, types, clock, steps);
         }
 
         [Test]
         public void Verify_default()
         {
-            CreateClock();
+            using (CreateClock())
+            {
+            }
         }
+
+        [Test]
+        public void Verify_instantaneous_clock_instance_method(
+            [InstanceChangeTypeValues] ChangeType change,
+            [IntervalTimePerTimeValues] IQuantity intervalTimePerTimeQty,
+            [Values(1, 2, 3)] int steps,
+            [TimePerStepValues] IQuantity timePerStepQty)
+        {
+            using (var clock = CreateClock(intervalTimePerTimeQty, timePerStepQty))
+            {
+                var estimatedQty = CalculateEstimated(change, steps, intervalTimePerTimeQty, timePerStepQty);
+
+                ChangeClock(clock, change, steps, timePerStepQty)
+                    .Verify(c =>
+                    {
+                        Assert.That(c.CurrentRequest, Is.Null);
+
+                        var estimatedElapsed = estimatedQty.ToTimeSpan();
+                        Assert.That(c.Elapsed, Is.EqualTo(estimatedElapsed));
+                    });
+            }
+        }
+
+        [Test]
+        public void Verify_instantaneous_unary_operator_clock_operator_method(
+            [UnaryOperatorChangeTypeValues] ChangeType change,
+            [IntervalTimePerTimeValues] IQuantity intervalTimePerTimeQty,
+            [TimePerStepValues] IQuantity timePerStepQty)
+        {
+            using (var clock = CreateClock(intervalTimePerTimeQty, timePerStepQty))
+            {
+                const int steps = 1;
+
+                var estimatedQty = CalculateEstimated(change, steps, intervalTimePerTimeQty, timePerStepQty);
+
+                ChangeClock(clock, change)
+                    .Verify(c =>
+                    {
+                        Assert.That(c.CurrentRequest, Is.Null);
+
+                        var estimatedElapsed = estimatedQty.ToTimeSpan();
+                        Assert.That(c.Elapsed, Is.EqualTo(estimatedElapsed));
+                    });
+            }
+        }
+
+        [Test]
+        public void Verify_instantaneous_binary_operator_clock_operator_method(
+            [BinaryOperatorChangeTypeValues] ChangeType change,
+            [IntervalTimePerTimeValues] IQuantity intervalTimePerTimeQty,
+            [Values(1, 2, 3)] int steps,
+            [TimePerStepValues] IQuantity timePerStepQty)
+        {
+            using (var clock = CreateClock(intervalTimePerTimeQty, timePerStepQty))
+            {
+                var estimatedQty = CalculateEstimated(change, steps, intervalTimePerTimeQty, timePerStepQty);
+
+                ChangeClock(clock, change, steps)
+                    .Verify(c =>
+                    {
+                        Assert.That(c.CurrentRequest, Is.Null);
+
+                        var estimatedElapsed = estimatedQty.ToTimeSpan();
+                        Assert.That(c.Elapsed, Is.EqualTo(estimatedElapsed));
+                    });
+            }
+        }
+
+        //protected abstract void VerifyIncrementOperator(TClock clock);
+
+        //protected abstract void VerifyDecrementOperator(TClock clock);
     }
 }
 

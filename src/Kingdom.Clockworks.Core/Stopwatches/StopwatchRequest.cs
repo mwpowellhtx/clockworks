@@ -12,9 +12,9 @@ namespace Kingdom.Clockworks.Stopwatches
             , IEquatable<StopwatchRequest>
     {
         /// <summary>
-        /// 
+        /// Gets the DefaultRequest.
         /// </summary>
-        public static readonly StopwatchRequest Default = new StopwatchRequest(steps: 0);
+        public static readonly StopwatchRequest DefaultRequest = new StopwatchRequest(steps: 0);
 
         /// <summary>
         /// Returns the number of <see cref="TimeableRequestBase.Steps"/> depending on the

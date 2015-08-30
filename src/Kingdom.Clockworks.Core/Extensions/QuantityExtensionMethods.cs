@@ -54,7 +54,12 @@ namespace Kingdom.Clockworks
 
             // ReSharper disable once PossibleNullReferenceException
             if (dimension.Equals(T.Microsecond))
-                return TimeSpan.FromMilliseconds(quantity.ConvertTo(T.Millisecond).Value);
+            {
+                var millisecondQty = quantity.ConvertTo(T.Millisecond);
+                millisecondQty.Value = Math.Min(millisecondQty.Value, TimeSpan.MaxValue.TotalMilliseconds - 1);
+                millisecondQty.Value = Math.Max(millisecondQty.Value, TimeSpan.MinValue.TotalMilliseconds + 1);
+                return TimeSpan.FromMilliseconds(millisecondQty.Value);
+            }
 
             if (dimension.Equals(T.Millisecond))
                 return TimeSpan.FromMilliseconds(quantity.Value);

@@ -57,14 +57,21 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Attributes\BinaryOperatorChangeTypeValuesAttribute.cs" />
     <Compile Include="Attributes\CommonsTimeValuesAttribute.cs" />
     <Compile Include="Attributes\DurationValuesAttribute.cs" />
+    <Compile Include="Attributes\IntervalTimePerTimeValuesAttribute.cs" />
+    <Compile Include="Attributes\ChangeTypeValuesAttribute.cs" />
     <Compile Include="Attributes\NullableTimePerStepValuesAttribute.cs" />
     <Compile Include="Attributes\TimePerStepUnitValuesAttribute.cs" />
     <Compile Include="Attributes\TimePerStepValuesAttribute.cs" />
     <Compile Include="Attributes\RequestTypeValuesAttribute.cs" />
     <Compile Include="Attributes\RunningDirectionValuesAttribute.cs" />
     <Compile Include="Attributes\StepValuesAttribute.cs" />
+    <Compile Include="Attributes\TimeQuantityValuesAttribute.cs" />
+    <Compile Include="Attributes\UnaryOperatorChangeTypeValuesAttribute.cs" />
+    <Compile Include="ChangeType.cs" />
+    <Compile Include="Extensions\ClockExtensionMethods.cs" />
     <Compile Include="Stopwatches\SimulationStopwatchTests.cs" />
     <Compile Include="Attributes\TimerIntervalValuesAttribute.cs" />
     <Compile Include="Timers\SimulationTimerTests.cs" />

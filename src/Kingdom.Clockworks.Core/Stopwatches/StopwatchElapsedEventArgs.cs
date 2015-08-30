@@ -13,8 +13,7 @@ namespace Kingdom.Clockworks.Stopwatches
         /// <param name="request"></param>
         /// <param name="elapsedQty"></param>
         /// <param name="currentQty"></param>
-        internal StopwatchElapsedEventArgs(StopwatchRequest request,
-            IQuantity elapsedQty, IQuantity currentQty)
+        internal StopwatchElapsedEventArgs(StopwatchRequest request, IQuantity elapsedQty, IQuantity currentQty)
             : base(request, elapsedQty, currentQty)
         {
         }
