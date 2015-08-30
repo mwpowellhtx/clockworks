@@ -87,6 +87,9 @@ namespace Kingdom.Unitworks
             if (y != null && x == null) return -1;
             if (x == null) return 0;
 
+            ////TODO: TBD: whether to verify here? throw exception? or just take the "silent" result as in TryCompareTo
+            //x.VerifyEquivalent(y);
+
             if (!x.Dimensions.AreCompatible(y.Dimensions))
                 return -2;
 

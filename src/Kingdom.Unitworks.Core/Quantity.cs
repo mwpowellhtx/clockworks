@@ -511,13 +511,8 @@ namespace Kingdom.Unitworks
             if (y == null && x != null) return (IQuantity) x.Clone();
             if (x == null) return null;
 
-            x.VerifyEquivalent(y);
-
-            var xBaseValue = x.ToBase().Value;
-            var yBaseValue = y.ToBase().Value;
-
-            if (xBaseValue > yBaseValue) return (IQuantity) y.Clone();
-            if (xBaseValue < yBaseValue) return (IQuantity) x.Clone();
+            if ((Quantity) x > y) return (IQuantity) y.Clone();
+            if ((Quantity) x < y) return (IQuantity) x.Clone();
 
             return (IQuantity) x.Clone();
         }
@@ -534,13 +529,8 @@ namespace Kingdom.Unitworks
             if (y == null && x != null) return (IQuantity) x.Clone();
             if (x == null) return null;
 
-            x.VerifyEquivalent(y);
-
-            var xBaseValue = x.ToBase().Value;
-            var yBaseValue = y.ToBase().Value;
-
-            if (xBaseValue < yBaseValue) return (IQuantity) y.Clone();
-            if (xBaseValue > yBaseValue) return (IQuantity) x.Clone();
+            if ((Quantity) x < y) return (IQuantity) y.Clone();
+            if ((Quantity) x > y) return (IQuantity) x.Clone();
 
             return (IQuantity) x.Clone();
         }
