@@ -33,7 +33,7 @@ using (var installed = SystemClock.Install(new DateTime(1999, 1, 1)))
 The ``SystemClock.Now`` and ``SystemClock.UtcNow`` properties expose the bare system clock, or the overridden system clock after calling ``Install``.
 
 ```C#
-using (var installed = SystemClock.Install(...)
+using (var installed = SystemClock.Install(...))
 {
     Console.WriteLine("This is the new Now: {0}", SystemClock.Now);
     Console.WriteLine("This is the new UtcNow: {0}", SystemClock.UtcNow);
