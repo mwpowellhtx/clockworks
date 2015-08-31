@@ -20,6 +20,7 @@ namespace Kingdom.Clockworks
             , IStartableClock
             , ISteppableClock
     {
+        ////TODO: TBD: not sure what I needed with this one? probably want to preclude negative values; but should permit NegativeInfinity/PositiveInfinity, depending on the value...
         private static double VerifyPositive(double value)
         {
             if (value >= 0d) return value;
@@ -31,12 +32,13 @@ namespace Kingdom.Clockworks
         /// </summary>
         protected TimeableClockBase()
         {
-            TimePerStepQty = new Quantity(1d, T.Second);
+            const int infinite = Timeout.Infinite;
+            _timer = new Timer(ProtectedTimerCallback, null, infinite, infinite);
 
-            const int defaultPeriod = Timeout.Infinite;
-            _timer = new Timer(ProtectedTimerCallback, null, defaultPeriod, defaultPeriod);
+            var s = T.Second;
 
-            Reset(0d);
+            TimePerStepQty = new Quantity(1d, s);
+            _timerIntervalQty = new Quantity(double.NegativeInfinity, s);
         }
 
         #region Internal Members
@@ -46,36 +48,6 @@ namespace Kingdom.Clockworks
         /// </summary>
         /// <param name="state"></param>
         protected abstract void ProtectedTimerCallback(object state);
-
-        /// <summary>
-        /// TimerIntervalQuantity backing field.
-        /// </summary>
-        private IQuantity _timerIntervalQty;
-
-        /// <summary>
-        /// Gets or sets the TimerIntervalQuantity.
-        /// Sets in terms of <see cref="T.Millisecond"/> or Null.
-        /// </summary>
-        protected IQuantity TimerIntervalQty
-        {
-            get { return _timerIntervalQty; }
-            set { _timerIntervalQty = value; }
-        }
-
-        /// <summary>
-        /// Gets the TimerIntervalMilliseconds if possible.
-        /// Gets Null if there is no interval currently set.
-        /// </summary>
-        /// <see cref="TimerIntervalQty"/>
-        protected double? TimerIntervalMilliseconds
-        {
-            get
-            {
-                return ReferenceEquals(null, _timerIntervalQty)
-                    ? (double?) null
-                    : _timerIntervalQty.Value;
-            }
-        }
 
         /// <summary>
         /// Timer backing field.
@@ -108,14 +80,45 @@ namespace Kingdom.Clockworks
 
         #region Startable Clock Members
 
+        // ReSharper disable once InconsistentNaming
+        /// <summary>
+        /// TimerIntervalQuantity backing field.
+        /// </summary>
+        protected IQuantity _timerIntervalQty;
+
+        /// <summary>
+        /// Gets or sets the internal TimerIntervalQty.
+        /// </summary>
+        public IQuantity TimerIntervalQty
+        {
+            get { return _timerIntervalQty; }
+            set
+            {
+                _timerIntervalQty = value ?? new Quantity(double.NegativeInfinity, T.Second);
+                if (_timerIntervalQty.IsInfinity)
+                {
+                    Stop();
+                    return;
+                }
+                Start(_timerIntervalQty.ToTimeSpan());
+            }
+        }
+
+        /// <summary>
+        /// Gets whether the timerable clock IsRunning.
+        /// </summary>
+        public bool IsRunning
+        {
+            get { lock (this) return !TimerIntervalQty.IsInfinity; }
+        }
+
         /// <summary>
         /// Starts the timerable clock timer running. The default interval is every
         /// half second, or 500 milliseconds.
         /// </summary>
         public void Start()
         {
-            const double interval = 500d;
-            Start(TimeSpan.FromMilliseconds(interval));
+            Start(500d);
         }
 
         /// <summary>
@@ -124,7 +127,7 @@ namespace Kingdom.Clockworks
         /// <param name="interval"></param>
         public void Start(int interval)
         {
-            Start(TimeSpan.FromMilliseconds(interval));
+            Start(interval == Timeout.Infinite ? double.NegativeInfinity : interval);
         }
 
         /// <summary>
@@ -133,7 +136,7 @@ namespace Kingdom.Clockworks
         /// <param name="interval"></param>
         public void Start(long interval)
         {
-            Start(TimeSpan.FromMilliseconds(interval));
+            Start(interval == Timeout.Infinite ? double.NegativeInfinity : interval);
         }
 
         /// <summary>
@@ -142,7 +145,16 @@ namespace Kingdom.Clockworks
         /// <param name="interval"></param>
         public void Start(uint interval)
         {
-            Start(TimeSpan.FromMilliseconds(interval));
+            Start(interval == Timeout.Infinite ? double.NegativeInfinity : interval);
+        }
+
+        /// <summary>
+        /// Starts the clock timer running with the <paramref name="interval"/>.
+        /// </summary>
+        /// <param name="interval"></param>
+        private void Start(double interval)
+        {
+            TimerIntervalQty = new Quantity(interval, T.Millisecond);
         }
 
         /// <summary>
@@ -155,24 +167,6 @@ namespace Kingdom.Clockworks
         /// Stops the timerable clock timer from running.
         /// </summary>
         public abstract void Stop();
-
-        /// <summary>
-        /// Gets or sets the Elapsed <see cref="TimeSpan"/>.
-        /// </summary>
-        // ReSharper disable once InconsistentNaming
-        protected IQuantity _elapsedQty;
-
-        /// <summary>
-        /// Resets the timeable clock.
-        /// </summary>
-        /// <param name="elapsedMilliseconds"></param>
-        public void Reset(double elapsedMilliseconds)
-        {
-            lock (this)
-            {
-                _elapsedQty = new Quantity(elapsedMilliseconds, T.Millisecond);
-            }
-        }
 
         #endregion
 
@@ -256,12 +250,15 @@ namespace Kingdom.Clockworks
     /// <summary>
     /// 
     /// </summary>
-    public abstract class TimeableClockBase<TRequest, TElapsedEventArgs>
+    /// <typeparam name="TRequest"></typeparam>
+    /// <typeparam name="TTimerElapsedEventArgs"></typeparam>
+    public abstract class TimeableClockBase<TRequest, TTimerElapsedEventArgs>
         : TimeableClockBase
             , IScaleableClock
+            , IStartableClock<TTimerElapsedEventArgs>
             , IMeasurableClock<TRequest>
         where TRequest : TimeableRequestBase
-        where TElapsedEventArgs : EventArgs
+        where TTimerElapsedEventArgs : EventArgs
     {
         #region Measurable Clock Members
 
@@ -274,10 +271,10 @@ namespace Kingdom.Clockworks
         /// Gets or sets the StartingQty.
         /// </summary>
         /// <see cref="Starting"/>
-        public virtual IQuantity StartingQty
+        public IQuantity StartingQty
         {
             get { return _startingQty; }
-            set { _startingQty = value; }
+            set { _startingQty = value ?? Quantity.Zero(T.Second); }
         }
 
         /// <summary>
@@ -290,62 +287,80 @@ namespace Kingdom.Clockworks
         }
 
         /// <summary>
-        /// Elapsed event.
+        /// TimerElapsed event.
         /// </summary>
-        public event EventHandler<TElapsedEventArgs> Elapsed;
+        public event EventHandler<TTimerElapsedEventArgs> TimerElapsed;
 
         /// <summary>
-        /// Raises the <see cref="Elapsed"/> event. Returns the asynchronous event handler.
+        /// Raises the <see cref="TimerElapsed"/> event. Returns the asynchronous event handler.
         /// Returns an empty task runner when the event handler is empty.
         /// </summary>
         /// <param name="e"></param>
-        private IAsyncResult RaiseElapsedAsync(TElapsedEventArgs e)
+        private IAsyncResult RaiseTimerElapsedAsync(TTimerElapsedEventArgs e)
         {
-            return Elapsed == null
+            return TimerElapsed == null
                 ? Task.Run(() => { })
-                : Elapsed.BeginInvoke(this, e, null, null);
+                : TimerElapsed.BeginInvoke(this, e, null, null);
         }
 
         /// <summary>
-        /// Raises the <see cref="Elapsed"/> event.
+        /// Ends the <see cref="RaiseTimerElapsedAsync"/> asynchronous invokation.
+        /// </summary>
+        /// <param name="ar"></param>
+        private void EndRaiseTimerElapsedAsync(IAsyncResult ar)
+        {
+            if (TimerElapsed == null) return;
+            TimerElapsed.EndInvoke(ar);
+        }
+
+        /// <summary>
+        /// Raises the <see cref="TimerElapsed"/> event.
         /// </summary>
         /// <param name="e"></param>
-        private void RaiseElapsed(TElapsedEventArgs e)
+        private void RaiseTimerElapsed(TTimerElapsedEventArgs e)
         {
-            if (Elapsed == null) return;
-            Elapsed(this, e);
+            if (TimerElapsed == null) return;
+            TimerElapsed(this, e);
         }
 
         /// <summary>
-        /// Gets whether the timerable clock IsRunning.
+        /// Gets the Elapsed <see cref="TimeSpan"/>.
         /// </summary>
-        public bool IsRunning
+        public TimeSpan Elapsed
         {
-            get
-            {
-                lock (this)
-                {
-                    //TODO: Timeout + Direction? Timeout represents whether the _timer is moving or not.
-                    return TimerIntervalMilliseconds.HasValue
-                           && (_lastRequest != null && _lastRequest.WillRun);
-                }
-            }
+            get { lock (this) return ElapsedQty.ToTimeSpan(); }
+        }
+
+        /// <summary>
+        /// Gets or sets the Elapsed <see cref="TimeSpan"/>.
+        /// </summary>
+        // ReSharper disable once InconsistentNaming
+        protected IQuantity _elapsedQty;
+
+        /// <summary>
+        /// Gets the ElapsedQty.
+        /// </summary>
+        public IQuantity ElapsedQty
+        {
+            get { lock (this) return _elapsedQty; }
+            set { _elapsedQty = value ?? new Quantity(0d, T.Second); }
         }
 
         /// <summary>
         /// Gets the current Elapsed TimeSpan.
         /// </summary>
-        TimeSpan IMeasurableClock<TRequest>.Elapsed
+        TimeSpan IMeasurableClock.Elapsed
         {
-            get { lock (this) return _elapsedQty.ToTimeSpan(); }
+            get { return Elapsed; }
         }
 
         /// <summary>
-        /// Gets the ElapsedQuantity <see cref="IQuantity"/>.
+        /// Gets the <see cref="IMeasurableClock.ElapsedQty"/>.
         /// </summary>
-        IQuantity IMeasurableClock<TRequest>.ElapsedQty
+        IQuantity IMeasurableClock.ElapsedQty
         {
-            get { lock (this) return _elapsedQty; }
+            get { return ElapsedQty; }
+            set { ElapsedQty = value; }
         }
 
         /// <summary>
@@ -365,7 +380,7 @@ namespace Kingdom.Clockworks
         protected TimeableClockBase(IQuantity startingQty)
         {
             StartingQty = startingQty;
-            _elapsedQty = Quantity.Zero(T.Millisecond);
+            ElapsedQty = Quantity.Zero(T.Millisecond);
             IntervalTimePerTimeQty = new Quantity(1d, T.Second, T.Second.Invert());
         }
 
@@ -377,7 +392,7 @@ namespace Kingdom.Clockworks
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        protected abstract TElapsedEventArgs GetNextEventArgs(TRequest request);
+        protected abstract TTimerElapsedEventArgs GetNextEventArgs(TRequest request);
 
         /// <summary>
         /// Requests backing field.
@@ -392,8 +407,9 @@ namespace Kingdom.Clockworks
         {
             lock (this)
             {
+                //TODO: TBD: for the moment state is "null", but could easily be "this" ?
                 Debug.Assert(state == null);
-                //TODO: should consider passing both direction and steps with every increment, whether automatically timed or manual...
+                // The request mechanism encapsulates the bits that instruct the clock how next to operate.
                 Next(GetNextRequest());
             }
         }
@@ -425,22 +441,21 @@ namespace Kingdom.Clockworks
         /// <param name="request"></param>
         private void NextAsync(TRequest request)
         {
-            IAsyncResult elapsedRaised;
+            IAsyncResult eventRaised;
 
             lock (this)
             {
                 // Defer event handling free the lock in case anyone wants to callback into the timerable clock.
-                elapsedRaised = RaiseElapsedAsync(GetNextEventArgs(request));
+                eventRaised = RaiseTimerElapsedAsync(GetNextEventArgs(request));
             }
 
             //TODO: wait with a time out?
-            // Wait for the elapsed event to complete.
-            elapsedRaised.AsyncWaitHandle.WaitOne();
+            // Wait for the elapsed event to complete which may require locks apart from the current thread.
+            eventRaised.AsyncWaitHandle.WaitOne();
 
             lock (this)
             {
-                if (Elapsed == null) return;
-                Elapsed.EndInvoke(elapsedRaised);
+                EndRaiseTimerElapsedAsync(eventRaised);
             }
         }
 
@@ -453,7 +468,7 @@ namespace Kingdom.Clockworks
             lock (this)
             {
                 // Defer event handling free the lock in case anyone wants to callback into the timerable clock.
-                RaiseElapsed(GetNextEventArgs(request));
+                RaiseTimerElapsed(GetNextEventArgs(request));
             }
         }
 
@@ -544,11 +559,7 @@ namespace Kingdom.Clockworks
                     Requests.Push(StartingRequest);
                 }
 
-                var intervalMs = interval.TotalMilliseconds;
-
-                TimerIntervalQty = intervalMs < 0d
-                    ? null
-                    : new Quantity(intervalMs, T.Millisecond);
+                _timerIntervalQty = interval.ToQuantity();
 
                 TryChangeTimer(interval, interval);
             }
@@ -591,15 +602,23 @@ namespace Kingdom.Clockworks
             }
         }
 
-        private static IEnumerable<IDimension> ComparableDimensions = new[]
+        /// <summary>
+        /// Gets the ComparableDimensions.
+        /// </summary>
+        private static IEnumerable<IDimension> ComparableDimensions
         {
-            (ITime) T.Second.Clone(),
-            (ITime) T.Second.Invert()
-        };
+            get
+            {
+                var s = T.Second;
+                return new[] {(ITime) s.Clone(), (ITime) s.Invert()};
+            }
+        }
 
         private static void VerifyCompatibleDimensions(IEnumerable<IDimension> dimensions)
         {
+            // ReSharper disable once PossibleMultipleEnumeration
             var simulatedTime = (ITime) dimensions.ElementAtOrDefault(0);
+            // ReSharper disable once PossibleMultipleEnumeration
             var perTime = (ITime) dimensions.ElementAtOrDefault(1);
             VerifyCompatibleDimensions(simulatedTime, perTime);
         }
@@ -608,11 +627,13 @@ namespace Kingdom.Clockworks
         {
             var actualDimensions = new[] {simulatedTime, perTimerTime};
 
-            if (ComparableDimensions.AreCompatible(actualDimensions, true))
+            var dimensions = ComparableDimensions.ToArray();
+
+            if (dimensions.AreCompatible(actualDimensions, true))
                 return;
 
             var message = string.Format("Expecting dimensions {0} but was {1}.",
-                string.Join(" ", ComparableDimensions.Select(d => d.ToString())),
+                string.Join(" ", dimensions.Select(d => d.ToString())),
                 string.Join(" ", actualDimensions.Select(d => d.ToString())));
 
             throw new IncompatibleDimensionsException(message);

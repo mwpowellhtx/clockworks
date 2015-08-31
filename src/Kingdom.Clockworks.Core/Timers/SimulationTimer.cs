@@ -76,15 +76,21 @@ namespace Kingdom.Clockworks.Timers
 
                 if (CannotBeNegative)
                 {
+                    // Stop the timer as soon as we discover it should be stopped.
+                    if ((Quantity) _elapsedQty + candidateQty >= StartingQty)
+                        Stop();
+
                     remainingQty = Quantity.Min(Quantity.Zero(T.Millisecond), remainingQty);
                     currentQty = (Quantity) Quantity.Max(candidateQty, remainingQty);
                 }
 
-                if (CannotBeNegative && (Quantity) _elapsedQty + candidateQty >= StartingQty)
-                    Stop();
+                // Which by now current is what it should be.
+                _elapsedQty += currentQty;
 
-                return new TimerElapsedEventArgs(request, _elapsedQty += currentQty,
-                    currentQty, StartingQty, remainingQty);
+                // This looks like a recalculation of the same but it may not be, especially if constrained by zero.
+                var trueRemainingQty = (Quantity) StartingQty - _elapsedQty;
+
+                return new TimerElapsedEventArgs(request, _elapsedQty, currentQty, StartingQty, trueRemainingQty);
             }
         }
 

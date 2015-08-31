@@ -1,4 +1,6 @@
 using System;
+using System.Threading;
+using Kingdom.Unitworks;
 
 namespace Kingdom.Clockworks
 {
@@ -8,43 +10,63 @@ namespace Kingdom.Clockworks
     public interface IStartableClock
     {
         /// <summary>
-        /// Starts the stopwatch running.
+        /// Gets whether the clock IsRunning.
+        /// </summary>
+        bool IsRunning { get; }
+
+        /// <summary>
+        /// Starts the clock running.
         /// </summary>
         void Start();
 
         /// <summary>
-        /// Starts the stopwatch running using the specified <paramref name="interval"/>.
+        /// Starts the clock running using the specified <paramref name="interval"/>.
+        /// Starting the clock with <see cref="Timeout.Infinite"/> stops the clock timer from running.
         /// </summary>
         /// <param name="interval"></param>
         void Start(int interval);
 
         /// <summary>
-        /// Starts the stopwatch running using the specified <paramref name="interval"/>.
+        /// Starts the clock running using the specified <paramref name="interval"/>.
         /// </summary>
         /// <param name="interval"></param>
         void Start(long interval);
 
         /// <summary>
-        /// Starts the stopwatch running using the specified <paramref name="interval"/>.
+        /// Starts the clock running using the specified <paramref name="interval"/>.
         /// </summary>
         /// <param name="interval"></param>
         void Start(uint interval);
 
         /// <summary>
-        /// Starts the stopwatch running using the specified <paramref name="interval"/>.
+        /// Starts the clock running using the specified <paramref name="interval"/>.
         /// </summary>
         /// <param name="interval"></param>
         void Start(TimeSpan interval);
 
         /// <summary>
-        /// Stops the stopwatch from running.
+        /// Stops the clock from running.
         /// </summary>
         void Stop();
+    }
+
+    /// <summary>
+    /// Represents an <see cref="IStartableClock"/> with specified <see cref="TimerElapsed"/> event.
+    /// </summary>
+    /// <typeparam name="TTimerElapsedEventArgs"></typeparam>
+    public interface IStartableClock<TTimerElapsedEventArgs> : IStartableClock
+        where TTimerElapsedEventArgs : EventArgs
+    {
+        /// <summary>
+        /// Gets or sets the internal TimerIntervalQty. Settings the interval to
+        /// <see cref="double.NegativeInfinity"/> or <see cref="double.PositiveInfinity"/> stops the
+        /// clock timer from running.
+        /// </summary>
+        IQuantity TimerIntervalQty { get; set; }
 
         /// <summary>
-        /// Resets the stopwatch.
+        /// TimerElapsed event.
         /// </summary>
-        /// <param name="elapsedMilliseconds"></param>
-        void Reset(double elapsedMilliseconds);
+        event EventHandler<TTimerElapsedEventArgs> TimerElapsed;
     }
 }

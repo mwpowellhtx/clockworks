@@ -10,9 +10,10 @@ namespace Kingdom.Clockworks
 {
     using T = Unitworks.Dimensions.Systems.Commons.Time;
 
-    public abstract class TimeableClockTestFixtureBase<TClock, TRequest> : TestFixtureBase
-        where TClock : class, IClockBase<TRequest>, new()
+    public abstract class TimeableClockTestFixtureBase<TClock, TRequest, TTimerElapsedEventArgs> : TestFixtureBase
+        where TClock : class, IClockBase<TRequest>, IStartableClock<TTimerElapsedEventArgs>, new()
         where TRequest : TimeableRequestBase
+        where TTimerElapsedEventArgs : EventArgs
     {
         protected IQuantity StartingQty { get; set; }
 
@@ -44,8 +45,11 @@ namespace Kingdom.Clockworks
 
         protected virtual void VerifyClock(TClock clock,
             IQuantity intervalTimePerTimeQty = null,
-            IQuantity timePerStepQty = null)
+            IQuantity timePerStepQty = null,
+            IQuantity timerIntervalQty = null)
         {
+            //TODO: should establish these as known defaults some where in the clock works assembly ...
+            // Initialize with nominal expected values.
             intervalTimePerTimeQty
                 = intervalTimePerTimeQty
                   ?? new Quantity(1, clock.IntervalTimePerTimeQty.Dimensions);
@@ -54,14 +58,24 @@ namespace Kingdom.Clockworks
                 = timePerStepQty
                   ?? new Quantity(1, clock.TimePerStepQty.Dimensions);
 
+            timerIntervalQty
+                = timerIntervalQty
+                  ?? new Quantity(double.NegativeInfinity, clock.TimerIntervalQty.Dimensions);
+
+            // Better organized verification.
             Assert.That(clock, Is.Not.Null);
-            Assert.That(clock.StartingQty.Equals(StartingQty));
-            Assert.That(clock.ElapsedQty.Equals(Quantity.Zero(clock.ElapsedQty.Dimensions)));
-            Assert.That(clock.TimePerStepQty.Equals(timePerStepQty));
             Assert.That(clock.CurrentRequest, Is.Null);
-            Assert.That(clock.Elapsed, Is.EqualTo(TimeSpan.Zero));
-            Assert.That(clock.IntervalTimePerTimeQty.Equals(intervalTimePerTimeQty));
+
             Assert.That(clock.IsRunning, Is.False);
+            Assert.That(clock.TimerIntervalQty.Equals(timerIntervalQty));
+
+            Assert.That(clock.IntervalTimePerTimeQty.Equals(intervalTimePerTimeQty));
+            Assert.That(clock.TimePerStepQty.Equals(timePerStepQty));
+
+            Assert.That(clock.StartingQty.Equals(StartingQty));
+
+            Assert.That(clock.Elapsed, Is.EqualTo(TimeSpan.Zero));
+            Assert.That(clock.ElapsedQty.Equals(Quantity.Zero(clock.ElapsedQty.Dimensions)));
         }
 
         /// <summary>
@@ -226,10 +240,6 @@ namespace Kingdom.Clockworks
                     });
             }
         }
-
-        //protected abstract void VerifyIncrementOperator(TClock clock);
-
-        //protected abstract void VerifyDecrementOperator(TClock clock);
     }
 }
 

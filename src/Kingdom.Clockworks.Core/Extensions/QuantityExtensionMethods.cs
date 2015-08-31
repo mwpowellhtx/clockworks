@@ -82,5 +82,15 @@ namespace Kingdom.Clockworks
 
             return TimeSpan.Zero;
         }
+
+        /// <summary>
+        /// Gets an <see cref="IQuantity"/> given the <see cref="value"/>.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static IQuantity ToQuantity(this TimeSpan value)
+        {
+            return new Quantity(value.TotalMilliseconds, T.Millisecond);
+        }
     }
 }

@@ -5,8 +5,8 @@ namespace Kingdom.Clockworks.Stopwatches
 {
     using T = Unitworks.Dimensions.Systems.Commons.Time;
 
-    public class SimulationStopwatchTests
-        : TimeableClockTestFixtureBase<SimulationStopwatch, StopwatchRequest>
+    public class SimulationStopwatchTests : TimeableClockTestFixtureBase<
+        SimulationStopwatch, StopwatchRequest, StopwatchElapsedEventArgs>
     {
         protected override IQuantity CalculateEstimated(ChangeType change, int steps,
             IQuantity intervalTimePerTimeQty, IQuantity timePerStepQty)

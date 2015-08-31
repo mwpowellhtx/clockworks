@@ -1,13 +1,12 @@
 using System.Linq;
 using Kingdom.Unitworks;
-using NUnit.Framework;
 
 namespace Kingdom.Clockworks.Timers
 {
     using T = Unitworks.Dimensions.Systems.Commons.Time;
 
-    public class SimulationTimerTests
-        : TimeableClockTestFixtureBase<SimulationTimer, TimerRequest>
+    public class SimulationTimerTests : TimeableClockTestFixtureBase<
+        SimulationTimer, TimerRequest, TimerElapsedEventArgs>
     {
         protected override IQuantity CalculateEstimated(ChangeType change, int steps,
             IQuantity intervalTimePerTimeQty, IQuantity timePerStepQty)
