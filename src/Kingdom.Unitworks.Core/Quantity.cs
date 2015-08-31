@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Linq.Expressions;
 using Kingdom.Unitworks.Dimensions;
 
 namespace Kingdom.Unitworks
@@ -650,6 +651,18 @@ namespace Kingdom.Unitworks
         public static double Power(this double x, double y = 0d)
         {
             return y.Equals(0d) ? 1d : Math.Pow(x, y);
+        }
+
+        /// <summary>
+        /// Returns a new <see cref="IQuantity"/> with <paramref name="value"/> and with the same
+        /// dimensionality as <paramref name="qty"/>.
+        /// </summary>
+        /// <param name="qty"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static IQuantity CloneDimensions(this IQuantity qty, double value = default(double))
+        {
+            return new Quantity(value, ReferenceEquals(null, qty) ?  new IDimension[0] : qty.Dimensions.ToArray());
         }
     }
 }
