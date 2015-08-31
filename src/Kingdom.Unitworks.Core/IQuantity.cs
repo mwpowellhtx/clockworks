@@ -41,7 +41,27 @@ namespace Kingdom.Unitworks
         IQuantity Inverse();
 
         /// <summary>
-        /// 
+        /// Gets whether IsNaN.
+        /// </summary>
+        bool IsNaN { get; }
+
+        /// <summary>
+        /// Gets whether IsPositiveInfinity.
+        /// </summary>
+        bool IsPositiveInfinity { get; }
+
+        /// <summary>
+        /// Gets whether IsNegativeInfinity.
+        /// </summary>
+        bool IsNegativeInfinity { get; }
+
+        /// <summary>
+        /// Gets whether IsInfinity.
+        /// </summary>
+        bool IsInfinity { get; }
+
+        /// <summary>
+        /// Gets whether Is Dimensionless.
         /// </summary>
         bool IsDimensionless { get; }
 

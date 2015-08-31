@@ -483,9 +483,49 @@ namespace Kingdom.Unitworks
             return squared*this;
         }
 
+        /// <summary>
+        /// Gets whether IsNaN.
+        /// </summary>
+        public virtual bool IsNaN
+        {
+            get { return double.IsNaN(Value); }
+        }
+
+        /// <summary>
+        /// Gets whether IsPositiveInfinity.
+        /// </summary>
+        public virtual bool IsPositiveInfinity
+        {
+            get { return double.IsPositiveInfinity(Value); }
+        }
+
+        /// <summary>
+        /// Gets whether IsNegativeInfinity.
+        /// </summary>
+        public virtual bool IsNegativeInfinity
+        {
+            get { return double.IsNegativeInfinity(Value); }
+        }
+
+        /// <summary>
+        /// Gets whether IsInfinity.
+        /// </summary>
+        public virtual bool IsInfinity
+        {
+            get { return double.IsInfinity(Value); }
+        }
+
+        /// <summary>
+        /// Gets whether IsDimensionless.
+        /// </summary>
         public virtual bool IsDimensionless
         {
-            get { return !Dimensions.Any() || Dimensions.Sum(d => d.Exponent) == 0; }
+            get
+            {
+                if (!Dimensions.Any()) return false;
+                var enumerated = Dimensions.EnumerateAll().ToArray();
+                return enumerated.Sum(d => d.Exponent) == 0;
+            }
         }
 
         public override string ToString()
