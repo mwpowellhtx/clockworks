@@ -2,12 +2,12 @@
 <package>
     <metadata>
         <id>Kingdom.Clockworks.Core</id>
-        <version>3.2.0</version>
+        <version>3.2.2</version>
         <authors>Michael W. Powell</authors>
         <requireLicenseAcceptance>false</requireLicenseAcceptance>
         <description>Sometimes it is necessary to exercise control over a system clock during controlled, simulated experiments.</description>
         <dependencies>
-            <dependency id="Kingdom.Unitworks.Core" version="[2.0.0,3.0.0)" />
+            <dependency id="Kingdom.Unitworks.Core" version="[2.7.0,3.0.0)" />
         </dependencies>
     </metadata>
     <files>
