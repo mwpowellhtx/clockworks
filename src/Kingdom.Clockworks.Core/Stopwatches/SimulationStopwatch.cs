@@ -1,8 +1,9 @@
 ﻿using Kingdom.Unitworks;
+using Kingdom.Unitworks.Dimensions.Systems.Commons;
 
 namespace Kingdom.Clockworks.Stopwatches
 {
-    using T = Unitworks.Dimensions.Systems.Commons.Time;
+    using T = Time;
 
     /// <summary>
     /// Represents a stopwatch used for simulation purposes. This does not depend on a live system
@@ -18,14 +19,14 @@ namespace Kingdom.Clockworks.Stopwatches
         /// Default Constructor
         /// </summary>
         public SimulationStopwatch()
-            : this(Quantity.Zero(T.Millisecond))
+            : this(null)
         {
         }
 
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="startingQty"></param>
+        /// <param name="startingQty">Provide a starting <see cref="Time"/> based quantity. Default is zero.</param>
         public SimulationStopwatch(IQuantity startingQty)
             : base(startingQty)
         {

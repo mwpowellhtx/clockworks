@@ -179,10 +179,48 @@ namespace Kingdom.Clockworks
         public IQuantity TimePerStepQty
         {
             get { return _timePerStepQty; }
-            set { _timePerStepQty = value; }
+            set { SetQuantity(value, new Quantity(1, T.Second), out _timePerStepQty); }
         }
 
         #endregion
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="valueQty"></param>
+        /// <param name="defaultQty"></param>
+        /// <param name="fieldQty"></param>
+        protected static void SetQuantity(IQuantity valueQty, IQuantity defaultQty, out IQuantity fieldQty)
+        {
+            // There's a bit of overhead involved here, but it's unavoidable in keeping with dimensional safety over convenience.
+            if (ReferenceEquals(null, defaultQty))
+                throw new ArgumentNullException("defaultQty", "Default quantity must not be null.");
+            valueQty = (IQuantity)((valueQty ?? defaultQty).Clone());
+            VerifyCompatibleDimensions(valueQty.Dimensions, defaultQty.Dimensions.ToArray());
+            fieldQty = valueQty;
+        }
+
+        /// <summary>
+        /// Verifies that the dimensions are compatible.
+        /// </summary>
+        /// <param name="dimensions"></param>
+        /// <param name="expected"></param>
+        private static void VerifyCompatibleDimensions(IEnumerable<IDimension> dimensions,
+            params IDimension[] expected)
+        {
+            if (dimensions == null)
+                throw new ArgumentNullException("dimensions", "There must be dimensions.");
+
+            var local = dimensions.ToArray();
+
+            if (local.AreCompatible(expected)) return;
+
+            var message = string.Format("Expecting dimensions {{{0}}} but was {{{1}}}.",
+                string.Join(" ", expected.Select(d => d.ToString())),
+                string.Join(" ", local.Select(d => d.ToString())));
+
+            throw new IncompatibleDimensionsException(message);
+        }
 
         /* TODO: TBD: increment/decrement? Direction? continuous/latching? or leave the previous state alone?
          * "Next" almost needs to include Direction + steps and that's it. Some of which is internal state,
@@ -274,7 +312,7 @@ namespace Kingdom.Clockworks
         public IQuantity StartingQty
         {
             get { return _startingQty; }
-            set { _startingQty = value ?? Quantity.Zero(T.Second); }
+            set { SetQuantity(value, Quantity.Zero(T.Second), out _startingQty); }
         }
 
         /// <summary>
@@ -343,7 +381,11 @@ namespace Kingdom.Clockworks
         public IQuantity ElapsedQty
         {
             get { lock (this) return _elapsedQty; }
-            set { _elapsedQty = value ?? new Quantity(0d, T.Second); }
+            set
+            {
+                // Ditto StartingQty re: overhead.
+                _elapsedQty = (IQuantity) ((value ?? Quantity.Zero(T.Second)).Clone());
+            }
         }
 
         /// <summary>
@@ -380,8 +422,8 @@ namespace Kingdom.Clockworks
         protected TimeableClockBase(IQuantity startingQty)
         {
             StartingQty = startingQty;
-            ElapsedQty = Quantity.Zero(T.Millisecond);
-            IntervalTimePerTimeQty = new Quantity(1d, T.Second, T.Second.Invert());
+            ElapsedQty = null;
+            IntervalTimePerTimeQty = null;
         }
 
         #region Internal Timer Concerns
@@ -587,56 +629,15 @@ namespace Kingdom.Clockworks
 
         #region Scaleable Clock Members
 
-        private IQuantity _intervalTimePerTimeQty = Quantity.Zero(T.Second, T.Second.Invert());
+        private IQuantity _intervalTimePerTimeQty;
 
         /// <summary>
-        /// 
+        /// Gets or sets the IntervalTimePerTimeQty.
         /// </summary>
         public IQuantity IntervalTimePerTimeQty
         {
             get { return _intervalTimePerTimeQty; }
-            set
-            {
-                VerifyCompatibleDimensions(value.Dimensions);
-                _intervalTimePerTimeQty = (IQuantity)value.Clone();
-            }
-        }
-
-        /// <summary>
-        /// Gets the ComparableDimensions.
-        /// </summary>
-        private static IEnumerable<IDimension> ComparableDimensions
-        {
-            get
-            {
-                var s = T.Second;
-                return new[] {(ITime) s.Clone(), (ITime) s.Invert()};
-            }
-        }
-
-        private static void VerifyCompatibleDimensions(IEnumerable<IDimension> dimensions)
-        {
-            // ReSharper disable once PossibleMultipleEnumeration
-            var simulatedTime = (ITime) dimensions.ElementAtOrDefault(0);
-            // ReSharper disable once PossibleMultipleEnumeration
-            var perTime = (ITime) dimensions.ElementAtOrDefault(1);
-            VerifyCompatibleDimensions(simulatedTime, perTime);
-        }
-
-        private static void VerifyCompatibleDimensions(ITime simulatedTime, ITime perTimerTime)
-        {
-            var actualDimensions = new[] {simulatedTime, perTimerTime};
-
-            var dimensions = ComparableDimensions.ToArray();
-
-            if (dimensions.AreCompatible(actualDimensions, true))
-                return;
-
-            var message = string.Format("Expecting dimensions {0} but was {1}.",
-                string.Join(" ", dimensions.Select(d => d.ToString())),
-                string.Join(" ", actualDimensions.Select(d => d.ToString())));
-
-            throw new IncompatibleDimensionsException(message);
+            set { SetQuantity(value, new Quantity(1, T.Second, T.Second.Invert()), out _intervalTimePerTimeQty); }
         }
 
         #endregion
