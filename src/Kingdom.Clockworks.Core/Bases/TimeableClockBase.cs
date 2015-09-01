@@ -123,8 +123,10 @@ namespace Kingdom.Clockworks
         }
 
         /// <summary>
-        /// Starts the timerable clock timer running with specified <paramref name="interval"/>
-        /// in <see cref="Time.Millisecond"/>.
+        /// Starts the clock timer running with the <paramref name="interval"/> in
+        /// <see cref="Time.Millisecond"/>. Negative values causes the timer to stop.
+        /// <see cref="Timeout.Infinite"/> causes the timer to stop. Only positive
+        /// values cause the timer to run.
         /// </summary>
         /// <param name="interval"></param>
         public void Start(int interval)
@@ -133,8 +135,10 @@ namespace Kingdom.Clockworks
         }
 
         /// <summary>
-        /// Starts the timerable clock timer running with specified <paramref name="interval"/>
-        /// in <see cref="Time.Millisecond"/>.
+        /// Starts the clock timer running with the <paramref name="interval"/> in
+        /// <see cref="Time.Millisecond"/>. Negative values causes the timer to stop.
+        /// <see cref="Timeout.Infinite"/> causes the timer to stop. Only positive
+        /// values cause the timer to run.
         /// </summary>
         /// <param name="interval"></param>
         public void Start(long interval)
@@ -143,8 +147,10 @@ namespace Kingdom.Clockworks
         }
 
         /// <summary>
-        /// Starts the timerable clock timer running with specified <paramref name="interval"/>
-        /// in <see cref="Time.Millisecond"/>.
+        /// Starts the clock timer running with the <paramref name="interval"/> in
+        /// <see cref="Time.Millisecond"/>. Negative values causes the timer to stop.
+        /// <see cref="Timeout.Infinite"/> causes the timer to stop. Only positive
+        /// values cause the timer to run.
         /// </summary>
         /// <param name="interval"></param>
         public void Start(uint interval)
@@ -153,11 +159,21 @@ namespace Kingdom.Clockworks
         }
 
         /// <summary>
-        /// Starts the clock timer running with the <paramref name="interval"/> in <see cref="Time.Millisecond"/>.
+        /// Starts the clock timer running with the <paramref name="interval"/> in
+        /// <see cref="Time.Millisecond"/>. Negative values causes the timer to stop.
+        /// <see cref="double.NegativeInfinity"/> causes the timer to stop. Only positive
+        /// values cause the timer to run.
         /// </summary>
         /// <param name="interval"></param>
-        private void Start(double interval)
+        public void Start(double interval)
         {
+            const double defaultInterval = default(double);
+
+            // Either cause to be Infinity (stopped) or allow positive only.
+            interval = (double.IsInfinity(interval) || interval <= defaultInterval)
+                ? double.NegativeInfinity
+                : interval;
+
             TimerIntervalQty = new Quantity(interval, T.Millisecond);
         }
 
