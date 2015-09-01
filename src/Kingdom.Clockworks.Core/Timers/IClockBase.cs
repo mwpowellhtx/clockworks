@@ -5,7 +5,7 @@ namespace Kingdom.Clockworks.Timers
     /// <summary>
     /// 
     /// </summary>
-    public interface IClockBase
+    public interface IClockBase : IDisposable
     {
     }
 
@@ -19,7 +19,6 @@ namespace Kingdom.Clockworks.Timers
             , ISteppableClock
             , IMeasurableClock<TRequest>
             , IStartableClock
-            , IDisposable
         where TRequest : TimeableRequestBase
     {
     }

@@ -1,4 +1,5 @@
 
+using System;
 using Kingdom.Unitworks;
 
 namespace Kingdom.Clockworks
@@ -6,7 +7,7 @@ namespace Kingdom.Clockworks
     /// <summary>
     /// Represents the scalability of a clock.
     /// </summary>
-    public interface IScaleableClock
+    public interface IScaleableClock : IDisposable
     {
         /// <summary>
         /// Gets or sets how much time should pass between clock intervals. This may

@@ -90,6 +90,10 @@ namespace Kingdom.Clockworks
         /// <summary>
         /// Gets or sets the internal TimerIntervalQty.
         /// </summary>
+        /// <see cref="TimeableClockBase.Start(int)"/>
+        /// <see cref="TimeableClockBase.Start(long)"/>
+        /// <see cref="TimeableClockBase.Start(double)"/>
+        /// <see cref="TimeableClockBase.Stop"/>
         public IQuantity TimerIntervalQty
         {
             get { return _timerIntervalQty; }
@@ -98,7 +102,7 @@ namespace Kingdom.Clockworks
                 SetQuantity(value, new Quantity(double.NegativeInfinity, T.Second), out _timerIntervalQty);
                 if (_timerIntervalQty.IsInfinity)
                 {
-                    Stop();
+                    Stop(Timeout.Infinite);
                     return;
                 }
                 Start(_timerIntervalQty.ToTimeSpan());
@@ -106,7 +110,7 @@ namespace Kingdom.Clockworks
         }
 
         /// <summary>
-        /// Gets whether the timerable clock IsRunning.
+        /// Gets whether the timer clock IsRunning.
         /// </summary>
         public bool IsRunning
         {
@@ -114,7 +118,7 @@ namespace Kingdom.Clockworks
         }
 
         /// <summary>
-        /// Starts the timerable clock timer running. The default interval is every
+        /// Starts the timer clock timer running. The default interval is every
         /// half second, or 500 milliseconds.
         /// </summary>
         public void Start()
@@ -149,18 +153,6 @@ namespace Kingdom.Clockworks
         /// <summary>
         /// Starts the clock timer running with the <paramref name="interval"/> in
         /// <see cref="Time.Millisecond"/>. Negative values causes the timer to stop.
-        /// <see cref="Timeout.Infinite"/> causes the timer to stop. Only positive
-        /// values cause the timer to run.
-        /// </summary>
-        /// <param name="interval"></param>
-        public void Start(uint interval)
-        {
-            Start(interval == Timeout.Infinite ? double.NegativeInfinity : interval);
-        }
-
-        /// <summary>
-        /// Starts the clock timer running with the <paramref name="interval"/> in
-        /// <see cref="Time.Millisecond"/>. Negative values causes the timer to stop.
         /// <see cref="double.NegativeInfinity"/> causes the timer to stop. Only positive
         /// values cause the timer to run.
         /// </summary>
@@ -184,9 +176,18 @@ namespace Kingdom.Clockworks
         public abstract void Start(TimeSpan interval);
 
         /// <summary>
-        /// Stops the timerable clock timer from running.
+        /// Stops the timer clock from running.
         /// </summary>
-        public abstract void Stop();
+        public void Stop()
+        {
+            lock (this) TimerIntervalQty = null;
+        }
+
+        /// <summary>
+        /// Stops the timer from running.
+        /// </summary>
+        /// <param name="period"></param>
+        protected abstract void Stop(int period);
 
         #endregion
 
@@ -247,7 +248,7 @@ namespace Kingdom.Clockworks
          * or instantaneous, as necessary. */
 
         /// <summary>
-        /// Increments the timerable clock by one <see cref="RequestType.Instantaneous"/> step.
+        /// Increments the timer clock by one <see cref="RequestType.Instantaneous"/> step.
         /// </summary>
         public void Increment()
         {
@@ -255,7 +256,7 @@ namespace Kingdom.Clockworks
         }
 
         /// <summary>
-        /// Decrements the timerable clock by one <see cref="RequestType.Instantaneous"/> step.
+        /// Decrements the timer clock by one <see cref="RequestType.Instantaneous"/> step.
         /// </summary>
         public void Decrement()
         {
@@ -263,7 +264,7 @@ namespace Kingdom.Clockworks
         }
 
         /// <summary>
-        /// Increments the timerable clock given a number of <paramref name="steps"/> and <paramref name="type"/>.
+        /// Increments the timer clock given a number of <paramref name="steps"/> and <paramref name="type"/>.
         /// </summary>
         /// <param name="steps"></param>
         /// <param name="timePerStepQty">Represents a time component per step.</param>
@@ -272,7 +273,7 @@ namespace Kingdom.Clockworks
             RequestType type = RequestType.Continuous);
 
         /// <summary>
-        /// Decrements the timerable clock given a number of <paramref name="steps"/> and <paramref name="type"/>.
+        /// Decrements the timer clock given a number of <paramref name="steps"/> and <paramref name="type"/>.
         /// </summary>
         /// <param name="steps"></param>
         /// <param name="timePerStepQty">Represents a time component per step.</param>
@@ -445,7 +446,7 @@ namespace Kingdom.Clockworks
         #region Internal Timer Concerns
 
         /// <summary>
-        /// This portion of the timerable clock is consistent regardless of whether we are
+        /// This portion of the timer clock is consistent regardless of whether we are
         /// talking about <see cref="Next"/> or <see cref="NextAsync"/>.
         /// </summary>
         /// <param name="request"></param>
@@ -494,7 +495,7 @@ namespace Kingdom.Clockworks
         }
 
         /// <summary>
-        /// Processes the next timerable clock <paramref name="request"/> asynchronously.
+        /// Processes the next timer clock <paramref name="request"/> asynchronously.
         /// </summary>
         /// <param name="request"></param>
         private void NextAsync(TRequest request)
@@ -518,14 +519,14 @@ namespace Kingdom.Clockworks
         }
 
         /// <summary>
-        /// Processes the next timerable clock <paramref name="request"/>.
+        /// Processes the next timer clock <paramref name="request"/>.
         /// </summary>
         /// <param name="request"></param>
         private void Next(TRequest request)
         {
             lock (this)
             {
-                // Defer event handling free the lock in case anyone wants to callback into the timerable clock.
+                // Defer event handling free the lock in case anyone wants to callback into the timer clock.
                 RaiseTimerElapsed(GetNextEventArgs(request));
             }
         }
@@ -571,7 +572,7 @@ namespace Kingdom.Clockworks
         }
 
         /// <summary>
-        /// Increments the timerable clock given a number of <paramref name="steps"/> and <paramref name="type"/>.
+        /// Increments the timer clock given a number of <paramref name="steps"/> and <paramref name="type"/>.
         /// </summary>
         /// <param name="steps"></param>
         /// <param name="timePerStepQty">Represents a time component per step.</param>
@@ -585,7 +586,7 @@ namespace Kingdom.Clockworks
         }
 
         /// <summary>
-        /// Decrements the timerable clock given a number of <paramref name="steps"/> and <paramref name="type"/>.
+        /// Decrements the timer clock given a number of <paramref name="steps"/> and <paramref name="type"/>.
         /// </summary>
         /// <param name="steps"></param>
         /// <param name="timePerStepQty">Represents a time component per step.</param>
@@ -624,21 +625,17 @@ namespace Kingdom.Clockworks
         }
 
         /// <summary>
-        /// Stops the timerable clock timer from running.
+        /// Stops the timer clock from running.
         /// </summary>
-        public override void Stop()
+        /// <param name="period"></param>
+        protected override void Stop(int period)
         {
-            lock (this)
-            {
-                const int period = Timeout.Infinite;
+            Debug.Assert(period == Timeout.Infinite);
 
-                TimerIntervalQty = null;
+            TryChangeTimer(period, period);
 
-                TryChangeTimer(period, period);
-
-                if (GetNextRequest().WillRun)
-                    Requests.Clear();
-            }
+            if (GetNextRequest().WillRun)
+                Requests.Clear();
         }
 
         #endregion

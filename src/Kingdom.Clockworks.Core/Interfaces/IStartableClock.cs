@@ -8,7 +8,7 @@ namespace Kingdom.Clockworks
     /// <summary>
     /// 
     /// </summary>
-    public interface IStartableClock
+    public interface IStartableClock : IDisposable
     {
         /// <summary>
         /// Gets whether the clock IsRunning.
@@ -37,15 +37,6 @@ namespace Kingdom.Clockworks
         /// </summary>
         /// <param name="interval"></param>
         void Start(long interval);
-
-        /// <summary>
-        /// Starts the clock timer running with the <paramref name="interval"/> in
-        /// <see cref="Time.Millisecond"/>. Negative values causes the timer to stop.
-        /// <see cref="Timeout.Infinite"/> causes the timer to stop. Only positive
-        /// values cause the timer to run.
-        /// </summary>
-        /// <param name="interval"></param>
-        void Start(uint interval);
 
         /// Starts the clock timer running with the <paramref name="interval"/> in
         /// <see cref="Time.Millisecond"/>. Negative values causes the timer to stop.
@@ -77,6 +68,10 @@ namespace Kingdom.Clockworks
         /// <see cref="double.NegativeInfinity"/> or <see cref="double.PositiveInfinity"/> stops the
         /// clock timer from running.
         /// </summary>
+        /// <see cref="IStartableClock.Start(int)"/>
+        /// <see cref="IStartableClock.Start(long)"/>
+        /// <see cref="IStartableClock.Start(double)"/>
+        /// <see cref="IStartableClock.Stop"/>
         IQuantity TimerIntervalQty { get; set; }
 
         /// <summary>

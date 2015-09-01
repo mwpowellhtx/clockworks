@@ -10,6 +10,12 @@ namespace Kingdom.Clockworks
 {
     using T = Unitworks.Dimensions.Systems.Commons.Time;
 
+    /// <summary>
+    /// Sets up a test fixture in order to host <see cref="TClock"/> related unit tests.
+    /// </summary>
+    /// <typeparam name="TClock"></typeparam>
+    /// <typeparam name="TRequest"></typeparam>
+    /// <typeparam name="TTimerElapsedEventArgs"></typeparam>
     public abstract class TimeableClockTestFixtureBase<TClock, TRequest, TTimerElapsedEventArgs> : TestFixtureBase
         where TClock : class, IClockBase<TRequest>, IStartableClock<TTimerElapsedEventArgs>, new()
         where TRequest : TimeableRequestBase
@@ -242,6 +248,24 @@ namespace Kingdom.Clockworks
                         var estimatedElapsed = estimatedQty.ToTimeSpan();
                         Assert.That(c.Elapsed, Is.EqualTo(estimatedElapsed));
                     });
+            }
+        }
+
+        [Test]
+        [TestCase(250, 2500)]
+        [TestCase(250L, 2500)]
+        [TestCase(250d, 2500)]
+        public void Verify_startability(object interval, int durationMilliseconds)
+        {
+            //TODO: "normalize" the duration so that we can some counts ...
+
+            using (var clock = CreateClock())
+            {
+                using (var fixture = new TimeableClockStartableFixture<TClock, TRequest, TTimerElapsedEventArgs>(
+                    clock, durationMilliseconds))
+                {
+                    fixture.Start(interval);
+                }
             }
         }
     }

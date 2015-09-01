@@ -74,6 +74,7 @@
     <Compile Include="Extensions\ClockExtensionMethods.cs" />
     <Compile Include="Stopwatches\SimulationStopwatchTests.cs" />
     <Compile Include="Attributes\TimerIntervalValuesAttribute.cs" />
+    <Compile Include="TimeableClockStartableFixture.cs" />
     <Compile Include="Timers\SimulationTimerTests.cs" />
     <Compile Include="TimeableClockTestFixtureBase.cs" />
     <Compile Include="SystemClockFixture.cs" />

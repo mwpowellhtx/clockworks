@@ -1,11 +1,12 @@
-﻿using Kingdom.Unitworks;
+﻿using System;
+using Kingdom.Unitworks;
 
 namespace Kingdom.Clockworks
 {
     /// <summary>
     /// Represents the capability to step the timeable clock along.
     /// </summary>
-    public interface ISteppableClock
+    public interface ISteppableClock : IDisposable
     {
         /// <summary>
         /// Increments the timeable clock by one <see cref="RequestType.Instantaneous"/> step.

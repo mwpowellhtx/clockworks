@@ -8,7 +8,7 @@ namespace Kingdom.Clockworks
     /// <summary>
     /// Provides a way of measuring the stopwatch behavior.
     /// </summary>
-    public interface IMeasurableClock
+    public interface IMeasurableClock : IDisposable
     {
         /// <summary>
         /// Gets the Starting <see cref="TimeSpan"/>.
