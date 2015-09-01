@@ -1,6 +1,7 @@
 using System;
 using System.Threading;
 using Kingdom.Unitworks;
+using Kingdom.Unitworks.Dimensions.Systems.Commons;
 
 namespace Kingdom.Clockworks
 {
@@ -20,20 +21,23 @@ namespace Kingdom.Clockworks
         void Start();
 
         /// <summary>
-        /// Starts the clock running using the specified <paramref name="interval"/>.
+        /// Starts the clock running using the specified <paramref name="interval"/>
+        /// in <see cref="Time.Millisecond"/>.
         /// Starting the clock with <see cref="Timeout.Infinite"/> stops the clock timer from running.
         /// </summary>
         /// <param name="interval"></param>
         void Start(int interval);
 
         /// <summary>
-        /// Starts the clock running using the specified <paramref name="interval"/>.
+        /// Starts the clock running using the specified <paramref name="interval"/>
+        /// in <see cref="Time.Millisecond"/>.
         /// </summary>
         /// <param name="interval"></param>
         void Start(long interval);
 
         /// <summary>
-        /// Starts the clock running using the specified <paramref name="interval"/>.
+        /// Starts the clock running using the specified <paramref name="interval"/>
+        /// in <see cref="Time.Millisecond"/>.
         /// </summary>
         /// <param name="interval"></param>
         void Start(uint interval);

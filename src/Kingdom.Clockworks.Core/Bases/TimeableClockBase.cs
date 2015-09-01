@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Kingdom.Unitworks;
 using Kingdom.Unitworks.Dimensions;
+using Kingdom.Unitworks.Dimensions.Systems.Commons;
 
 namespace Kingdom.Clockworks
 {
@@ -94,7 +95,7 @@ namespace Kingdom.Clockworks
             get { return _timerIntervalQty; }
             set
             {
-                _timerIntervalQty = value ?? new Quantity(double.NegativeInfinity, T.Second);
+                SetQuantity(value, new Quantity(double.NegativeInfinity, T.Second), out _timerIntervalQty);
                 if (_timerIntervalQty.IsInfinity)
                 {
                     Stop();
@@ -122,7 +123,8 @@ namespace Kingdom.Clockworks
         }
 
         /// <summary>
-        /// Starts the timerable clock timer running with specified <paramref name="interval"/>.
+        /// Starts the timerable clock timer running with specified <paramref name="interval"/>
+        /// in <see cref="Time.Millisecond"/>.
         /// </summary>
         /// <param name="interval"></param>
         public void Start(int interval)
@@ -131,7 +133,8 @@ namespace Kingdom.Clockworks
         }
 
         /// <summary>
-        /// Starts the timerable clock timer running with specified <paramref name="interval"/>.
+        /// Starts the timerable clock timer running with specified <paramref name="interval"/>
+        /// in <see cref="Time.Millisecond"/>.
         /// </summary>
         /// <param name="interval"></param>
         public void Start(long interval)
@@ -140,7 +143,8 @@ namespace Kingdom.Clockworks
         }
 
         /// <summary>
-        /// Starts the timerable clock timer running with specified <paramref name="interval"/>.
+        /// Starts the timerable clock timer running with specified <paramref name="interval"/>
+        /// in <see cref="Time.Millisecond"/>.
         /// </summary>
         /// <param name="interval"></param>
         public void Start(uint interval)
@@ -149,7 +153,7 @@ namespace Kingdom.Clockworks
         }
 
         /// <summary>
-        /// Starts the clock timer running with the <paramref name="interval"/>.
+        /// Starts the clock timer running with the <paramref name="interval"/> in <see cref="Time.Millisecond"/>.
         /// </summary>
         /// <param name="interval"></param>
         private void Start(double interval)
@@ -381,11 +385,7 @@ namespace Kingdom.Clockworks
         public IQuantity ElapsedQty
         {
             get { lock (this) return _elapsedQty; }
-            set
-            {
-                // Ditto StartingQty re: overhead.
-                _elapsedQty = (IQuantity) ((value ?? Quantity.Zero(T.Second)).Clone());
-            }
+            set { SetQuantity(value, Quantity.Zero(T.Second), out _elapsedQty); }
         }
 
         /// <summary>
