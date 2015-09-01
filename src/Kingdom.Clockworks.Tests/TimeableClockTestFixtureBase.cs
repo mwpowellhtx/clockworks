@@ -112,6 +112,10 @@ namespace Kingdom.Clockworks
 
                 var methodInfo = clockType.GetMethod(methodName, flags, Type.DefaultBinder, types.ToArray(), null);
 
+                Assert.That(methodInfo, Is.Not.Null);
+
+                Console.WriteLine("Changing clock with: {0}", methodInfo);
+
                 methodInfo.Invoke(obj, args);
 
                 return clock;
@@ -175,7 +179,7 @@ namespace Kingdom.Clockworks
         }
 
         [Test]
-        public void Verify_instantaneous_clock_instance_method(
+        public void Verify_instantaneous_instance_method(
             [InstanceChangeTypeValues] ChangeType change,
             [IntervalTimePerTimeValues] IQuantity intervalTimePerTimeQty,
             [Values(1, 2, 3)] int steps,
@@ -197,7 +201,7 @@ namespace Kingdom.Clockworks
         }
 
         [Test]
-        public void Verify_instantaneous_unary_operator_clock_operator_method(
+        public void Verify_instantaneous_unary_operator_overload(
             [UnaryOperatorChangeTypeValues] ChangeType change,
             [IntervalTimePerTimeValues] IQuantity intervalTimePerTimeQty,
             [TimePerStepValues] IQuantity timePerStepQty)
@@ -220,7 +224,7 @@ namespace Kingdom.Clockworks
         }
 
         [Test]
-        public void Verify_instantaneous_binary_operator_clock_operator_method(
+        public void Verify_instantaneous_binary_operator_overload(
             [BinaryOperatorChangeTypeValues] ChangeType change,
             [IntervalTimePerTimeValues] IQuantity intervalTimePerTimeQty,
             [Values(1, 2, 3)] int steps,
