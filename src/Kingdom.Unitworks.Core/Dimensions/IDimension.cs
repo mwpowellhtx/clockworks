@@ -134,12 +134,10 @@ namespace Kingdom.Unitworks.Dimensions
         /// <returns></returns>
         public static IEnumerable<IDimension> Clone(this IEnumerable<IDimension> dimensions)
         {
-            foreach (var d in dimensions ?? new IDimension[0])
-            {
-                var cloned = (IDimension) d.Clone();
-                cloned.Exponent = d.Exponent;
-                yield return d;
-            }
+            // This can just clone the dimensions and not worry about the exponent not being part of them.
+            return from d in dimensions
+                             ?? new IDimension[0]
+                select (IDimension) d.Clone();
         }
 
         ///// <summary>

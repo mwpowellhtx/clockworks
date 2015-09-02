@@ -131,23 +131,21 @@ namespace Kingdom.Unitworks.Dimensions
         public virtual IDimension Invert()
         {
             var inverted = (IDimension) Clone();
-            inverted.Exponent = 0 - Exponent;
+            inverted.Exponent = 0 - inverted.Exponent;
             return inverted;
         }
 
         public virtual IDimension Squared()
         {
-            var exponent = Exponent;
             var squared = (IDimension) Clone();
-            squared.Exponent = exponent + exponent;
+            squared.Exponent *= 2;
             return squared;
         }
 
         public virtual IDimension Cubed()
         {
-            var exponent = Exponent;
             var cubed = (IDimension) Clone();
-            cubed.Exponent = exponent + exponent + exponent;
+            cubed.Exponent *= 3;
             return cubed;
         }
 
@@ -158,9 +156,8 @@ namespace Kingdom.Unitworks.Dimensions
         /// <returns></returns>
         public virtual IDimension Power(int power)
         {
-            var exponent = Exponent;
             var cloned = (IDimension) Clone();
-            cloned.Exponent = exponent*power;
+            cloned.Exponent *= power;
             return cloned;
         }
 
