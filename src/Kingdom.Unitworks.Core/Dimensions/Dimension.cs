@@ -4,6 +4,9 @@ using System.Reflection;
 
 namespace Kingdom.Unitworks.Dimensions
 {
+    /// <summary>
+    /// Represents what a dimension is to quantities and dimensional analysis.
+    /// </summary>
     public abstract partial class Dimension : IDimension
     {
         public override int GetHashCode()
@@ -53,6 +56,10 @@ namespace Kingdom.Unitworks.Dimensions
             protected internal set { _displayName = value; }
         }
 
+        /// <summary>
+        /// Protected Constructor
+        /// </summary>
+        /// <param name="abbreviation"></param>
         protected Dimension(string abbreviation)
         {
             Register(this);
@@ -60,6 +67,12 @@ namespace Kingdom.Unitworks.Dimensions
             Abbreviation = abbreviation;
         }
 
+        /// <summary>
+        /// Protected Constructor
+        /// </summary>
+        /// <param name="abbreviation"></param>
+        /// <param name="toBase"></param>
+        /// <param name="fromBase"></param>
         protected Dimension(string abbreviation, IUnitConversion toBase = null, IUnitConversion fromBase = null)
             : this(abbreviation)
         {
@@ -67,6 +80,10 @@ namespace Kingdom.Unitworks.Dimensions
             FromBase = fromBase ?? BaseDimensionUnitConversion.DefaultConversion;
         }
 
+        /// <summary>
+        /// Protected Constructor
+        /// </summary>
+        /// <param name="other"></param>
         protected Dimension(Dimension other)
             : this(other.Abbreviation)
         {

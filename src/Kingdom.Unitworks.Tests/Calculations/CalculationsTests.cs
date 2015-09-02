@@ -64,12 +64,19 @@ namespace Kingdom.Unitworks.Calculations
         }
 
         [Test]
-        [TestCase(100d, 200d, 2627416d)]
+        [TestCase(100d, 200d, 66736)]
         public void Verify_that_ridiculous_dimension_times_absurd_dimension_is_correct_in_inches(
-            double aValue, double bValue, double expectedValue)
+            double aValue, double bValue, int expectedValue)
         {
-            var a = new Quantity(aValue, SiV.MetersPerMinute, SiA.SquareMeter, SiL.Kilometer.Invert());
-            var b = new Quantity(bValue, SiV.MetersPerSecond, SiA.SquareMeter.Invert(), UsL.Foot.Invert());
+            var a = new Quantity(aValue,
+                SiV.MetersPerMinute.Squared(),
+                SiA.SquareMeter.Squared(),
+                SiL.Kilometer.Invert());
+
+            var b = new Quantity(bValue,
+                SiV.MetersPerSecond,
+                SiA.SquareMeter.Invert(),
+                UsL.Foot.Invert());
 
             var s = T.Second;
             var inch = UsL.Inch;
@@ -80,16 +87,24 @@ namespace Kingdom.Unitworks.Calculations
 
             Assert.That((int) result.Value, Is.EqualTo(expectedValue));
 
-            Assert.That(result.Dimensions.AreCompatible(new[] {inch.Power(4), s.Invert().Squared()}, true));
+            Assert.That(result.Dimensions
+                .AreCompatible(new[] {inch.Cubed(), s.Invert().Cubed()}, true));
         }
 
         [Test]
-        [TestCase(100d, 200d, 126d)]
+        [TestCase(100d, 200d, 38)]
         public void Verify_that_ridiculous_dimension_times_absurd_dimension_is_correct_in_feet(
-            double aValue, double bValue, double expectedValue)
+            double aValue, double bValue, int expectedValue)
         {
-            var a = new Quantity(aValue, SiV.MetersPerMinute, SiA.SquareMeter, SiL.Kilometer.Invert());
-            var b = new Quantity(bValue, SiV.MetersPerSecond, SiA.SquareMeter.Invert(), UsL.Foot.Invert());
+            var a = new Quantity(aValue,
+                SiV.MetersPerMinute.Squared(),
+                SiA.SquareMeter.Squared(),
+                SiL.Kilometer.Invert());
+
+            var b = new Quantity(bValue,
+                SiV.MetersPerSecond,
+                SiA.SquareMeter.Invert(),
+                UsL.Foot.Invert());
 
             var s = T.Second;
             var ft = UsL.Foot;
@@ -101,7 +116,8 @@ namespace Kingdom.Unitworks.Calculations
 
             Assert.That((int) result.Value, Is.EqualTo(expectedValue));
 
-            Assert.That(result.Dimensions.AreCompatible(new[] {ft.Power(4), s.Invert().Squared()}, true));
+            Assert.That(result.Dimensions
+                .AreCompatible(new[] {ft.Cubed(), s.Invert().Cubed()}, true));
         }
     }
 }

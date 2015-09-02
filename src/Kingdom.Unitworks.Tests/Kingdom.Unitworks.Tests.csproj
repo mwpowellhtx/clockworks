@@ -102,6 +102,7 @@
     <Compile Include="Quantities\DimensionlessQuantityMultiplicationTests.cs" />
     <Compile Include="Quantities\DimensionlessQuantitySubtractionTests.cs" />
     <Compile Include="Quantities\DimensionlessQuantityTests.cs" />
+    <Compile Include="Quantities\QuantityEquivalentTests.cs" />
     <Compile Include="Quantities\Trigonometric\ITrigonometricPart.cs" />
     <Compile Include="Quantities\Trigonometric\ITrigonometryContext.cs" />
     <Compile Include="Quantities\Trigonometric\TrigonometricPart.cs" />

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 
 namespace Kingdom.Unitworks.Dimensions
@@ -72,6 +71,7 @@ namespace Kingdom.Unitworks.Dimensions
                 (from d in other.Dimensions
                     select (IDimension) d.Clone()).ToArray())
         {
+            Exponent = other.Exponent;
         }
 
         /// <summary>

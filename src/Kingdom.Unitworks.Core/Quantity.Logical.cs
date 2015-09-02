@@ -22,8 +22,11 @@ namespace Kingdom.Unitworks
 
             if (x == null || y == null) return false;
 
-            if (!x.Dimensions.AreCompatible(y.Dimensions))
+            if (!x.Dimensions.EnumerateAll().AreEquivalent(
+                y.Dimensions.EnumerateAll()))
+            {
                 return false;
+            }
 
             var xBase = x.ToBase();
             var yBase = y.ToBase();
