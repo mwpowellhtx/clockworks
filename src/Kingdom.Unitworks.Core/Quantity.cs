@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Linq.Expressions;
 using Kingdom.Unitworks.Dimensions;
 
 namespace Kingdom.Unitworks
@@ -117,21 +116,9 @@ namespace Kingdom.Unitworks
         private static readonly Func<double, double, double> Addition = (a, b) => a + b;
         private static readonly Func<double, double, double> Subtraction = (a, b) => a - b;
 
-        private static void VerifyDimensionalCompatible(IQuantity a)
-        {
-            if (!a.Dimensions.AreEquivalent(new IDimension[0]))
-                throw new IDEX(a);
-        }
-
-        private static void VerifyDimensionsCompatible(IQuantity a, IQuantity b)
-        {
-            if (!a.Dimensions.AreEquivalent(b.Dimensions))
-                throw new IDEX(a, b);
-        }
-
         private static IQuantity Add(IQuantity a, IQuantity b, Func<double, double, double> adder)
         {
-            VerifyDimensionsCompatible(a, b);
+            a.VerifyDimensions(b);
 
             var aBase = a.ToBase();
             var bBase = b.ToBase();
@@ -144,7 +131,7 @@ namespace Kingdom.Unitworks
 
         private static IQuantity Add(IQuantity a, double b, Func<double, double, double> adder)
         {
-            VerifyDimensionalCompatible(a);
+            a.VerifyDimensions();
             return new Quantity(adder(a.Value, b));
         }
 
@@ -283,8 +270,9 @@ namespace Kingdom.Unitworks
             var aBase = a.ToBase();
             var bBase = b.ToBase();
 
+            //TODO: must B really be dimensionless? what are the ramifications for modulus being a close neighbor of division?
             // A can be any dimension, however, b must be dimensionless.
-            VerifyDimensionsCompatible(b, new Quantity());
+            b.VerifyDimensions();
 
             var aDims = aBase.Dimensions.EnumerateAll();
 
@@ -523,9 +511,13 @@ namespace Kingdom.Unitworks
         {
             get
             {
-                if (!Dimensions.Any()) return false;
-                var enumerated = Dimensions.EnumerateAll().ToArray();
-                return enumerated.Sum(d => d.Exponent) == 0;
+                // Oops should be returning TRUE here of couse.
+                if (!Dimensions.Any()) return true;
+
+                // Followed closely by, take the enumerated dimensions and reduce them.
+                var enumerated = Dimensions.EnumerateAll().Reduce().ToArray();
+
+                return !enumerated.Any();
             }
         }
 
@@ -602,6 +594,36 @@ namespace Kingdom.Unitworks
     /// </summary>
     public static class QuantityExtensionMethods
     {
+        /// <summary>
+        /// Verifies that the <see cref="IQuantity.Dimensions"/> are aligned with <paramref name="otherQty"/>.
+        /// </summary>
+        /// <param name="qty"></param>
+        /// <param name="otherQty"></param>
+        public static void VerifyDimensions(this IQuantity qty, IQuantity otherQty)
+        {
+            if (qty.Dimensions.EnumerateAll().AreCompatible(otherQty.Dimensions.EnumerateAll())) return;
+
+            var message = string.Format("Quantity {{{0}}} dimensions are incompatible with quantity {{{1}}} dimensions.",
+                qty, otherQty);
+
+            throw new IDEX(message, qty, otherQty);
+        }
+
+        /// <summary>
+        /// Verifies that the <see cref="IQuantity.Dimensions"/> are aligned with <paramref name="dimensions"/>.
+        /// </summary>
+        /// <param name="qty"></param>
+        /// <param name="dimensions"></param>
+        public static void VerifyDimensions(this IQuantity qty, params IDimension[] dimensions)
+        {
+            if (qty.Dimensions.EnumerateAll().AreCompatible(dimensions.EnumerateAll())) return;
+
+            var message = string.Format("Quantity {{{0}}} incompatible with dimensions {{{1}}}.",
+                qty, string.Join(", ", from d in dimensions select d.ToString()));
+
+            throw new IDEX(message, qty, Quantity.Zero(dimensions));
+        }
+
         //TODO: refactor me...
         internal static void VerifyEquivalent(this IQuantity x, IQuantity y)
         {
