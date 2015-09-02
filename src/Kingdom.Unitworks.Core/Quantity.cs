@@ -461,6 +461,34 @@ namespace Kingdom.Unitworks
             return 1/this;
         }
 
+        /// <summary>
+        /// Returns the representational equivalent of a Quantity SquareRoot. Will take the
+        /// <see cref="Math.Sqrt"/> of the <see cref="Value"/> itself. However, the key is
+        /// that the <see cref="Dimensions"/> themselves must also be evenly divisible.
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="IDEX">Throws exception when dimensions are not evenly divisible.</exception>
+        public virtual IQuantity SquareRoot()
+        {
+            var dimensions = Dimensions.EnumerateAll().Reduce().ToArray();
+
+            if (dimensions.Any(d => d.Exponent%2 != 0))
+            {
+                var message = string.Format("Dimensions {{{0}}} are not all evenly divisible.",
+                    string.Join(", ", from d in dimensions select d.ToString()));
+                throw new IDEX(message, this);
+            }
+
+            var rooted = dimensions.Select(d =>
+            {
+                var cloned = (IDimension) d.Clone();
+                cloned.Exponent = d.Exponent/2;
+                return cloned;
+            }).ToArray();
+
+            return new Quantity(Math.Sqrt(Value), rooted);
+        }
+
         public virtual IQuantity Squared()
         {
             return this*this;

@@ -23,6 +23,14 @@ namespace Kingdom.Unitworks
         IReadOnlyCollection<IDimension> Dimensions { get; }
 
         /// <summary>
+        /// Returns the representational equivalent of a Quantity SquareRoot. Will take the
+        /// <see cref="Math.Sqrt"/> of the <see cref="Value"/> itself. However, the key is
+        /// that the <see cref="Dimensions"/> themselves must also be evenly divisible.
+        /// </summary>
+        /// <returns></returns>
+        IQuantity SquareRoot();
+
+        /// <summary>
         /// 
         /// </summary>
         /// <returns></returns>
