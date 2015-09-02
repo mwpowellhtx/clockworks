@@ -1,0 +1,17 @@
+﻿<?xml version="1.0"?>
+<package>
+    <metadata>
+        <id>Kingdom.Clockworks.Calculators</id>
+        <version>1.0.0</version>
+        <authors>Michael W. Powell</authors>
+        <requireLicenseAcceptance>false</requireLicenseAcceptance>
+        <description>Provides some useful calculators for use with the Unitworks assemblies.</description>
+        <dependencies>
+            <dependency id="Kingdom.Unitworks.Core" version="[2.7.0,3.0.0)" />
+        </dependencies>
+    </metadata>
+    <files>
+        <file src="bin\Release\Kingdom.Clockworks.Calculators.dll" target="lib\net40" />
+        <file src="bin\Release\Kingdom.Clockworks.Calculators.xml" target="lib\net40" />
+    </files>
+</package>

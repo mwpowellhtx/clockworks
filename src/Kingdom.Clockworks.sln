@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.31101.0
+VisualStudioVersion = 12.0.40629.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kingdom.Clockworks.Core", "Kingdom.Clockworks.Core\Kingdom.Clockworks.Core.csproj", "{8D8076E8-C579-40E8-98AD-25F64E11D7AC}"
 EndProject
@@ -19,6 +19,10 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kingdom.Tests.Core", "Kingdom.Tests.Core\Kingdom.Tests.Core.csproj", "{0D97E02B-0FFD-4DF7-9198-A36F70140750}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kingdom.Unitworks.Tests", "Kingdom.Unitworks.Tests\Kingdom.Unitworks.Tests.csproj", "{074D109A-E0AC-466A-89A9-5B8133CDBC05}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kingdom.Unitworks.Calculators", "Kingdom.Unitworks.Calculators\Kingdom.Unitworks.Calculators.csproj", "{0703383C-1E23-43FB-A32B-B3B8038087F4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kingdom.Unitworks.Calculators.Tests", "Kingdom.Unitworks.Calculators.Tests\Kingdom.Unitworks.Calculators.Tests.csproj", "{7463BCC2-565B-4282-B397-F2B0C742BEFF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -46,6 +50,14 @@ Global
 		{074D109A-E0AC-466A-89A9-5B8133CDBC05}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{074D109A-E0AC-466A-89A9-5B8133CDBC05}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{074D109A-E0AC-466A-89A9-5B8133CDBC05}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0703383C-1E23-43FB-A32B-B3B8038087F4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0703383C-1E23-43FB-A32B-B3B8038087F4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0703383C-1E23-43FB-A32B-B3B8038087F4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0703383C-1E23-43FB-A32B-B3B8038087F4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7463BCC2-565B-4282-B397-F2B0C742BEFF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7463BCC2-565B-4282-B397-F2B0C742BEFF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7463BCC2-565B-4282-B397-F2B0C742BEFF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7463BCC2-565B-4282-B397-F2B0C742BEFF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
