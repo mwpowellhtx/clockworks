@@ -3,7 +3,9 @@ using NUnit.Framework;
 
 namespace Kingdom.Unitworks.Dimensions.Systems.US
 {
-    public class AngleTests : DimensionlessDimensionTestFixtureBase<Angle, IAngle>
+    using Theta = PlanarAngle;
+
+    public class PlanarAngleTests : DimensionlessDimensionTestFixtureBase<PlanarAngle, IPlanarAngle>
     {
         protected override IEnumerable<TestCaseData> InstanceNamesTestCases
         {
@@ -26,7 +28,7 @@ namespace Kingdom.Unitworks.Dimensions.Systems.US
             {
                 const double value = BaseConversionStartValue;
 
-                yield return new TestCaseData("Degree", value*Angle.RadianPerDegree);
+                yield return new TestCaseData("Degree", value*Theta.RadianPerDegree);
             }
         }
 
@@ -36,7 +38,7 @@ namespace Kingdom.Unitworks.Dimensions.Systems.US
             {
                 const double value = BaseConversionStartValue;
 
-                yield return new TestCaseData("Degree", value/Angle.RadianPerDegree);
+                yield return new TestCaseData("Degree", value/Theta.RadianPerDegree);
             }
         }
     }

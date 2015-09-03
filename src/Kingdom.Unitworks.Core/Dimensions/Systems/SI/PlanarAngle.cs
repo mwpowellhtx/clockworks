@@ -1,23 +1,21 @@
-namespace Kingdom.Unitworks.Dimensions.Systems.US
+﻿namespace Kingdom.Unitworks.Dimensions.Systems.SI
 {
-    using Theta = Angle;
-
     /// <summary>
     /// 
     /// </summary>
-    public class Steradian : SteradianBase
+    public class PlanarAngle : BaseDimension, IPlanarAngle
     {
         /// <summary>
         /// 
         /// </summary>
-        public static readonly ISteradian SquareDegree = new Steradian((IAngle) Theta.Degree.Squared());
+        public static readonly IPlanarAngle Radian = new PlanarAngle("rad");
 
-        private Steradian(IAngle squareAngle)
-            : base(null, squareAngle)
+        private PlanarAngle(string abbreviation)
+            : base(abbreviation, null, null)
         {
         }
 
-        private Steradian(Steradian other)
+        private PlanarAngle(PlanarAngle other)
             : base(other)
         {
         }
@@ -28,7 +26,7 @@ namespace Kingdom.Unitworks.Dimensions.Systems.US
         /// <returns></returns>
         public override IDimension GetBase()
         {
-            return GetBase<SI.Steradian, ISteradian>();
+            return GetBase<PlanarAngle, IPlanarAngle>();
         }
 
         /// <summary>
@@ -37,7 +35,7 @@ namespace Kingdom.Unitworks.Dimensions.Systems.US
         /// <returns></returns>
         public override object Clone()
         {
-            return new Steradian(this);
+            return new PlanarAngle(this);
         }
     }
 }

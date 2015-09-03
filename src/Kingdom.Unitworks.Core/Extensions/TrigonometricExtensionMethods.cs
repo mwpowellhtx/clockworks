@@ -5,8 +5,8 @@ using Kingdom.Unitworks.Dimensions;
 
 namespace Kingdom.Unitworks
 {
-    using UsTheta = Dimensions.Systems.US.Angle;
-    using SiTheta = Dimensions.Systems.SI.Angle;
+    using UsTheta = Dimensions.Systems.US.PlanarAngle;
+    using SiTheta = Dimensions.Systems.SI.PlanarAngle;
 
     /// <summary>
     /// 
@@ -32,7 +32,7 @@ namespace Kingdom.Unitworks
             IEnumerable<IDimension[]> expected = new IDimension[][]
             {
                 new[] {SiTheta.Radian},
-                new[] {Dimensions.Systems.US.Angle.Degree}
+                new[] {UsTheta.Degree}
             };
 
             if (expected.Any(x => quantity.Dimensions.AreEquivalent(x)))
@@ -70,7 +70,7 @@ namespace Kingdom.Unitworks
             return result;
         }
 
-        private static IQuantity CalculateAngular(this IQuantity dimensionless, IAngle desiredUnit,
+        private static IQuantity CalculateAngular(this IQuantity dimensionless, IPlanarAngle desiredUnit,
             Func<double, double> trigonometry)
         {
             dimensionless.VerifyDimensionless();
@@ -86,7 +86,7 @@ namespace Kingdom.Unitworks
             return result.ConvertTo(desiredUnit);
         }
 
-        private static IQuantity CalculateAngular(IQuantity x, IQuantity y, IAngle desiredUnit,
+        private static IQuantity CalculateAngular(IQuantity x, IQuantity y, IPlanarAngle desiredUnit,
             Func<double, double, double> trigonometry)
         {
             //TODO: just dimensionless?
@@ -207,7 +207,7 @@ namespace Kingdom.Unitworks
         /// <param name="desiredUnit"></param>
         /// <returns></returns>
         /// <a href="!:http://msdn.microsoft.com/en-us/library/system.math.acos.aspx" />
-        public static IQuantity Acos(this IQuantity d, IAngle desiredUnit = null)
+        public static IQuantity Acos(this IQuantity d, IPlanarAngle desiredUnit = null)
         {
             return CalculateAngular(d, desiredUnit, Math.Acos);
         }
@@ -222,7 +222,7 @@ namespace Kingdom.Unitworks
         /// <see cref="SiTheta.Radian"/>
         /// <see cref="UsTheta.Degree"/>
         /// <a href="!:http://msdn.microsoft.com/en-us/library/system.math.asin.aspx" />
-        public static IQuantity Asin(this IQuantity d, IAngle desiredUnit = null)
+        public static IQuantity Asin(this IQuantity d, IPlanarAngle desiredUnit = null)
         {
             return CalculateAngular(d, desiredUnit, Math.Asin);
         }
@@ -234,7 +234,7 @@ namespace Kingdom.Unitworks
         /// <param name="desiredUnit"></param>
         /// <returns></returns>
         /// <a href="!:http://msdn.microsoft.com/en-us/library/system.math.atan.aspx" />
-        public static IQuantity Atan(this IQuantity d, IAngle desiredUnit = null)
+        public static IQuantity Atan(this IQuantity d, IPlanarAngle desiredUnit = null)
         {
             return CalculateAngular(d, desiredUnit, Math.Atan);
         }
@@ -247,7 +247,7 @@ namespace Kingdom.Unitworks
         /// <param name="desiredUnit"></param>
         /// <returns></returns>
         /// <a href="!:http://msdn.microsoft.com/en-us/library/system.math.atan2.aspx" />
-        public static IQuantity Atan2(this IQuantity x, IQuantity y, IAngle desiredUnit = null)
+        public static IQuantity Atan2(this IQuantity x, IQuantity y, IPlanarAngle desiredUnit = null)
         {
             return CalculateAngular(x, y, desiredUnit, Math.Atan2);
         }

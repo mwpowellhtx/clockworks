@@ -47,7 +47,9 @@ namespace Kingdom.Unitworks.Dimensions
 
         private void VerifyDimensions()
         {
+            // ReSharper disable once RedundantAssignment
             var l = this.Length;
+            // ReSharper disable once RedundantAssignment
             var t = this.PerSquareTime;
 
             Debug.Assert(l != null && l.Exponent == 1);

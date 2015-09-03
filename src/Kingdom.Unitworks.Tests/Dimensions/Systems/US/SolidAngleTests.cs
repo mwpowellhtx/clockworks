@@ -1,24 +1,25 @@
 ﻿using System.Collections.Generic;
 using NUnit.Framework;
 
-namespace Kingdom.Unitworks.Dimensions.Systems.SI
+namespace Kingdom.Unitworks.Dimensions.Systems.US
 {
-    using Theta = Angle;
+    using Theta = PlanarAngle;
+    using Omega = SolidAngle;
 
-    public class SteradianTests : DerivedDimensionTestFixtureBase<Steradian, ISteradian>
+    public class SolidAngleTests : DerivedDimensionTestFixtureBase<SolidAngle, ISolidAngle>
     {
         protected override IEnumerable<TestCaseData> InstanceNamesTestCases
         {
-            get { yield return new TestCaseData("SquareRadian"); }
+            get { yield return new TestCaseData("SquareDegree"); }
         }
 
         protected override IEnumerable<TestCaseData> BaseUnitTestCases
         {
             get
             {
-                const bool baseUnit = true;
+                const bool nonBaseUnit = false;
 
-                yield return new TestCaseData("SquareRadian", baseUnit);
+                yield return new TestCaseData("SquareDegree", nonBaseUnit);
             }
         }
 
@@ -28,7 +29,7 @@ namespace Kingdom.Unitworks.Dimensions.Systems.SI
             {
                 const double value = BaseConversionStartValue;
 
-                yield return new TestCaseData("SquareRadian", value);
+                yield return new TestCaseData("SquareDegree", value*Theta.RadianPerDegree.Squared());
             }
         }
 
@@ -38,7 +39,7 @@ namespace Kingdom.Unitworks.Dimensions.Systems.SI
             {
                 const double value = BaseConversionStartValue;
 
-                yield return new TestCaseData("SquareRadian", value);
+                yield return new TestCaseData("SquareDegree", value/Theta.RadianPerDegree.Squared());
             }
         }
     }

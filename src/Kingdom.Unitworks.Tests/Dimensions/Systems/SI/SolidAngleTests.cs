@@ -3,14 +3,13 @@ using NUnit.Framework;
 
 namespace Kingdom.Unitworks.Dimensions.Systems.SI
 {
-    public class AngleTests : DimensionlessDimensionTestFixtureBase<Angle, IAngle>
+    using Omega = SolidAngle;
+
+    public class SolidAngleTests : DerivedDimensionTestFixtureBase<SolidAngle, ISolidAngle>
     {
         protected override IEnumerable<TestCaseData> InstanceNamesTestCases
         {
-            get
-            {
-                yield return new TestCaseData("Radian");
-            }
+            get { yield return new TestCaseData("Steradian"); }
         }
 
         protected override IEnumerable<TestCaseData> BaseUnitTestCases
@@ -19,7 +18,7 @@ namespace Kingdom.Unitworks.Dimensions.Systems.SI
             {
                 const bool baseUnit = true;
 
-                yield return new TestCaseData("Radian", baseUnit);
+                yield return new TestCaseData("Steradian", baseUnit);
             }
         }
 
@@ -29,7 +28,7 @@ namespace Kingdom.Unitworks.Dimensions.Systems.SI
             {
                 const double value = BaseConversionStartValue;
 
-                yield return new TestCaseData("Radian", value);
+                yield return new TestCaseData("Steradian", value);
             }
         }
 
@@ -39,7 +38,7 @@ namespace Kingdom.Unitworks.Dimensions.Systems.SI
             {
                 const double value = BaseConversionStartValue;
 
-                yield return new TestCaseData("Radian", value);
+                yield return new TestCaseData("Steradian", value);
             }
         }
     }

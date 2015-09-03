@@ -1,22 +1,25 @@
 ﻿using System.Collections.Generic;
 using NUnit.Framework;
 
-namespace Kingdom.Unitworks.Dimensions.Systems.US
+namespace Kingdom.Unitworks.Dimensions.Systems.SI
 {
-    public class SteradianTests : DerivedDimensionTestFixtureBase<Steradian, ISteradian>
+    public class PlanarAngleTests : DimensionlessDimensionTestFixtureBase<PlanarAngle, IPlanarAngle>
     {
         protected override IEnumerable<TestCaseData> InstanceNamesTestCases
         {
-            get { yield return new TestCaseData("SquareDegree"); }
+            get
+            {
+                yield return new TestCaseData("Radian");
+            }
         }
 
         protected override IEnumerable<TestCaseData> BaseUnitTestCases
         {
             get
             {
-                const bool nonBaseUnit = false;
+                const bool baseUnit = true;
 
-                yield return new TestCaseData("SquareDegree", nonBaseUnit);
+                yield return new TestCaseData("Radian", baseUnit);
             }
         }
 
@@ -26,7 +29,7 @@ namespace Kingdom.Unitworks.Dimensions.Systems.US
             {
                 const double value = BaseConversionStartValue;
 
-                yield return new TestCaseData("SquareDegree", value*Angle.RadianPerDegree.Squared());
+                yield return new TestCaseData("Radian", value);
             }
         }
 
@@ -36,7 +39,7 @@ namespace Kingdom.Unitworks.Dimensions.Systems.US
             {
                 const double value = BaseConversionStartValue;
 
-                yield return new TestCaseData("SquareDegree", value/Angle.RadianPerDegree.Squared());
+                yield return new TestCaseData("Radian", value);
             }
         }
     }

@@ -6,6 +6,7 @@ namespace Kingdom.Unitworks.Trigonometric
 {
     using A = TrigonometryTests.Angles;
     using C = TrigonometryTests.Consts;
+    using UsTheta = Dimensions.Systems.US.PlanarAngle;
 
     /// <summary>
     /// Establishes some trigonometry test cases.
@@ -184,7 +185,7 @@ namespace Kingdom.Unitworks.Trigonometric
         {
             using (new TrigonometryContext()
                 .Starting(ctx => new TrigonometricPart(ctx, value,
-                    (x, d) => new Quantity(x, d), Dimensions.Systems.US.Angle.Degree))
+                    (x, d) => new Quantity(x, d), UsTheta.Degree))
                 .Expected(ctx => new TrigonometricPart(ctx, expectedValue, (x, d) => new Quantity(x, d)))
                 .SetEpsilon(Epsilon)
                 .Function(s => s.Sin()))
@@ -198,7 +199,7 @@ namespace Kingdom.Unitworks.Trigonometric
         {
             using (new TrigonometryContext()
                 .Starting(ctx => new TrigonometricPart(ctx, value,
-                    (x, d) => new Quantity(x, d), Dimensions.Systems.US.Angle.Degree))
+                    (x, d) => new Quantity(x, d), UsTheta.Degree))
                 .Expected(ctx => new TrigonometricPart(ctx, expectedValue, (x, d) => new Quantity(x, d)))
                 .SetEpsilon(Epsilon)
                 .Function(s => s.Cos()))
@@ -212,7 +213,7 @@ namespace Kingdom.Unitworks.Trigonometric
         {
             using (new TrigonometryContext()
                 .Starting(ctx => new TrigonometricPart(ctx, value,
-                    (x, d) => new Quantity(x, d), Dimensions.Systems.US.Angle.Degree))
+                    (x, d) => new Quantity(x, d), UsTheta.Degree))
                 .Expected(ctx => new TrigonometricPart(ctx, expectedValue, (x, d) => new Quantity(x, d)))
                 .SetEpsilon(Epsilon)
                 .Function(s => s.Tan()))
@@ -226,7 +227,7 @@ namespace Kingdom.Unitworks.Trigonometric
         {
             using (new TrigonometryContext()
                 .Starting(ctx => new TrigonometricPart(ctx, value,
-                    (x, d) => new Quantity(x, d), Dimensions.Systems.US.Angle.Degree))
+                    (x, d) => new Quantity(x, d), UsTheta.Degree))
                 .Expected(ctx => new TrigonometricPart(ctx, expectedValue, (x, d) => new Quantity(x, d)))
                 .SetEpsilon(Epsilon)
                 .Function(s => s.Cot()))

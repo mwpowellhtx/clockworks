@@ -56,14 +56,14 @@
     <Compile Include="Dimensions\Systems\DimensionlessDimensionTestFixtureBase.cs" />
     <Compile Include="Dimensions\Systems\DimensionTestFixtureBase.cs" />
     <Compile Include="Dimensions\Systems\SI\AccelerationTests.cs" />
-    <Compile Include="Dimensions\Systems\SI\AngleTests.cs" />
+    <Compile Include="Dimensions\Systems\SI\PlanarAngleTests.cs" />
     <Compile Include="Dimensions\Systems\SI\AreaTests.cs" />
     <Compile Include="Dimensions\Systems\SI\EnergyTests.cs" />
     <Compile Include="Dimensions\Systems\SI\ForceTests.cs" />
     <Compile Include="Dimensions\Systems\SI\LengthTests.cs" />
     <Compile Include="Dimensions\Systems\SI\MassTests.cs" />
     <Compile Include="Dimensions\Systems\SI\PressureTests.cs" />
-    <Compile Include="Dimensions\Systems\SI\SteradianTests.cs" />
+    <Compile Include="Dimensions\Systems\SI\SolidAngleTests.cs" />
     <Compile Include="Dimensions\Systems\SI\TemperatureTests.cs" />
     <Compile Include="Dimensions\Systems\SI\VelocityTests.cs" />
     <Compile Include="Dimensions\Systems\US\AccelerationTests.cs" />
@@ -72,7 +72,7 @@
     <Compile Include="Dimensions\Systems\US\ForceTests.cs" />
     <Compile Include="Dimensions\Systems\US\LengthTests.cs" />
     <Compile Include="Dimensions\Systems\US\MassTests.cs" />
-    <Compile Include="Dimensions\Systems\US\SteradianTests.cs" />
+    <Compile Include="Dimensions\Systems\US\SolidAngleTests.cs" />
     <Compile Include="Dimensions\Systems\US\TemperatureTests.cs" />
     <Compile Include="Dimensions\Systems\US\VelocityTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
