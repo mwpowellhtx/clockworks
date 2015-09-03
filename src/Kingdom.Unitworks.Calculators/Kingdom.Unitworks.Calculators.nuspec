@@ -2,7 +2,7 @@
 <package>
     <metadata>
         <id>Kingdom.Unitworks.Calculators</id>
-        <version>1.1.0</version>
+        <version>1.1.2</version>
         <authors>Michael W. Powell</authors>
         <requireLicenseAcceptance>false</requireLicenseAcceptance>
         <description>Provides some useful calculators for use with the Unitworks assemblies.</description>
