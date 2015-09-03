@@ -246,7 +246,7 @@ namespace Kingdom.Unitworks.Calculators
         /// <returns></returns>
         private static IQuantity CalculateCircumferenceFromRadius(IQuantity qty, CircularCalculationType type)
         {
-            if (type.HasFlag(CircularCalculationType.Radius)) return null;
+            if (!type.HasFlag(CircularCalculationType.Radius)) return null;
 
             var resultQty = (Quantity) qty*2d*Math.PI;
 
@@ -261,7 +261,7 @@ namespace Kingdom.Unitworks.Calculators
         /// <returns></returns>
         private static IQuantity CalculateCircumferenceFromDiameter(IQuantity qty, CircularCalculationType type)
         {
-            if (type.HasFlag(CircularCalculationType.Diameter)) return null;
+            if (!type.HasFlag(CircularCalculationType.Diameter)) return null;
 
             /* Results will be in terms of base units. Which is still 2 PI r, but
              * notice the 2 is understood by the Diameter being 2 r to begin with. */

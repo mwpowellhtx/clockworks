@@ -1,6 +1,7 @@
 using System;
 using Kingdom.Unitworks.Attributes;
 using NUnit.Framework;
+using Kingdom.Unitworks.Calculators.Fixtures;
 
 namespace Kingdom.Unitworks.Calculators
 {
@@ -17,8 +18,8 @@ namespace Kingdom.Unitworks.Calculators
         {
             const CircularCalculationType type = CircularCalculationType.Radius;
 
-            using (new CircularCalculatorFixture<CircularCalculator>(
-                qty, x => 2d*x, c => c.CalculateDiameter, type, L.Meter))
+            using (new CircularCalculatorFixture(qty,
+                x => 2d*x, c => c.CalculateDiameter, type, L.Meter))
             {
             }
         }
@@ -32,8 +33,8 @@ namespace Kingdom.Unitworks.Calculators
         {
             const CircularCalculationType type = CircularCalculationType.Circumference;
 
-            using (new CircularCalculatorFixture<CircularCalculator>(
-                qty, x => 2d*(x/(2d*Math.PI)), c => c.CalculateDiameter, type, L.Meter))
+            using (new CircularCalculatorFixture(qty,
+                x => 2d*(x/(2d*Math.PI)), c => c.CalculateDiameter, type, L.Meter))
             {
             }
         }
@@ -47,8 +48,8 @@ namespace Kingdom.Unitworks.Calculators
         {
             const CircularCalculationType type = CircularCalculationType.Area;
 
-            using (new CircularCalculatorFixture<CircularCalculator>(
-                qty, x => 2d*Math.Sqrt(x/Math.PI), c => c.CalculateDiameter, type, L.Meter))
+            using (new CircularCalculatorFixture(qty,
+                x => 2d*Math.Sqrt(x/Math.PI), c => c.CalculateDiameter, type, L.Meter))
             {
             }
         }
