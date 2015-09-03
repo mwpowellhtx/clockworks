@@ -28,7 +28,6 @@
         /// </summary>
         public static readonly IAcceleration InchesPerHourSquared = new Acceleration(L.Inch, (ITime) T.Hour.Squared().Invert());
 
-
         /// <summary>
         /// 
         /// </summary>
