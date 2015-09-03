@@ -208,17 +208,26 @@ namespace Kingdom.Unitworks.Dimensions
         /// <param name="dimensions"></param>
         /// <param name="others"></param>
         /// <returns></returns>
+        /// <exception cref="ArgumentNullException"></exception>
         public static bool AreEquivalent(this IEnumerable<IDimension> dimensions, IEnumerable<IDimension> others)
         {
-            var dim = dimensions.EnumerateAll().ToDictionary(x => x.DimensionId);
-            var oth = others.EnumerateAll().ToDictionary(x => x.DimensionId);
+            //TODO: this one may be the one to use ... consider removing "arecompatible"
+            if (dimensions == null)
+                throw new ArgumentNullException("dimensions");
 
-            var dKeys = dim.Keys.OrderBy(k => k);
-            var oKeys = oth.Keys.OrderBy(k => k);
+            if (others == null)
+                throw new ArgumentNullException("others");
 
-            return dim.Count == oth.Count
-                   && dKeys.SequenceEqual(oKeys)
-                   && dKeys.Zip(oKeys, (dKey, oKey) => dim[dKey].Exponent == oth[oKey].Exponent).All(x => x);
+            var dim = dimensions.EnumerateAll().Reduce()
+                .OrderBy(d => d.DimensionId).ThenBy(d => d.Exponent).ToArray();
+
+            var oth = others.EnumerateAll().Reduce()
+                .OrderBy(d => d.DimensionId).ThenBy(d => d.Exponent).ToArray();
+
+            return dim.Length == oth.Length && dim.Zip(oth,
+                (d, o) => d.DimensionId.Equals(o.DimensionId)
+                          && d.Exponent == o.Exponent)
+                .All(x => x);
         }
 
         /// <summary>

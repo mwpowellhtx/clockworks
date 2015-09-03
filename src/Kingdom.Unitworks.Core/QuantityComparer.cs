@@ -49,8 +49,7 @@ namespace Kingdom.Unitworks
 
             if (ReferenceEquals(null, x)) return -1;
 
-            if (x.Dimensions.EnumerateAll().Reduce().AreCompatible(
-                y.Dimensions.EnumerateAll().Reduce(), true))
+            if (!x.Dimensions.AreEquivalent(y.Dimensions))
             {
                 return -2;
             }
