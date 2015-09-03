@@ -44,7 +44,7 @@ namespace Kingdom.Unitworks.Dimensions
         /// </summary>
         /// <param name="dimensions"></param>
         protected DerivedDimension(params IDimension[] dimensions)
-            : this(null, dimensions)
+            : this(null, null, null, dimensions)
         {
         }
 
@@ -54,12 +54,26 @@ namespace Kingdom.Unitworks.Dimensions
         /// <param name="abbreviation"></param>
         /// <param name="dimensions"></param>
         protected DerivedDimension(string abbreviation, params IDimension[] dimensions)
+            : this(abbreviation, null, null, dimensions)
+        {
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="abbreviation"></param>
+        /// <param name="toBase"></param>
+        /// <param name="fromBase"></param>
+        /// <param name="dimensions"></param>
+        protected DerivedDimension(string abbreviation,
+            IUnitConversion toBase, IUnitConversion fromBase,
+            params IDimension[] dimensions)
             : base(abbreviation)
         {
             //TODO: may order these, by exponent?
             _dimensions.AddRange(dimensions);
-            ToBase = new DerivedUnitConversion(() => Dimensions, d => d.ToBase);
-            FromBase = new DerivedUnitConversion(() => Dimensions, d => d.FromBase);
+            ToBase = toBase ?? new DerivedUnitConversion(() => Dimensions, d => d.ToBase);
+            FromBase = fromBase ?? new DerivedUnitConversion(() => Dimensions, d => d.FromBase);
         }
 
         /// <summary>
@@ -67,9 +81,8 @@ namespace Kingdom.Unitworks.Dimensions
         /// </summary>
         /// <param name="other"></param>
         protected DerivedDimension(DerivedDimension other)
-            : this(other.Abbreviation,
-                (from d in other.Dimensions
-                    select (IDimension) d.Clone()).ToArray())
+            : this(other.Abbreviation, other.ToBase, other.FromBase,
+                (from d in other.Dimensions select (IDimension) d.Clone()).ToArray())
         {
             Exponent = other.Exponent;
         }

@@ -76,6 +76,7 @@
     <Compile Include="Dimensions\ITemperature.cs" />
     <Compile Include="Dimensions\ITime.cs" />
     <Compile Include="Dimensions\IVelocity.cs" />
+    <Compile Include="Dimensions\PlanarAngleBase.cs" />
     <Compile Include="Dimensions\SolidAngleBase.cs" />
     <Compile Include="Dimensions\Systems\CGS\Area.cs" />
     <Compile Include="Dimensions\Systems\CGS\Length.cs" />

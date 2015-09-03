@@ -10,7 +10,7 @@ namespace Kingdom.Unitworks.Dimensions
     /// <a href="!:http://en.wikipedia.org/wiki/SI_derived_unit" > SI_derived_unit </a>
     /// <a href="!:http://en.wikipedia.org/wiki/Angle" > Angle </a>
     /// <a href="!:http://en.wikipedia.org/wiki/Radian" > Radian </a>
-    public interface IPlanarAngle : IBaseDimension, IDimensionless
+    public interface IPlanarAngle : IDerivedDimension, IDimensionless
     {
     }
 }

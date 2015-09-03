@@ -2,8 +2,14 @@ using System.Collections.Generic;
 
 namespace Kingdom.Unitworks.Dimensions
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public interface IDerivedDimension : IDimension
     {
+        /// <summary>
+        /// Gets the Dimensions.
+        /// </summary>
         ICollection<IDimension> Dimensions { get; }
 
         /// <summary>
@@ -14,6 +20,11 @@ namespace Kingdom.Unitworks.Dimensions
         /// <returns></returns>
         bool TryReplace(IDimension unit);
 
+        /// <summary>
+        /// Replaces the <see cref="Dimensions"/> with comparable <paramref name="unit"/>.
+        /// </summary>
+        /// <param name="unit"></param>
+        /// <returns></returns>
         IDerivedDimension Replace(IDimension unit);
     }
 }

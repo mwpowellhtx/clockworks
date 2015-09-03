@@ -1,5 +1,8 @@
 namespace Kingdom.Unitworks.Dimensions.Systems.SI
 {
+    using A = Area;
+    using L = Length;
+
     using Theta = PlanarAngle;
 
     /// <summary>
@@ -8,10 +11,15 @@ namespace Kingdom.Unitworks.Dimensions.Systems.SI
     public class SolidAngle : SolidAngleBase
     {
         /// <a href="!:http://en.wikipedia.org/wiki/Steradian" >Steradian</a>
-        public static readonly ISolidAngle Steradian = new SolidAngle("sr", (IPlanarAngle) Theta.Radian.Squared());
+        public static readonly ISolidAngle Steradian = new SolidAngle("sr",
+            BaseDimensionUnitConversion.DefaultConversion,
+            BaseDimensionUnitConversion.DefaultConversion,
+            A.SquareMeter, (ILength) L.Meter.Squared().Invert());
 
-        private SolidAngle(string abbreviation, IPlanarAngle squarePlanarAngle)
-            : base(abbreviation, squarePlanarAngle)
+        private SolidAngle(string abbreviation,
+            IUnitConversion toBase, IUnitConversion fromBase,
+            IArea surfaceArea, ILength squareRadius)
+            : base(abbreviation, toBase, fromBase, surfaceArea, squareRadius)
         {
         }
 

@@ -3,7 +3,6 @@ using NUnit.Framework;
 
 namespace Kingdom.Unitworks.Dimensions.Systems.US
 {
-    using Theta = PlanarAngle;
     using Omega = SolidAngle;
 
     public class SolidAngleTests : DerivedDimensionTestFixtureBase<SolidAngle, ISolidAngle>
@@ -29,7 +28,7 @@ namespace Kingdom.Unitworks.Dimensions.Systems.US
             {
                 const double value = BaseConversionStartValue;
 
-                yield return new TestCaseData("SquareDegree", value*Theta.RadianPerDegree.Squared());
+                yield return new TestCaseData("SquareDegree", value*Omega.SteridiansPerSquareDegree);
             }
         }
 
@@ -39,7 +38,7 @@ namespace Kingdom.Unitworks.Dimensions.Systems.US
             {
                 const double value = BaseConversionStartValue;
 
-                yield return new TestCaseData("SquareDegree", value/Theta.RadianPerDegree.Squared());
+                yield return new TestCaseData("SquareDegree", value/Omega.SteridiansPerSquareDegree);
             }
         }
     }

@@ -2,21 +2,29 @@
 
 namespace Kingdom.Unitworks.Dimensions.Systems.US
 {
+    using L = Length;
+
     /// <summary>
     /// 
     /// </summary>
-    public class PlanarAngle : BaseDimension, IPlanarAngle
+    public class PlanarAngle : PlanarAngleBase
     {
+        /// <summary>
+        /// <see cref="Math.PI"/> divided by 180.
+        /// </summary>
         internal const double RadianPerDegree = Math.PI/180d;
 
-        ///
         // or "°" ...
+        ///
         public static readonly IPlanarAngle Degree = new PlanarAngle("deg",
             new BaseDimensionUnitConversion(RadianPerDegree),
-            new BaseDimensionUnitConversion(1d/RadianPerDegree));
+            new BaseDimensionUnitConversion(1d/RadianPerDegree),
+            L.Foot, (ILength) L.Foot.Invert());
 
-        private PlanarAngle(string abbreviation, IUnitConversion toBase = null, IUnitConversion fromBase = null)
-            : base(abbreviation, toBase, fromBase)
+        private PlanarAngle(string abbreviation,
+            IUnitConversion toBase, IUnitConversion fromBase,
+            ILength arc, ILength radius)
+            : base(abbreviation, toBase, fromBase, arc, radius)
         {
         }
 
