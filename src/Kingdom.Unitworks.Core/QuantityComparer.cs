@@ -50,9 +50,7 @@ namespace Kingdom.Unitworks
             if (ReferenceEquals(null, x)) return -1;
 
             if (!x.Dimensions.AreEquivalent(y.Dimensions))
-            {
                 return -2;
-            }
 
             var xBase = x.ToBase();
             var yBase = y.ToBase();
@@ -60,9 +58,9 @@ namespace Kingdom.Unitworks
             var xValue = xBase.Value;
             var yValue = yBase.Value;
 
-            var delta = xValue - yValue;
+            var delta = Math.Abs(xValue - yValue);
 
-            return (delta.CompareTo(Epsilon) < 0)
+            return delta < Epsilon
                 ? 0
                 : (xValue < yValue ? -1 : 1);
         }
