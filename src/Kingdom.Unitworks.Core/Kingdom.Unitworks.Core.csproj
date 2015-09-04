@@ -107,6 +107,7 @@
     <Compile Include="Dimensions\Systems\US\Temperature.cs" />
     <Compile Include="Dimensions\Systems\US\Values.cs" />
     <Compile Include="Dimensions\Systems\US\Velocity.cs" />
+    <Compile Include="Extensions\MathExtensionMethods.cs" />
     <Compile Include="Extensions\TrigonometricExtensionMethods.cs" />
     <Compile Include="Dimensions\VelocityBase.cs" />
     <Compile Include="Exceptions\Dimensions\IncompatibleDimensionsException.cs" />
