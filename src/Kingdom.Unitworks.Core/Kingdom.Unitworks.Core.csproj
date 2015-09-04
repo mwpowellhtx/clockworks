@@ -59,6 +59,7 @@
     <Compile Include="Dimensions\ForceBase.cs" />
     <Compile Include="Dimensions\FrequencyBase.cs" />
     <Compile Include="Dimensions\IAcceleration.cs" />
+    <Compile Include="Dimensions\IMassDensity.cs" />
     <Compile Include="Dimensions\IPlanarAngle.cs" />
     <Compile Include="Dimensions\IArea.cs" />
     <Compile Include="Dimensions\IBaseDimension.cs" />
@@ -76,15 +77,20 @@
     <Compile Include="Dimensions\ITemperature.cs" />
     <Compile Include="Dimensions\ITime.cs" />
     <Compile Include="Dimensions\IVelocity.cs" />
+    <Compile Include="Dimensions\IVolume.cs" />
+    <Compile Include="Dimensions\MassDensityBase.cs" />
     <Compile Include="Dimensions\PlanarAngleBase.cs" />
     <Compile Include="Dimensions\SolidAngleBase.cs" />
     <Compile Include="Dimensions\Systems\CGS\Area.cs" />
     <Compile Include="Dimensions\Systems\CGS\Length.cs" />
     <Compile Include="Dimensions\Systems\CGS\Mass.cs" />
+    <Compile Include="Dimensions\Systems\CGS\MassDensity.cs" />
+    <Compile Include="Dimensions\Systems\CGS\Volume.cs" />
     <Compile Include="Dimensions\Systems\Commons\Frequency.cs" />
     <Compile Include="Dimensions\Systems\Commons\Prefix.cs" />
     <Compile Include="Dimensions\Systems\Commons\Time.cs" />
     <Compile Include="Dimensions\Systems\SI\Acceleration.cs" />
+    <Compile Include="Dimensions\Systems\SI\MassDensity.cs" />
     <Compile Include="Dimensions\Systems\SI\PlanarAngle.cs" />
     <Compile Include="Dimensions\Systems\SI\Area.cs" />
     <Compile Include="Dimensions\Systems\SI\Energy.cs" />
@@ -96,7 +102,9 @@
     <Compile Include="Dimensions\Systems\SI\Temperature.cs" />
     <Compile Include="Dimensions\Systems\SI\Values.cs" />
     <Compile Include="Dimensions\Systems\SI\Velocity.cs" />
+    <Compile Include="Dimensions\Systems\SI\Volume.cs" />
     <Compile Include="Dimensions\Systems\US\Acceleration.cs" />
+    <Compile Include="Dimensions\Systems\US\MassDensity.cs" />
     <Compile Include="Dimensions\Systems\US\PlanarAngle.cs" />
     <Compile Include="Dimensions\Systems\US\Area.cs" />
     <Compile Include="Dimensions\Systems\US\Energy.cs" />
@@ -107,6 +115,8 @@
     <Compile Include="Dimensions\Systems\US\Temperature.cs" />
     <Compile Include="Dimensions\Systems\US\Values.cs" />
     <Compile Include="Dimensions\Systems\US\Velocity.cs" />
+    <Compile Include="Dimensions\Systems\US\Volume.cs" />
+    <Compile Include="Dimensions\VolumeBase.cs" />
     <Compile Include="Extensions\MathExtensionMethods.cs" />
     <Compile Include="Extensions\TrigonometricExtensionMethods.cs" />
     <Compile Include="Dimensions\VelocityBase.cs" />
