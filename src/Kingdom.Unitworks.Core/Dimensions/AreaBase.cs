@@ -36,6 +36,7 @@ namespace Kingdom.Unitworks.Dimensions
 
         private void VerifyDimensions()
         {
+            // ReSharper disable once RedundantAssignment
             var l = SquareLength;
 
             Debug.Assert(l != null && l.Exponent == 2);

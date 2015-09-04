@@ -33,7 +33,7 @@ namespace Kingdom.Unitworks.Dimensions.Systems.SI
         /// <returns></returns>
         public override IDimension GetBase()
         {
-            return SquareMeter;
+            return GetBase<Area, IArea>();
         }
 
         /// <summary>

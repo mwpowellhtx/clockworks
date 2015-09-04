@@ -5,7 +5,7 @@
     /// <summary>
     /// 
     /// </summary>
-    public class Area : DerivedDimension, IArea
+    public class Area : AreaBase
     {
         /// <summary>
         /// 
