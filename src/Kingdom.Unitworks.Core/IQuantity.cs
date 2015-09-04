@@ -4,6 +4,10 @@ using Kingdom.Unitworks.Dimensions;
 
 namespace Kingdom.Unitworks
 {
+    /* TODO: might be worth instilling a "lock dimension" in each Qty, especially for purposes
+     * of supporting custom units, not base units, during each calculation. the tricky part being
+     * that all units must then agree with each other, otherwise the calculation is meaningless... */
+
     /// <summary>
     /// 
     /// </summary>
