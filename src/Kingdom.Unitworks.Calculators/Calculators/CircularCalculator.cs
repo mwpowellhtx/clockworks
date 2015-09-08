@@ -22,9 +22,10 @@ namespace Kingdom.Unitworks.Calculators
         public IQuantity CalculateRadius(IQuantity qty,
             CircularCalculationType type = CircularCalculationType.Diameter)
         {
-            return CalculateRadiusFromArea(qty, type)
-                   ?? CalculateRadiusFromDiameter(qty, type)
-                   ?? CalculateRadiusFromCircumference(qty, type);
+            return VerifyDimensions(
+                CalculateRadiusFromArea(qty, type)
+                ?? CalculateRadiusFromDiameter(qty, type)
+                ?? CalculateRadiusFromCircumference(qty, type), L.Meter);
         }
 
         /// <summary>
@@ -94,9 +95,10 @@ namespace Kingdom.Unitworks.Calculators
         public IQuantity CalculateDiameter(IQuantity qty,
             CircularCalculationType type = CircularCalculationType.Radius)
         {
-            return CalculateDiameterFromArea(qty, type)
-                   ?? CalculateDiameterFromRadius(qty, type)
-                   ?? CalculateDiameterFromCircumference(qty, type);
+            return VerifyDimensions(
+                CalculateDiameterFromArea(qty, type)
+                ?? CalculateDiameterFromRadius(qty, type)
+                ?? CalculateDiameterFromCircumference(qty, type), L.Meter);
         }
 
         private static IQuantity CalculateDiameterFromRadius(IQuantity qty, CircularCalculationType type)
@@ -147,8 +149,9 @@ namespace Kingdom.Unitworks.Calculators
         public IQuantity CalculateArea(IQuantity qty,
             CircularCalculationType type = CircularCalculationType.Diameter)
         {
-            return CalculateAreaFromRadius(qty, type)
-                   ?? CalculateAreaFromDiameter(qty, type);
+            return VerifyDimensions(
+                CalculateAreaFromRadius(qty, type)
+                ?? CalculateAreaFromDiameter(qty, type), A.SquareMeter);
         }
 
         /// <summary>
@@ -197,7 +200,8 @@ namespace Kingdom.Unitworks.Calculators
         /// <a href="!:http://www.coolmath.com/reference/circles-geometry#The_area_of_a_circle" >circles geometry (the area of a circle)</a>
         public IQuantity CalculateArea(IQuantity aQty, IQuantity bQty)
         {
-            return CalculateEllipticalArea(aQty, bQty);
+            return VerifyDimensions(
+                CalculateEllipticalArea(aQty, bQty), A.SquareMeter);
         }
 
         /// <summary>
@@ -234,8 +238,9 @@ namespace Kingdom.Unitworks.Calculators
         public IQuantity CalculateCircumference(IQuantity qty,
             CircularCalculationType type = CircularCalculationType.Diameter)
         {
-            return CalculateCircumferenceFromRadius(qty, type)
-                   ?? CalculateCircumferenceFromDiameter(qty, type);
+            return VerifyDimensions(
+                CalculateCircumferenceFromRadius(qty, type)
+                ?? CalculateCircumferenceFromDiameter(qty, type), L.Meter);
         }
 
         /// <summary>

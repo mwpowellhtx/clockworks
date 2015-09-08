@@ -3,7 +3,7 @@ using System;
 namespace Kingdom.Unitworks.Calculators
 {
     /// <summary>
-    /// 
+    /// Represents a set of <see cref="CircularCalculator"/> types.
     /// </summary>
     [Flags]
     public enum CircularCalculationType : long

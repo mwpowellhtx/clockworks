@@ -5,7 +5,6 @@ using Kingdom.Unitworks.Calculators.Fixtures;
 
 namespace Kingdom.Unitworks.Calculators
 {
-    using L = Dimensions.Systems.SI.Length;
     using A = Dimensions.Systems.SI.Area;
 
     public class CircularAreaCalculationTests : CalculatorTestFixtureBase<CircularCalculator>
@@ -49,7 +48,7 @@ namespace Kingdom.Unitworks.Calculators
         {
             using (new EllipticalCalculatorFixture(aQty, bQty,
                 (a, b) => Math.PI*a*b, c => c.CalculateArea,
-                CircularCalculationType.Area, L.Meter.Squared()))
+                CircularCalculationType.Area, A.SquareMeter))
             {
             }
         }
