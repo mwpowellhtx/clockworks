@@ -92,7 +92,7 @@
     <Compile Include="Dimensions\Systems\Commons\Prefix.cs" />
     <Compile Include="Dimensions\Systems\Commons\Time.cs" />
     <Compile Include="Dimensions\Systems\SI\Acceleration.cs" />
-    <Compile Include="Dimensions\Systems\SI\SubstanceAmount.cs" />
+    <Compile Include="Dimensions\Systems\Commons\SubstanceAmount.cs" />
     <Compile Include="Dimensions\Systems\SI\MassDensity.cs" />
     <Compile Include="Dimensions\Systems\SI\PlanarAngle.cs" />
     <Compile Include="Dimensions\Systems\SI\Area.cs" />

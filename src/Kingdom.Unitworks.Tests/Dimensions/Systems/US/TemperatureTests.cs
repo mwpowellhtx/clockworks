@@ -12,6 +12,7 @@ namespace Kingdom.Unitworks.Dimensions.Systems.US
             get
             {
                 yield return new TestCaseData("Fahrenheit");
+                yield return new TestCaseData("Rankine");
             }
         }
 
@@ -22,6 +23,7 @@ namespace Kingdom.Unitworks.Dimensions.Systems.US
                 const bool notBaseUnit = false;
 
                 yield return new TestCaseData("Fahrenheit", notBaseUnit);
+                yield return new TestCaseData("Rankine", notBaseUnit);
             }
         }
 
@@ -33,6 +35,7 @@ namespace Kingdom.Unitworks.Dimensions.Systems.US
 
                 // This one is a bit different from all the rest.
                 yield return new TestCaseData("Fahrenheit", Theta.FahrenheitToBase.Convert(value, 1));
+                yield return new TestCaseData("Rankine", value*Theta.KelvinPerRankine);
             }
         }
 
@@ -44,6 +47,7 @@ namespace Kingdom.Unitworks.Dimensions.Systems.US
 
                 // This one is a bit different from all the rest.
                 yield return new TestCaseData("Fahrenheit", Theta.BaseToFahrenheit.Convert(value, 1));
+                yield return new TestCaseData("Rankine", value*Theta.RankinePerKelvin);
             }
         }
     }

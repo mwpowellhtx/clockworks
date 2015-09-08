@@ -6,8 +6,9 @@
     public class Temperature : BaseDimension, ITemperature
     {
         /// <summary>
-        /// 
+        /// Kelvin is a unit of <see cref="ITemperature"/> measure based upon an absolute scale.
         /// </summary>
+        /// <a href="!:http://en.wikipedia.org/wiki/Kelvin" >Kelvin scale</a>
         public static readonly ITemperature Kelvin = new Temperature("K");
 
         private Temperature(string abbreviation)
