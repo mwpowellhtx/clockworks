@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Linq;
 using Kingdom.Unitworks;
+using Kingdom.Unitworks.Dimensions;
 
 namespace Kingdom.Clockworks
 {
-    using ITime = Unitworks.Dimensions.ITime;
     using T = Unitworks.Dimensions.Systems.Commons.Time;
 
     //TODO: TBD: consider refactoring to something like Kingdom.Unitworks.Extensions ...

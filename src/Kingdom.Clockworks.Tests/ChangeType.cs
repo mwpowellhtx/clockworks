@@ -5,7 +5,7 @@ using NUnit.Framework;
 namespace Kingdom.Clockworks
 {
     /// <summary>
-    /// 
+    /// Represents the type of change that is to occur.
     /// </summary>
     [Flags]
     public enum ChangeType : uint
@@ -19,12 +19,12 @@ namespace Kingdom.Clockworks
     }
 
     /// <summary>
-    /// 
+    /// Change extension methods.
     /// </summary>
     internal static class ChangeExtensionMethods
     {
         /// <summary>
-        /// 
+        /// Represents a dictionary of possible change Names.
         /// </summary>
         private static readonly IDictionary<ChangeType, string> Names;
 
@@ -33,21 +33,27 @@ namespace Kingdom.Clockworks
         /// </summary>
         static ChangeExtensionMethods()
         {
-            const string op = "op_";
+            const string opText = "op_";
+
+            const ChangeType increment = ChangeType.Increment;
+            const ChangeType decrement = ChangeType.Decrement;
+            const ChangeType addition = ChangeType.Addition;
+            const ChangeType subtraction = ChangeType.Subtraction;
+            const ChangeType op = ChangeType.Operator;
 
             Names = new Dictionary<ChangeType, string>
             {
-                {ChangeType.Increment, ChangeType.Increment.ToString()},
-                {ChangeType.Decrement, ChangeType.Decrement.ToString()},
-                {ChangeType.Operator | ChangeType.Increment, op + ChangeType.Increment},
-                {ChangeType.Operator | ChangeType.Decrement, op + ChangeType.Decrement},
-                {ChangeType.Operator | ChangeType.Addition, op + ChangeType.Addition},
-                {ChangeType.Operator | ChangeType.Subtraction, op + ChangeType.Subtraction},
+                {increment, increment.ToString()},
+                {decrement, decrement.ToString()},
+                {op | increment, opText + increment},
+                {op | decrement, opText + decrement},
+                {op | addition, opText + addition},
+                {op | subtraction, opText + subtraction},
             };
         }
 
         /// <summary>
-        /// 
+        /// Returns the method name corresponding to the <paramref name="value"/>.
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>

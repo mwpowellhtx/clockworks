@@ -22,6 +22,7 @@ namespace Kingdom.Clockworks
                 T.Second,
                 T.Minute,
                 T.Hour,
+                //// Day and week are way too extreme for purposes of these tests.
                 //T.Day,
                 //T.Week,
             };

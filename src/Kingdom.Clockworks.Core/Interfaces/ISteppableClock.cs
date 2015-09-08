@@ -1,5 +1,6 @@
 ﻿using System;
 using Kingdom.Unitworks;
+using Kingdom.Unitworks.Dimensions;
 
 namespace Kingdom.Clockworks
 {
@@ -35,7 +36,7 @@ namespace Kingdom.Clockworks
         void Decrement(int steps, IQuantity timePerStepQty = null, RequestType type = RequestType.Continuous);
 
         /// <summary>
-        /// 
+        /// Gets or sets the <see cref="ITime"/> per step quantity.
         /// </summary>
         IQuantity TimePerStepQty { get; set; }
     }

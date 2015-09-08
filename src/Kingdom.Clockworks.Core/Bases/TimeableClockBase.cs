@@ -11,7 +11,7 @@ using Kingdom.Unitworks.Dimensions.Systems.Commons;
 
 namespace Kingdom.Clockworks
 {
-    using T = Unitworks.Dimensions.Systems.Commons.Time;
+    using T = Time;
 
     /// <summary>
     /// 
@@ -191,8 +191,6 @@ namespace Kingdom.Clockworks
 
         #endregion
 
-        #region Steppable Clock Members
-
         #region Per Step Members
 
         private IQuantity _timePerStepQty;
@@ -204,6 +202,8 @@ namespace Kingdom.Clockworks
         }
 
         #endregion
+
+        #region Steppable Clock Members
 
         /// <summary>
         /// 
