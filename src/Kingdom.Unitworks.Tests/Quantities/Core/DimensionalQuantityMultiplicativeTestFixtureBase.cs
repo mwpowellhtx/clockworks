@@ -11,7 +11,9 @@ namespace Kingdom.Unitworks
     {
         //TODO: might do some math across a couple different units of measure among the same dimensions...
         protected IQuantity B { get; private set; }
+        
         protected IQuantity C { get; private set; }
+
         protected IQuantity D { get; private set; }
 
         protected override void InitializeQuantities()

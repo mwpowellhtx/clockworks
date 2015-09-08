@@ -3,6 +3,9 @@ using System.Linq;
 
 namespace Kingdom.Unitworks.Dimensions
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public abstract class EnergyBase : DerivedDimension, IEnergy
     {
         ///
@@ -23,12 +26,12 @@ namespace Kingdom.Unitworks.Dimensions
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="length"></param>
-        /// <param name="force"></param>
-        protected EnergyBase(ILength length, IForce force)
-            : base(length, force)
+        /// <param name="abbreviation"></param>
+        /// <param name="toBase"></param>
+        /// <param name="fromBase"></param>
+        protected EnergyBase(string abbreviation, IUnitConversion toBase, IUnitConversion fromBase)
+            : base(abbreviation, toBase, fromBase)
         {
-            VerifyDimensions();
         }
 
         /// <summary>

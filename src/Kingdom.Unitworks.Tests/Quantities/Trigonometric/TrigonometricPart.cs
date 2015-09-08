@@ -43,6 +43,9 @@ namespace Kingdom.Unitworks.Trigonometric
             Assert.That(_factory = factory, Is.Not.Null);
         }
 
+        /// <summary>
+        /// Disposes the object.
+        /// </summary>
         public void Dispose()
         {
         }

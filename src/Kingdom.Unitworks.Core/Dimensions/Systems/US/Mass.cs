@@ -1,10 +1,13 @@
-﻿namespace Kingdom.Unitworks.Dimensions.Systems.US
+﻿using System.Runtime.InteropServices;
+
+namespace Kingdom.Unitworks.Dimensions.Systems.US
 {
     /// <summary>
     /// 
     /// </summary>
     public class Mass : BaseDimension, IMass
     {
+        private const double SlugPerKilogram = 14.5939029d;
         private const double PoundPerKilogram = 2.20462262185d;
         private const double OuncesPerKilogram = PoundPerKilogram*16d;
         private const double StonePerKilogram = PoundPerKilogram/14d;
@@ -13,15 +16,24 @@
         /// 
         /// </summary>
         /// <a href="!:http://www.google.com/?gws_rd=ssl#q=ounce+to+kilogram" />
-        internal const double KilogramsPerOunce = 1d / OuncesPerKilogram;
+        internal const double KilogramsPerOunce = 1d/OuncesPerKilogram;
 
         /// <summary>
         /// 
         /// </summary>
         /// <a href="!:http://www.google.com/?gws_rd=ssl#q=pound+to+kilogram" />
-        internal const double KilogramsPerPound = 1d / PoundPerKilogram;
+        internal const double KilogramsPerPound = 1d/PoundPerKilogram;
 
         internal const double KilogramsPerStone = 1d/StonePerKilogram;
+
+        /// <a href="!:http://en.wikipedia.org/wiki/Slug_%28mass%29" >Slug (mass)</a>
+        /// <a href="!:https://www.google.com/?gws_rd=ssl#q=slug+to+kilogram" >Slug to kilogram conversion</a>
+        internal const double KilogramPerSlug = 1d/SlugPerKilogram;
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        public static readonly IMass Slug = new Mass("slug", KilogramPerSlug, SlugPerKilogram);
 
         /// <summary>
         /// 

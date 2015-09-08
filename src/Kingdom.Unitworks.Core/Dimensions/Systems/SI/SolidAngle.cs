@@ -2,11 +2,10 @@ namespace Kingdom.Unitworks.Dimensions.Systems.SI
 {
     using A = Area;
     using L = Length;
-
     using Theta = PlanarAngle;
 
     /// <summary>
-    /// 
+    /// Represents the SI system SolidAngle.
     /// </summary>
     public class SolidAngle : SolidAngleBase
     {

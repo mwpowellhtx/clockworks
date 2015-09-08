@@ -3,7 +3,7 @@ using System;
 namespace Kingdom.Unitworks
 {
     /// <summary>
-    /// 
+    /// Represents <see cref="IQuantity"/> based math extension methods.
     /// </summary>
     public static class MathExtensionMethods
     {

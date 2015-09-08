@@ -8,6 +8,7 @@ namespace Kingdom.Unitworks.Dimensions
     /// <summary>
     /// 
     /// </summary>
+    /// <a href="!:http://en.wikipedia.org/wiki/Solid_angle" >Solid angle</a>
     public abstract class SolidAngleBase : DerivedDimension, ISolidAngle
     {
         /// <summary>

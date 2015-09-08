@@ -11,6 +11,7 @@ namespace Kingdom.Unitworks.Dimensions.Systems.US
         {
             get
             {
+                yield return new TestCaseData("Slug");
                 yield return new TestCaseData("Ounce");
                 yield return new TestCaseData("Pound");
                 yield return new TestCaseData("Stone");
@@ -23,6 +24,7 @@ namespace Kingdom.Unitworks.Dimensions.Systems.US
             {
                 const bool notBaseUnit = false;
 
+                yield return new TestCaseData("Slug", notBaseUnit);
                 yield return new TestCaseData("Ounce", notBaseUnit);
                 yield return new TestCaseData("Pound", notBaseUnit);
                 yield return new TestCaseData("Stone", notBaseUnit);
@@ -35,6 +37,7 @@ namespace Kingdom.Unitworks.Dimensions.Systems.US
             {
                 const double value = BaseConversionStartValue;
 
+                yield return new TestCaseData("Slug", value*M.KilogramPerSlug);
                 yield return new TestCaseData("Ounce", value*M.KilogramsPerOunce);
                 yield return new TestCaseData("Pound", value*M.KilogramsPerPound);
                 yield return new TestCaseData("Stone", value*M.KilogramsPerStone);
@@ -47,6 +50,7 @@ namespace Kingdom.Unitworks.Dimensions.Systems.US
             {
                 const double value = BaseConversionStartValue;
 
+                yield return new TestCaseData("Slug", value/M.KilogramPerSlug);
                 yield return new TestCaseData("Ounce", value/M.KilogramsPerOunce);
                 yield return new TestCaseData("Pound", value/M.KilogramsPerPound);
                 yield return new TestCaseData("Stone", value/M.KilogramsPerStone);

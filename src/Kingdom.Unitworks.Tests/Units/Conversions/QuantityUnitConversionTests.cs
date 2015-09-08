@@ -9,7 +9,7 @@ namespace Kingdom.Unitworks.Units.Conversions
     using SiV = Dimensions.Systems.SI.Velocity;
     using UsL = Dimensions.Systems.US.Length;
     using UsV = Dimensions.Systems.US.Velocity;
-    using CommonsT = Dimensions.Systems.Commons.Time;
+    using T = Dimensions.Systems.Commons.Time;
 
     public class QuantityUnitConversionTests : TestFixtureBase
     {
@@ -121,7 +121,7 @@ namespace Kingdom.Unitworks.Units.Conversions
         [Test]
         public void Verify_SI_Velocity_Converts_To_US_MilesPerHour()
         {
-            const double expectedValue = Value*CommonsT.SecondsPerHour/UsL.MetersPerMile;
+            const double expectedValue = Value*T.SecondsPerHour/UsL.MetersPerMile;
 
             using (ConversionContext.Create(Value, SiV.MetersPerSecond)
                 .AccurateTo(FourDecimalPlaces)
@@ -133,7 +133,7 @@ namespace Kingdom.Unitworks.Units.Conversions
         [Test]
         public void Verify_SI_Velocity_Converts_To_US_YardsPerMinute()
         {
-            const double expectedValue = Value*CommonsT.SecondsPerMinute/UsL.MetersPerYard;
+            const double expectedValue = Value*T.SecondsPerMinute/UsL.MetersPerYard;
 
             using (ConversionContext.Create(Value, SiV.MetersPerSecond)
                 .AccurateTo(FourDecimalPlaces)

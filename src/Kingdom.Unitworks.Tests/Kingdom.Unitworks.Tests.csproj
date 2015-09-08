@@ -73,6 +73,7 @@
     <Compile Include="Dimensions\Systems\US\AccelerationTests.cs" />
     <Compile Include="Dimensions\Systems\US\AngleTests.cs" />
     <Compile Include="Dimensions\Systems\US\AreaTests.cs" />
+    <Compile Include="Dimensions\Systems\US\EnergyTests.cs" />
     <Compile Include="Dimensions\Systems\US\ForceTests.cs" />
     <Compile Include="Dimensions\Systems\US\LengthTests.cs" />
     <Compile Include="Dimensions\Systems\US\MassDensityTests.cs" />

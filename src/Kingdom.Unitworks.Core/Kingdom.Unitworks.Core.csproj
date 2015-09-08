@@ -59,6 +59,8 @@
     <Compile Include="Dimensions\ForceBase.cs" />
     <Compile Include="Dimensions\FrequencyBase.cs" />
     <Compile Include="Dimensions\IAcceleration.cs" />
+    <Compile Include="Dimensions\IDragFactor.cs" />
+    <Compile Include="Dimensions\ISubstanceAmount.cs" />
     <Compile Include="Dimensions\IMassDensity.cs" />
     <Compile Include="Dimensions\IPlanarAngle.cs" />
     <Compile Include="Dimensions\IArea.cs" />
@@ -90,6 +92,7 @@
     <Compile Include="Dimensions\Systems\Commons\Prefix.cs" />
     <Compile Include="Dimensions\Systems\Commons\Time.cs" />
     <Compile Include="Dimensions\Systems\SI\Acceleration.cs" />
+    <Compile Include="Dimensions\Systems\SI\SubstanceAmount.cs" />
     <Compile Include="Dimensions\Systems\SI\MassDensity.cs" />
     <Compile Include="Dimensions\Systems\SI\PlanarAngle.cs" />
     <Compile Include="Dimensions\Systems\SI\Area.cs" />

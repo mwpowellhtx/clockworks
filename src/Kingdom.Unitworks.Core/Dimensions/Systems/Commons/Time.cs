@@ -1,7 +1,7 @@
 ﻿namespace Kingdom.Unitworks.Dimensions.Systems.Commons
 {
     /// <summary>
-    /// 
+    /// Represents a common set of <see cref="ITime"/> dimensional units.
     /// </summary>
     /// <a href="!:http://en.wikipedia.org/wiki/International_System_of_Units" />
     public class Time : BaseDimension, ITime
