@@ -5,7 +5,7 @@ using NUnit.Framework;
 namespace Kingdom
 {
     /// <summary>
-    /// 
+    /// Represents the common operators that will be overloaded.
     /// </summary>
     public enum OperatorPart : ulong
     {
@@ -165,6 +165,11 @@ namespace Kingdom
             }
         }
 
+        /// <summary>
+        /// Returns the member name corresponding with the <paramref name="op"/>.
+        /// </summary>
+        /// <param name="op"></param>
+        /// <returns></returns>
         public static string GetMemberName(this OperatorPart op)
         {
             return string.Format("op_{0}", op);

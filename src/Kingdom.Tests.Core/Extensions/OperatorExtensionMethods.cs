@@ -7,6 +7,9 @@ using NUnit.Framework;
 
 namespace Kingdom
 {
+    /// <summary>
+    /// Represents a common means of exercising operator overloads.
+    /// </summary>
     public static class OperatorExtensionMethods
     {
         /// <summary>
@@ -50,13 +53,13 @@ namespace Kingdom
         public static Task InvokeOperatorAsync<THost>(this THost host,
             OperatorPart op , IEnumerable<Type> argTypes, params object[] args)
         {
-            return Task.Run(() => host.InvokeOperator<THost>(op, argTypes, args));
+            return Task.Run(() => host.InvokeOperator(op, argTypes, args));
         }
 
         public static TResult InvokeOperator<THost, TResult>(this THost host, OperatorPart op,
             params object[] args)
         {
-            return host.InvokeOperator<THost, TResult>(op, from a in args select a.GetType(),
+            return host.InvokeOperator(op, from a in args select a.GetType(),
                 x =>
                 {
                     Assert.That(x, Is.Not.Null);
@@ -77,7 +80,7 @@ namespace Kingdom
         {
             var argTypes = from a in args select a.GetType();
 
-            var local = host.InvokeOperator<THost>(op, argTypes, args);
+            var local = host.InvokeOperator(op, argTypes, args);
 
             result = default(TResult);
 
@@ -103,7 +106,7 @@ namespace Kingdom
         public static TResult InvokeOperator<THost, TResult>(this THost host, OperatorPart op,
             Func<object, TResult> filter, params object[] args)
         {
-            return host.InvokeOperator<THost, TResult>(op, from a in args select a.GetType(), filter, args);
+            return host.InvokeOperator(op, from a in args select a.GetType(), filter, args);
         }
 
         /// <summary>
@@ -127,7 +130,7 @@ namespace Kingdom
         }
 
         /// <summary>
-        /// Asynchronously invokes the operator according to <see cref="InvokeOperator{THost, TResult}"/>.
+        /// Asynchronously invokes the specified operator.
         /// </summary>
         /// <typeparam name="THost"></typeparam>
         /// <typeparam name="TResult"></typeparam>
@@ -139,11 +142,11 @@ namespace Kingdom
         public static Task<TResult> InvokeOperatorAsync<THost, TResult>(this THost host,
             OperatorPart op, Func<object, TResult> filter, params object[] args)
         {
-            return Task.Run(() => host.InvokeOperator<THost, TResult>(op, filter, args));
+            return Task.Run(() => host.InvokeOperator(op, filter, args));
         }
 
         /// <summary>
-        /// Asynchronously invokes the operator according to <see cref="InvokeOperator{THost, TResult}"/>.
+        /// Asynchronously invokes the specified operator.
         /// </summary>
         /// <typeparam name="THost"></typeparam>
         /// <typeparam name="TResult"></typeparam>
@@ -156,7 +159,7 @@ namespace Kingdom
         public static Task<TResult> InvokeOperatorAsync<THost, TResult>(this THost host,
             OperatorPart op, IEnumerable<Type> argTypes, Func<object, TResult> filter, params object[] args)
         {
-            return Task.Run(() => host.InvokeOperator<THost, TResult>(op, argTypes, filter, args));
+            return Task.Run(() => host.InvokeOperator(op, argTypes, filter, args));
         }
     }
 }
