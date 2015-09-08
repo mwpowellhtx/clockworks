@@ -8,30 +8,35 @@ namespace Kingdom.Unitworks.Dimensions
     /// </summary>
     public abstract class ForceBase : DerivedDimension, IForce
     {
+        // ReSharper disable SuggestBaseTypeForParameter
+        /// <summary>
+        /// Gets the Mass.
+        /// </summary>
         private IMass Mass
         {
             get { return Dimensions.OfType<IMass>().SingleOrDefault(); }
         }
 
-        private ITime SquareTime
+        /// <summary>
+        /// Gets the Acceleration.
+        /// </summary>
+        private IAcceleration Acceleration
         {
-            get { return Dimensions.OfType<ITime>().SingleOrDefault(); }
-        }
-
-        private ILength PerLength
-        {
-            get { return Dimensions.OfType<ILength>().SingleOrDefault(); }
+            get { return Dimensions.OfType<IAcceleration>().SingleOrDefault(); }
         }
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="abbreviation"></param>
+        /// <param name="toBase"></param>
+        /// <param name="fromBase"></param>
         /// <param name="mass"></param>
-        /// <param name="squareTime"></param>
-        /// <param name="perLength"></param>
-        protected ForceBase(string abbreviation, IMass mass, ITime squareTime, ILength perLength)
-            : base(abbreviation, mass, squareTime, perLength)
+        /// <param name="acceleration"></param>
+        protected ForceBase(string abbreviation,
+            IUnitConversion toBase, IUnitConversion fromBase,
+            IMass mass, IAcceleration acceleration)
+            : base(abbreviation, toBase, fromBase, mass, acceleration)
         {
             VerifyDimensions();
         }
@@ -48,15 +53,12 @@ namespace Kingdom.Unitworks.Dimensions
 
         private void VerifyDimensions()
         {
-            // This is a better approach because we want to maintain the same references.
-            //TODO: TBD: that or just verify that the dimensions are correct when we have them in hand...
+            // ReSharper disable RedundantAssignment
             var m = Mass;
-            var t = SquareTime;
-            var l = PerLength;
+            var accel = Acceleration;
 
             Debug.Assert(m != null && m.Exponent == 1);
-            Debug.Assert(t != null && t.Exponent == 2);
-            Debug.Assert(l != null && l.Exponent == -1);
+            Debug.Assert(accel != null && accel.Exponent == 1);
         }
     }
 }

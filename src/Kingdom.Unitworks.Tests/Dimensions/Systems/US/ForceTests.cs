@@ -3,9 +3,7 @@ using NUnit.Framework;
 
 namespace Kingdom.Unitworks.Dimensions.Systems.US
 {
-    using M = Mass;
-    using T = Commons.Time;
-    using L = Length;
+    using F = Force;
 
     public class ForceTests : DerivedDimensionTestFixtureBase<Force, IForce>
     {
@@ -13,7 +11,7 @@ namespace Kingdom.Unitworks.Dimensions.Systems.US
         {
             get
             {
-                yield return new TestCaseData("Slug");
+                yield return new TestCaseData("PoundForce");
             }
         }
 
@@ -23,13 +21,8 @@ namespace Kingdom.Unitworks.Dimensions.Systems.US
             {
                 const bool notBaseUnit = false;
 
-                yield return new TestCaseData("Slug", notBaseUnit);
+                yield return new TestCaseData("PoundForce", notBaseUnit);
             }
-        }
-
-        private static double CalculateFactor(double mass, double time, double length)
-        {
-            return mass*time.Squared()*length.Inverted();
         }
 
         protected override IEnumerable<TestCaseData> ToBaseTestCases
@@ -38,7 +31,7 @@ namespace Kingdom.Unitworks.Dimensions.Systems.US
             {
                 const double value = BaseConversionStartValue;
 
-                yield return new TestCaseData("Slug", value*CalculateFactor(M.KilogramsPerPound, 1d, L.MetersPerFoot));
+                yield return new TestCaseData("PoundForce", value*F.PoundForceToNewton);
             }
         }
 
@@ -48,7 +41,7 @@ namespace Kingdom.Unitworks.Dimensions.Systems.US
             {
                 const double value = BaseConversionStartValue;
 
-                yield return new TestCaseData("Slug", value*CalculateFactor(M.KilogramsPerPound, 1d, L.MetersPerFoot).Inverted());
+                yield return new TestCaseData("PoundForce", value*F.NewtonToPoundForce);
             }
         }
     }

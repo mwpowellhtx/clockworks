@@ -1,13 +1,16 @@
-﻿using System.Runtime.InteropServices;
-
-namespace Kingdom.Unitworks.Dimensions.Systems.US
+﻿namespace Kingdom.Unitworks.Dimensions.Systems.US
 {
     /// <summary>
     /// 
     /// </summary>
     public class Mass : BaseDimension, IMass
     {
+        /// <summary>
+        /// SlugPerKilogram: 14.5939029d
+        /// </summary>
+        /// <a href="!:http://en.wikipedia.org/wiki/Slug_%28mass%29" >Slug (mass)</a>
         private const double SlugPerKilogram = 14.5939029d;
+
         private const double PoundPerKilogram = 2.20462262185d;
         private const double OuncesPerKilogram = PoundPerKilogram*16d;
         private const double StonePerKilogram = PoundPerKilogram/14d;
@@ -15,17 +18,20 @@ namespace Kingdom.Unitworks.Dimensions.Systems.US
         /// <summary>
         /// 
         /// </summary>
-        /// <a href="!:http://www.google.com/?gws_rd=ssl#q=ounce+to+kilogram" />
+        /// <a href="!:http://www.google.com/?gws_rd=ssl#q=ounce+to+kilogram" >Ounce to kilogram conversion</a>
         internal const double KilogramsPerOunce = 1d/OuncesPerKilogram;
 
         /// <summary>
         /// 
         /// </summary>
-        /// <a href="!:http://www.google.com/?gws_rd=ssl#q=pound+to+kilogram" />
+        /// <a href="!:http://www.google.com/?gws_rd=ssl#q=pound+to+kilogram" >Pound to kilogram conversion</a>
         internal const double KilogramsPerPound = 1d/PoundPerKilogram;
 
         internal const double KilogramsPerStone = 1d/StonePerKilogram;
 
+        /// <summary>
+        /// KilogramsPerSlug: 1/14.5939029d
+        /// </summary>
         /// <a href="!:http://en.wikipedia.org/wiki/Slug_%28mass%29" >Slug (mass)</a>
         /// <a href="!:https://www.google.com/?gws_rd=ssl#q=slug+to+kilogram" >Slug to kilogram conversion</a>
         internal const double KilogramPerSlug = 1d/SlugPerKilogram;

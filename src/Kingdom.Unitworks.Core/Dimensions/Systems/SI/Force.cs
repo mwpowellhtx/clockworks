@@ -1,8 +1,7 @@
 ﻿namespace Kingdom.Unitworks.Dimensions.Systems.SI
 {
     using M = Mass;
-    using T = Commons.Time;
-    using L = Length;
+    using Accel = Acceleration;
 
     /// <summary>
     /// 
@@ -11,13 +10,26 @@
     public class Force : ForceBase
     {
         /// <summary>
-        /// 
+        /// Derived unit of <see cref="IForce"/> measurement.
         /// </summary>
+        /// <a href="!:http://en.wikipedia.org/wiki/Newton_%28unit%29" >Newton (unit)</a>
         public static readonly IForce Newton = new Force("N",
-            M.Kilogram, (ITime) T.Second.Squared(), (ILength) L.Meter.Invert());
+            BaseDimensionUnitConversion.DefaultConversion,
+            BaseDimensionUnitConversion.DefaultConversion,
+            M.Kilogram, Accel.MetersPerSecondSquared);
 
-        private Force(string abbreviation, IMass mass, ITime squareTime, ILength perLength)
-            : base(abbreviation, mass, squareTime, perLength)
+        /// <summary>
+        /// Private Constructor
+        /// </summary>
+        /// <param name="abbreviation"></param>
+        /// <param name="toBase"></param>
+        /// <param name="fromBase"></param>
+        /// <param name="mass"></param>
+        /// <param name="acceleration"></param>
+        private Force(string abbreviation,
+            IUnitConversion toBase, IUnitConversion fromBase,
+            IMass mass, IAcceleration acceleration)
+            : base(abbreviation, toBase, fromBase, mass, acceleration)
         {
         }
 
