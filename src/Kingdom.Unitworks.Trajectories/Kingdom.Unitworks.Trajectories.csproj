@@ -1,0 +1,80 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{9C4B04E9-491A-4FCC-A52F-95A1DFEFCE98}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Kingdom.Unitworks</RootNamespace>
+    <AssemblyName>Kingdom.Unitworks.Trajectories</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Debug\Kingdom.Unitworks.Trajectories.xml</DocumentationFile>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Release\Kingdom.Unitworks.Trajectories.xml</DocumentationFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Trajectories\AirDensityCalculator.cs" />
+    <Compile Include="Trajectories\AtmosphericTrajectoryParameters.cs" />
+    <Compile Include="Trajectories\BasicHorizontalComponentCalculator.cs" />
+    <Compile Include="Trajectories\BasicVerticalComponentCalculator.cs" />
+    <Compile Include="Trajectories\DragForceCalculatorBase.cs" />
+    <Compile Include="Trajectories\IAirDensityCalculator.cs" />
+    <Compile Include="Trajectories\IAtmosphericTrajectoryParameters.cs" />
+    <Compile Include="Trajectories\IDragForceCalculator.cs" />
+    <Compile Include="Trajectories\ITrajectoryCalculator.cs" />
+    <Compile Include="Trajectories\ITrajectoryComponentCalculator.cs" />
+    <Compile Include="Trajectories\ITrajectoryParameters.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Trajectories\TrajectoryCalculator.cs" />
+    <Compile Include="Trajectories\TrajectoryCalculatorEventArgs.cs" />
+    <Compile Include="Trajectories\TrajectoryComponent.cs" />
+    <Compile Include="Trajectories\TrajectoryComponentCalculatorBase.cs" />
+    <Compile Include="Trajectories\TrajectoryParameters.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Kingdom.Unitworks.Calculators\Kingdom.Unitworks.Calculators.csproj">
+      <Project>{0703383c-1e23-43fb-a32b-b3b8038087f4}</Project>
+      <Name>Kingdom.Unitworks.Calculators</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Kingdom.Unitworks.Core\Kingdom.Unitworks.Core.csproj">
+      <Project>{896580be-a134-4512-8b3b-6287a560adb1}</Project>
+      <Name>Kingdom.Unitworks.Core</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
