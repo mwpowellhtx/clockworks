@@ -1,6 +1,4 @@
-using Kingdom.Unitworks.Calculators;
-
-namespace Kingdom.Unitworks.Trajectories
+namespace Kingdom.Unitworks.Calculators.Trajectories
 {
     /// <summary>
     /// Drag force calculator working from the default <see cref="ITrajectoryParameters"/>. Because

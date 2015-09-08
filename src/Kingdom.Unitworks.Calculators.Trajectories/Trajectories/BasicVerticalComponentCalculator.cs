@@ -1,20 +1,21 @@
-namespace Kingdom.Unitworks.Trajectories
+namespace Kingdom.Unitworks.Calculators.Trajectories
 {
     using L = Dimensions.Systems.SI.Length;
     using T = Dimensions.Systems.Commons.Time;
     using Theta = Dimensions.Systems.SI.PlanarAngle;
+    using Values = Dimensions.Systems.SI.Values;
 
     /// <summary>
     /// 
     /// </summary>
-    public class BasicHorizontalComponentCalculator : TrajectoryComponentCalculatorBase
+    public class BasicVerticalComponentCalculator : TrajectoryComponentCalculatorBase
     {
         /// <summary>
-        /// Gets the Type of component calculator it is: <see cref="TrajectoryComponent.X"/>.
+        /// Gets the Type of component calculator it is: <see cref="TrajectoryComponent.Y"/>.
         /// </summary>
         public override TrajectoryComponent Type
         {
-            get { return TrajectoryComponent.X; }
+            get { return TrajectoryComponent.Y; }
         }
 
         /// <summary>
@@ -34,8 +35,10 @@ namespace Kingdom.Unitworks.Trajectories
 
             var vla = VerifyDimensions(parameters.VerticalLaunchAngleQty, Theta.Radian);
 
-            // x = ( V cos A ) t
-            var resultQty = (Quantity) iv*vla.Cos()*t;
+            var g = VerifyDimensions(Values.StandardGravity, m, s.Squared().Invert());
+
+            // y = ( V sin A ) t - g t^2 / 2
+            var resultQty = ((Quantity) iv*vla.Sin()) - ((Quantity) g*t.Squared())/2d;
 
             // Should be left with a Length dimension.
             return VerifyDimensions(resultQty, m);

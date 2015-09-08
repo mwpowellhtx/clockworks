@@ -1,8 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
-using Kingdom.Unitworks.Calculators;
 
-namespace Kingdom.Unitworks.Trajectories
+namespace Kingdom.Unitworks.Calculators.Trajectories
 {
     using L = Dimensions.Systems.SI.Length;
 

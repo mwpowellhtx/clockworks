@@ -1,4 +1,4 @@
-namespace Kingdom.Unitworks.Trajectories
+namespace Kingdom.Unitworks.Calculators.Trajectories
 {
     using T = Dimensions.Systems.Commons.Time;
     using M = Dimensions.Systems.SI.Mass;

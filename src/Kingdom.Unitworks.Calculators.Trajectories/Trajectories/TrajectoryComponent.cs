@@ -1,4 +1,4 @@
-namespace Kingdom.Unitworks.Trajectories
+namespace Kingdom.Unitworks.Calculators.Trajectories
 {
     /// <summary>
     /// Informs the calculators which components are being considered.

@@ -7,8 +7,8 @@
     <ProjectGuid>{9C4B04E9-491A-4FCC-A52F-95A1DFEFCE98}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Kingdom.Unitworks</RootNamespace>
-    <AssemblyName>Kingdom.Unitworks.Trajectories</AssemblyName>
+    <RootNamespace>Kingdom.Unitworks.Calculators</RootNamespace>
+    <AssemblyName>Kingdom.Unitworks.Calculators.Trajectories</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -20,7 +20,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <DocumentationFile>bin\Debug\Kingdom.Unitworks.Trajectories.xml</DocumentationFile>
+    <DocumentationFile>bin\Debug\Kingdom.Unitworks.Calculators.Trajectories.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -29,7 +29,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <DocumentationFile>bin\Release\Kingdom.Unitworks.Trajectories.xml</DocumentationFile>
+    <DocumentationFile>bin\Release\Kingdom.Unitworks.Calculators.Trajectories.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -68,6 +68,9 @@
       <Project>{896580be-a134-4512-8b3b-6287a560adb1}</Project>
       <Name>Kingdom.Unitworks.Core</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Kingdom.Unitworks.Calculators.Trajectories.nuspec" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

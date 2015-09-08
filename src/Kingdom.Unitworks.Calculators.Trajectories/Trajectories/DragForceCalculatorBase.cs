@@ -1,8 +1,7 @@
 using System.Linq;
-using Kingdom.Unitworks.Calculators;
 using Kingdom.Unitworks.Dimensions;
 
-namespace Kingdom.Unitworks.Trajectories
+namespace Kingdom.Unitworks.Calculators.Trajectories
 {
     using F = Dimensions.Systems.SI.Force;
     using M = Dimensions.Systems.SI.Mass;
@@ -16,6 +15,9 @@ namespace Kingdom.Unitworks.Trajectories
         : CalculatorBase
             , IDragForceCalculator
     {
+        /// <summary>
+        /// Represents expected ForceDimensions as a function of <see cref="F"/>.
+        /// </summary>
         protected static readonly IDimension[] ForceDimensions;
 
         /// <summary>

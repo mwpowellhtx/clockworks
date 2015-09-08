@@ -1,4 +1,4 @@
-﻿namespace Kingdom.Unitworks.Trajectories
+﻿namespace Kingdom.Unitworks.Calculators.Trajectories
 {
     /// <summary>
     /// Represents trajectory parameters with additional atmospheric concerns.

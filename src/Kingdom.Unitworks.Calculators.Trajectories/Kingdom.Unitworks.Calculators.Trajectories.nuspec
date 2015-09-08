@@ -1,0 +1,17 @@
+﻿<?xml version="1.0"?>
+<package>
+    <metadata>
+        <id>Kingdom.Unitworks.Calculators.Trajectories</id>
+        <version>1.1.0</version>
+        <authors>Michael W. Powell</authors>
+        <requireLicenseAcceptance>false</requireLicenseAcceptance>
+        <description>Supports and extensible set of trajectory calculations.</description>
+        <dependencies>
+            <dependency id="Kingdom.Unitworks.Calculators" version="[1.2.0,2.0.0)" />
+        </dependencies>
+    </metadata>
+    <files>
+        <file src="bin\Release\Kingdom.Unitworks.Calculators.Trajectories.dll" target="lib\net40" />
+        <file src="bin\Release\Kingdom.Unitworks.Calculators.Trajectories.xml" target="lib\net40" />
+    </files>
+</package>

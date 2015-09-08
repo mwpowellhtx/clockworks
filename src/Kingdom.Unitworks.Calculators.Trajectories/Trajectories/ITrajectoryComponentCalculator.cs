@@ -1,6 +1,4 @@
-using Kingdom.Unitworks.Calculators;
-
-namespace Kingdom.Unitworks.Trajectories
+namespace Kingdom.Unitworks.Calculators.Trajectories
 {
     /// <summary>
     /// 

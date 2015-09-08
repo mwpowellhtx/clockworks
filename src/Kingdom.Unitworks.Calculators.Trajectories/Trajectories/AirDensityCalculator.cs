@@ -1,6 +1,4 @@
-﻿using Kingdom.Unitworks.Calculators;
-
-namespace Kingdom.Unitworks.Trajectories
+﻿namespace Kingdom.Unitworks.Calculators.Trajectories
 {
     using P = Dimensions.Systems.SI.Pressure;
     using E = Dimensions.Systems.SI.Energy;
