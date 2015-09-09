@@ -49,12 +49,17 @@
     <Compile Include="Attributes\LengthValuesAttribute.cs" />
     <Compile Include="Calculators\CalculatorTestFixtureBase.cs" />
     <Compile Include="Calculators\CircularAreaCalculationTests.cs" />
+    <Compile Include="Calculators\Fixtures\CalculatorFixtureBase.cs" />
     <Compile Include="Calculators\Fixtures\CircularCalculatorFixture.cs" />
     <Compile Include="Calculators\Fixtures\CircularCalculatorFixtureBase.cs" />
     <Compile Include="Calculators\CircularCircumferenceCalculationTests.cs" />
     <Compile Include="Calculators\CircularDiameterCalculationTests.cs" />
     <Compile Include="Calculators\CircularRadiusCalculationTests.cs" />
     <Compile Include="Calculators\Fixtures\EllipticalCalculatorFixture.cs" />
+    <Compile Include="Calculators\Fixtures\RightTriangleCalculatorFixture.cs" />
+    <Compile Include="Calculators\Fixtures\RightTriangleCalculatorFixtureBase.cs" />
+    <Compile Include="Calculators\Fixtures\TriangleComponent.cs" />
+    <Compile Include="Calculators\RightTriangleCalculatorTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

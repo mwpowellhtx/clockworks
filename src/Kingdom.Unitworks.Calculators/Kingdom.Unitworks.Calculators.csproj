@@ -49,6 +49,8 @@
     <Compile Include="Calculators\FlagsEnumTypeExtensionMethods.cs" />
     <Compile Include="Calculators\ICalculator.cs" />
     <Compile Include="Calculators\ICircularCalculator.cs" />
+    <Compile Include="Calculators\IRightTriangleCalculator.cs" />
+    <Compile Include="Calculators\RightTriangleCalculator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

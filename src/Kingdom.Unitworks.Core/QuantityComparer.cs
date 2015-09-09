@@ -52,6 +52,13 @@ namespace Kingdom.Unitworks
             if (!x.Dimensions.AreEquivalent(y.Dimensions))
                 return -2;
 
+            // Sometimes there is an appropriate response when NaN is involved.
+            if (double.IsNaN(x.Value) && double.IsNaN(y.Value)) return 0;
+            if (double.IsNaN(x.Value)) return -1;
+            if (double.IsNaN(y.Value)) return 1;
+
+            //TODO: TBD: for Intinity?
+
             var xBase = x.ToBase();
             var yBase = y.ToBase();
 
