@@ -29,14 +29,11 @@
         public override IQuantity Calculate(ITrajectoryParameters parameters, IQuantity timeQty)
         {
             var ivv = VerifyDimensions(parameters.InitialVerticalVelocityQty, V.MetersPerSecond);
-            var vla = VerifyDimensions(parameters.VerticalLaunchAngleQty, Theta.Radian);
 
             var g = Values.G;
 
-            //TODO: also does not take into consideration the initial launch height, i.e. from which thrown, punted, etc.
-
-            // Also, leverages trig identity: sin( 2 Θ ) = 2 sin( Θ ) cos( Θ )
-            var resultQty = ((Quantity) ivv.Squared()*((Quantity) vla*2d).Sin())/g;
+            // http://hyperphysics.phy-astr.gsu.edu/hbase/traj.html#tra5
+            var resultQty = (Quantity) ivv.Squared()/((Quantity) g*2d);
 
             return VerifyDimensions(resultQty, L.Meter);
         }

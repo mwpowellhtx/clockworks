@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Kingdom.Unitworks.Calculators.Trajectories.Components;
 using Kingdom.Unitworks.Dimensions;
 using NUnit.Framework;
@@ -11,45 +12,118 @@ namespace Kingdom.Unitworks.Calculators.Trajectories
     public class BasicTrajectoryCalculatorTests : TrajectoryTestFixtureBase<
         TrajectoryParameters, BasicTrajectoryCalculatorFixture>
     {
-        // TODO: Pick it up here ... consider how to verify these parts ...
+        private IQuantity _maxRangeQty;
+
+        private IQuantity MaxRangeQty
+        {
+            get { return _maxRangeQty; }
+            set
+            {
+                _maxRangeQty = _maxRangeQty ?? value;
+                Assert.That(_maxRangeQty, Is.Not.Null);
+            }
+        }
+
+        private IQuantity _maxHeightQty;
+
+        private IQuantity MaxHeightQty
+        {
+            get { return _maxHeightQty; }
+            set
+            {
+                _maxHeightQty = _maxHeightQty ?? value;
+                Assert.That(_maxHeightQty, Is.Not.Null);
+            }
+        }
+
+        private readonly IList<Tuple<IQuantity, IQuantity>> _trajectory
+            = new List<Tuple<IQuantity, IQuantity>>();
+
+        public override void SetUp()
+        {
+            base.SetUp();
+
+            _maxRangeQty = null;
+            _maxHeightQty = null;
+
+            _trajectory.Clear();
+
+            Continue = true;
+        }
+
+        public override void TearDown()
+        {
+            _trajectory.Clear();
+
+            _maxRangeQty = null;
+            _maxHeightQty = null;
+
+            base.TearDown();
+        }
+
+        /// <summary>
+        /// Gets or sets whether to Continue.
+        /// </summary>
+        private bool Continue { get; set; }
+
+        /// <summary>
+        /// <see cref="ITrajectoryCalculator.Calculated"/> observable handler.
+        /// </summary>
+        /// <param name="e"></param>
+        protected override void OnNext(TrajectoryCalculatorEventArgs e)
+        {
+            var m = L.Meter;
+
+            MaxRangeQty = e.Results.Verify(TrajectoryComponent.MaxRange)
+                .Verify(qty => Assert.That(qty.Dimensions.AreCompatible(new[] {m})));
+
+            MaxHeightQty = e.Results.Verify(TrajectoryComponent.MaxHeight)
+                .Verify(qty => Assert.That(qty.Dimensions.AreCompatible(new[] {m})));
+
+            var xQty = e.Results.Verify(TrajectoryComponent.X)
+                .Verify(qty => Assert.That(qty.Dimensions.AreCompatible(new[] {m})));
+
+            var yQty = e.Results.Verify(TrajectoryComponent.Y)
+                .Verify(qty => Assert.That(qty.Dimensions.AreCompatible(new[] {m})));
+
+            var item = Tuple.Create(xQty, yQty);
+
+            /* The X and Range components may be unreliable especially once aerodynamic
+             * resistance is factored in. But for this purpose this is sufficient. */
+
+            Continue = e.Continue = (Quantity) xQty < MaxRangeQty;
+
+            _trajectory.Add(item);
+        }
+
         /// <summary>
         /// Verifies the default <see cref="ITrajectoryCalculator.Calculated"/> event behavior.
         /// See what happens with a single event instance given zero for input components.
         /// </summary>
+        /// <param name="vlaQty"></param>
+        /// <param name="ivQty"></param>
         [Test]
-        public void Verify_default_calculated_event_handler()
+        [Combinatorial]
+        public void Verify_fully_calculated_trajectory(
+            [PlanarAngleValues] IQuantity vlaQty,
+            [VelocityValues] IQuantity ivQty)
         {
-            var m = L.Meter;
+            Parameters.VerticalLaunchAngleQty = vlaQty;
+            Parameters.InitialVelocityQty = ivQty;
+
             var ms = T.Millisecond;
 
-            var timeQty = new Quantity(1000d, ms);
+            var t = new Quantity(100d, ms);
+            var currentTimeQty = Quantity.Zero(ms);
 
-            Action<TrajectoryCalculatorEventArgs> onNext = e =>
+            using (Calculator.ObserveCalculated.Subscribe(OnNext))
             {
-                Assert.That(e, Is.Not.Null);
-
-                Assert.That(e.Continue, Is.True);
-
-                var results = e.Results;
-
-                results.TryVerify(TrajectoryComponent.Z, false);
-
-                /* We expect a Y component, but are less concerned with its actual value at this moment,
-                 * only that the dimensions are correct. */
-
-                results.Verify(TrajectoryComponent.Y)
-                    .Verify(qty => Assert.That(qty.Dimensions.AreCompatible(new[] {m})));
-
-                results.Verify(TrajectoryComponent.X).Verify(Quantity.Zero(m));
-                results.Verify(TrajectoryComponent.MaxTime).Verify(Quantity.Zero(ms));
-                results.Verify(TrajectoryComponent.MaxHeight).Verify(Quantity.Zero(m));
-                results.Verify(TrajectoryComponent.MaxRange).Verify(Quantity.Zero(m));
-            };
-
-            using (Calculator.ObserveCalculated.Subscribe(onNext))
-            {
-                Calculator.Calculate(timeQty);
+                // Keep calculating while we are allowed to do so.
+                while (Continue) Calculator.Calculate(currentTimeQty += t);
             }
+
+            // Verify that we have a valid trajectory.
+            _trajectory.Verify(MaxHeightQty);
         }
     }
 }

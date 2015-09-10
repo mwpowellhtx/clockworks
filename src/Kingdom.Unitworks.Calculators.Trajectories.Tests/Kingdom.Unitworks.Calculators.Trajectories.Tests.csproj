@@ -57,8 +57,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Attributes\PlanarAngleValuesAttribute.cs" />
+    <Compile Include="Attributes\VelocityValuesAttribute.cs" />
     <Compile Include="Trajectories\BasicTrajectoryCalculatorFixture.cs" />
     <Compile Include="Trajectories\BasicTrajectoryCalculatorTests.cs" />
+    <Compile Include="Trajectories\ZeroTrajectoryCalculatorTests.cs" />
     <Compile Include="Trajectories\TrajectoryTestFixtureBase.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -86,6 +89,7 @@
   <ItemGroup>
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
