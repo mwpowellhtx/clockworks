@@ -26,6 +26,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kingdom.Unitworks.Calculato
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kingdom.Unitworks.Calculators.Trajectories", "Kingdom.Unitworks.Calculators.Trajectories\Kingdom.Unitworks.Calculators.Trajectories.csproj", "{9C4B04E9-491A-4FCC-A52F-95A1DFEFCE98}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kingdom.Unitworks.Calculators.Trajectories.Tests", "Kingdom.Unitworks.Calculators.Trajectories.Tests\Kingdom.Unitworks.Calculators.Trajectories.Tests.csproj", "{DC6EEC8A-73AF-48FB-A40C-48224ECEB850}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -64,6 +66,10 @@ Global
 		{9C4B04E9-491A-4FCC-A52F-95A1DFEFCE98}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9C4B04E9-491A-4FCC-A52F-95A1DFEFCE98}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9C4B04E9-491A-4FCC-A52F-95A1DFEFCE98}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DC6EEC8A-73AF-48FB-A40C-48224ECEB850}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DC6EEC8A-73AF-48FB-A40C-48224ECEB850}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DC6EEC8A-73AF-48FB-A40C-48224ECEB850}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DC6EEC8A-73AF-48FB-A40C-48224ECEB850}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

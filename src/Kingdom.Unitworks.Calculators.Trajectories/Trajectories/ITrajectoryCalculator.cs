@@ -2,11 +2,18 @@ using System.Collections.Generic;
 
 namespace Kingdom.Unitworks.Calculators.Trajectories
 {
+    using Components;
+
     /// <summary>
     /// 
     /// </summary>
     public interface ITrajectoryCalculator : ICalculator
     {
+        /// <summary>
+        /// Gets or sets the Parameters.
+        /// </summary>
+        ITrajectoryParameters Parameters { get; set; }
+
         /// <summary>
         /// Calculates the trajectory components at the specified <paramref name="timeQty"/>.
         /// </summary>

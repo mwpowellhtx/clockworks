@@ -34,5 +34,21 @@
         /// Gets the change in <see cref="TimeQty"/>.
         /// </summary>
         IQuantity DeltaTimeQty { get; }
+
+        /// <summary>
+        /// Gets the InitialVerticalVelocityQty.
+        /// </summary>
+        /// <see cref="InitialVelocityQty"/>
+        /// <see cref="VerticalLaunchAngleQty"/>
+        /// <see cref="TrigonometricExtensionMethods.Sin"/>
+        IQuantity InitialVerticalVelocityQty { get; }
+
+        /// <summary>
+        /// Gets the InitialHorizontalVelocityQty.
+        /// </summary>
+        /// <see cref="InitialVelocityQty"/>
+        /// <see cref="HorizontalLaunchAngleQty"/>
+        /// <see cref="TrigonometricExtensionMethods.Cos"/>
+        IQuantity InitialHorizontalVelocityQty { get; }
     }
 }

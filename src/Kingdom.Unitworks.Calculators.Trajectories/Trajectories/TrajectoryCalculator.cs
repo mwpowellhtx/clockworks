@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using Kingdom.Unitworks.Calculators.Trajectories.Components;
 
 namespace Kingdom.Unitworks.Calculators.Trajectories
 {
@@ -12,9 +13,27 @@ namespace Kingdom.Unitworks.Calculators.Trajectories
         : CalculatorBase
             , ITrajectoryCalculator
     {
-        private readonly ITrajectoryParameters _parameters;
+        private ITrajectoryParameters _parameters;
+
+        /// <summary>
+        /// Gets or sets the Parameters.
+        /// </summary>
+        public ITrajectoryParameters Parameters
+        {
+            get { return _parameters; }
+            set { _parameters = value; }
+        }
 
         private readonly IEnumerable<ITrajectoryComponentCalculator> _calculators;
+
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="calculators"></param>
+        public TrajectoryCalculator(params ITrajectoryComponentCalculator[] calculators)
+        {
+            _calculators = calculators;
+        }
 
         /// <summary>
         /// Constructor
@@ -23,9 +42,9 @@ namespace Kingdom.Unitworks.Calculators.Trajectories
         /// <param name="calculators"></param>
         public TrajectoryCalculator(ITrajectoryParameters parameters,
             params ITrajectoryComponentCalculator[] calculators)
+            : this(calculators)
         {
             _parameters = parameters;
-            _calculators = calculators;
         }
 
         /// <summary>

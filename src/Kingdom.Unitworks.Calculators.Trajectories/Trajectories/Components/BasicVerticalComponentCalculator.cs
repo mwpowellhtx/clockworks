@@ -1,4 +1,4 @@
-namespace Kingdom.Unitworks.Calculators.Trajectories
+namespace Kingdom.Unitworks.Calculators.Trajectories.Components
 {
     using L = Dimensions.Systems.SI.Length;
     using T = Dimensions.Systems.Commons.Time;
@@ -11,7 +11,7 @@ namespace Kingdom.Unitworks.Calculators.Trajectories
     public class BasicVerticalComponentCalculator : TrajectoryComponentCalculatorBase
     {
         /// <summary>
-        /// Gets the Type of component calculator it is: <see cref="TrajectoryComponent.Y"/>.
+        /// Gets the Type: <see cref="TrajectoryComponent.Y"/>.
         /// </summary>
         public override TrajectoryComponent Type
         {
@@ -31,14 +31,15 @@ namespace Kingdom.Unitworks.Calculators.Trajectories
 
             var t = VerifyDimensions(timeQty, s);
 
-            var iv = VerifyDimensions(parameters.InitialVelocityQty, m, s.Invert());
+            var ivv = VerifyDimensions(parameters.InitialVerticalVelocityQty, m, s.Invert());
 
-            var vla = VerifyDimensions(parameters.VerticalLaunchAngleQty, Theta.Radian);
-
+            // TODO: TBD: Forces due to aerodynamic lift must also play a role here, but not in this "simple" component calculator...
             var g = VerifyDimensions(Values.StandardGravity, m, s.Squared().Invert());
 
-            // y = ( V sin A ) t - g t^2 / 2
-            var resultQty = ((Quantity) iv*vla.Sin()) - ((Quantity) g*t.Squared())/2d;
+            /* y = ( V sin A ) t - g t^2 / 2
+             * Or in this case, we have already calculated the initial vertical velocity component.
+             * ref: http://hyperphysics.phy-astr.gsu.edu/hbase/traj.html#tra12 */
+            var resultQty = (Quantity) ivv*t - ((Quantity) g*t.Squared())/2d;
 
             // Should be left with a Length dimension.
             return VerifyDimensions(resultQty, m);

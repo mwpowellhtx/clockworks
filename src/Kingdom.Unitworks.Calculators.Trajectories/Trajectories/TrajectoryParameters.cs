@@ -1,4 +1,4 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using Kingdom.Unitworks.Dimensions;
 
 namespace Kingdom.Unitworks.Calculators.Trajectories
@@ -7,6 +7,7 @@ namespace Kingdom.Unitworks.Calculators.Trajectories
     using M = Dimensions.Systems.SI.Mass;
     using L = Dimensions.Systems.SI.Length;
     using V = Dimensions.Systems.SI.Velocity;
+    using SiTheta = Dimensions.Systems.SI.PlanarAngle;
     using UsTheta = Dimensions.Systems.US.PlanarAngle;
 
     /// <summary>
@@ -84,8 +85,8 @@ namespace Kingdom.Unitworks.Calculators.Trajectories
             get { return _ivQty; }
             set
             {
-                var mps = V.MetersPerSecond;
-                _ivQty = VerifyDimension(value ?? Quantity.Zero(mps), mps);
+                var metersPerSecond = V.MetersPerSecond;
+                _ivQty = VerifyDimension(value ?? Quantity.Zero(metersPerSecond), metersPerSecond);
             }
         }
 
@@ -124,11 +125,33 @@ namespace Kingdom.Unitworks.Calculators.Trajectories
         /// </summary>
         public IQuantity DeltaTimeQty
         {
-            get
-            {
-                var s = T.Second;
-                return VerifyDimension((Quantity) TimeQty - PreviousTimeQty, s);
-            }
+            get { return VerifyDimension((Quantity) TimeQty - PreviousTimeQty, T.Second); }
+        }
+
+        private IQuantity _ivvQty;
+
+        /// <summary>
+        /// Gets the InitialVerticalVelocityQty.
+        /// </summary>
+        /// <see cref="InitialVelocityQty"/>
+        /// <see cref="VerticalLaunchAngleQty"/>
+        /// <see cref="TrigonometricExtensionMethods.Sin"/>
+        public IQuantity InitialVerticalVelocityQty
+        {
+            get { return _ivvQty ?? (_ivvQty = CalculateInitialVerticalVelocity(_ivQty, _vlaQty)); }
+        }
+
+        private IQuantity _ihvQty;
+
+        /// <summary>
+        /// Gets the InitialHorizontalVelocityQty.
+        /// </summary>
+        /// <see cref="InitialVelocityQty"/>
+        /// <see cref="VerticalLaunchAngleQty"/>
+        /// <see cref="TrigonometricExtensionMethods.Cos"/>
+        public IQuantity InitialHorizontalVelocityQty
+        {
+            get { return _ihvQty ?? (_ihvQty = CalculateInitialHorizontalVelocity(_ivQty, _vlaQty)); }
         }
 
         /// <summary>
@@ -154,6 +177,53 @@ namespace Kingdom.Unitworks.Calculators.Trajectories
             InitialVelocityQty = ivQty;
             PreviousTimeQty = null;
             TimeQty = null;
+        }
+
+        /* TODO: TBD: there might be enough here to justify a small-ish calculator all its own:
+         * remember also the horizontal velocity component: IV cos( Θ ) */
+
+        /// <summary>
+        /// Calculates the <see cref="InitialVerticalVelocityQty"/> from the
+        /// <see cref="InitialVelocityQty"/> and <see cref="VerticalLaunchAngleQty"/> components.
+        /// </summary>
+        /// <param name="ivQty"></param>
+        /// <param name="vlaQty"></param>
+        /// <returns></returns>
+        /// <see cref="TrigonometricExtensionMethods.Sin"/>
+        /// <a href="!:http://hyperphysics.phy-astr.gsu.edu/hbase/traj.html#tra5" >Trajectories,
+        /// height of trajectory</a>
+        private static IQuantity CalculateInitialVerticalVelocity(IQuantity ivQty, IQuantity vlaQty)
+        {
+            var metersPerSecond = V.MetersPerSecond;
+
+            var iv = VerifyDimension(ivQty, metersPerSecond);
+            var vla = VerifyDimension(vlaQty, SiTheta.Radian);
+
+            var ivvQty = (Quantity) iv*vla.Sin();
+
+            return VerifyDimension(ivvQty, metersPerSecond);
+        }
+
+        /// <summary>
+        /// Calculates the <see cref="InitialHorizontalVelocityQty"/> from the
+        /// <see cref="InitialVelocityQty"/> and <see cref="VerticalLaunchAngleQty"/> components.
+        /// </summary>
+        /// <param name="ivQty"></param>
+        /// <param name="vlaQty"></param>
+        /// <returns></returns>
+        /// <see cref="TrigonometricExtensionMethods.Cos"/>
+        /// <a href="!:http://hyperphysics.phy-astr.gsu.edu/hbase/traj.html#tra5" >Trajectories,
+        /// height of trajectory</a>
+        private static IQuantity CalculateInitialHorizontalVelocity(IQuantity ivQty, IQuantity vlaQty)
+        {
+            var metersPerSecond = V.MetersPerSecond;
+
+            var iv = VerifyDimension(ivQty, metersPerSecond);
+            var vla = VerifyDimension(vlaQty, SiTheta.Radian);
+
+            var ihvQty = (Quantity) iv*vla.Cos();
+
+            return VerifyDimension(ihvQty, metersPerSecond);
         }
     }
 }

@@ -1,4 +1,4 @@
-namespace Kingdom.Unitworks.Calculators.Trajectories
+namespace Kingdom.Unitworks.Calculators.Trajectories.Components
 {
     using L = Dimensions.Systems.SI.Length;
     using T = Dimensions.Systems.Commons.Time;
@@ -30,12 +30,12 @@ namespace Kingdom.Unitworks.Calculators.Trajectories
 
             var t = VerifyDimensions(timeQty, s);
 
-            var iv = VerifyDimensions(parameters.InitialVelocityQty, m, s.Invert());
+            var ihv = VerifyDimensions(parameters.InitialHorizontalVelocityQty, m, s.Invert());
 
-            var vla = VerifyDimensions(parameters.VerticalLaunchAngleQty, Theta.Radian);
-
-            // x = ( V cos A ) t
-            var resultQty = (Quantity) iv*vla.Cos()*t;
+            /* x = ( V cos A ) t
+             * Ditto re: vertical component calculations: we already have initial horizontal velocity ready.
+             * This calculation intentionally ignores Forces due to aerodynamic drag. */
+            var resultQty = (Quantity) ihv*t;
 
             // Should be left with a Length dimension.
             return VerifyDimensions(resultQty, m);

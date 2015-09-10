@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using Kingdom.Unitworks.Calculators.Trajectories.Components;
 
 namespace Kingdom.Unitworks.Calculators.Trajectories
 {
@@ -10,21 +11,7 @@ namespace Kingdom.Unitworks.Calculators.Trajectories
     public class TrajectoryCalculatorEventArgs : EventArgs
     {
         /// <summary>
-        /// Gets the Components that were calculated.
-        /// </summary>
-        internal readonly IDictionary<TrajectoryComponent, IQuantity> InternalComponents
-            = new Dictionary<TrajectoryComponent, IQuantity>();
-
-        /// <summary>
-        /// Gets the Components that were calculated.
-        /// </summary>
-        public IReadOnlyDictionary<TrajectoryComponent, IQuantity> Components
-        {
-            get { return new ReadOnlyDictionary<TrajectoryComponent, IQuantity>(InternalComponents); }
-        }
-
-        /// <summary>
-        /// Gets the Results involved.
+        /// Gets the Resultsthat were calculated.
         /// </summary>
         public readonly IReadOnlyDictionary<TrajectoryComponent, IQuantity> Results;
 

@@ -1,4 +1,4 @@
-namespace Kingdom.Unitworks.Calculators.Trajectories
+namespace Kingdom.Unitworks.Calculators.Trajectories.Components
 {
     /// <summary>
     /// Informs the calculators which components are being considered.
@@ -18,6 +18,21 @@ namespace Kingdom.Unitworks.Calculators.Trajectories
         /// <summary>
         /// The Z component.
         /// </summary>
-        Z
+        Z,
+
+        /// <summary>
+        /// The maximum <see cref="X"/>.
+        /// </summary>
+        MaxRange,
+
+        /// <summary>
+        /// The maximum <see cref="Y"/>.
+        /// </summary>
+        MaxHeight,
+
+        /// <summary>
+        /// The maximum time.
+        /// </summary>
+        MaxTime,
     }
 }

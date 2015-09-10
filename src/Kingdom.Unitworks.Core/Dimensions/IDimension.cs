@@ -176,8 +176,14 @@ namespace Kingdom.Unitworks.Dimensions
         public static bool AreCompatible(this IEnumerable<IDimension> dimensions,
             IEnumerable<IDimension> other, bool includeExponents = false)
         {
-            dimensions = (from d in dimensions orderby d.DimensionId, d.Exponent select d).ToArray();
-            other = (from d in other orderby d.DimensionId, d.Exponent select d).ToArray();
+            // Be sure to enumerate all of the dimensions, including the derived ones.
+            dimensions = (from d in dimensions.EnumerateAll()
+                orderby d.DimensionId, d.Exponent
+                select d).ToArray();
+
+            other = (from d in other.EnumerateAll()
+                orderby d.DimensionId, d.Exponent
+                select d).ToArray();
 
             if (dimensions.Count() != other.Count()) return false;
 
