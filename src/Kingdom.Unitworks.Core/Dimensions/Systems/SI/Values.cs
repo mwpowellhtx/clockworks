@@ -3,6 +3,7 @@ namespace Kingdom.Unitworks.Dimensions.Systems.SI
     using E = Energy;
     using M = Mass;
     using Theta = Temperature;
+    using D = MassDensity;
 
     /// <summary>
     /// 
@@ -22,6 +23,13 @@ namespace Kingdom.Unitworks.Dimensions.Systems.SI
         public static readonly IQuantity R;
 
         /// <summary>
+        /// Gets the sea level air density.
+        /// </summary>
+        /// <a href="!:http://en.wikipedia.org/wiki/External_ballistics#Empirical_measurement_method" >
+        /// External ballistics, empirical measurement method</a>
+        public static readonly IQuantity SeaLevelAirDensityQty;
+
+        /// <summary>
         /// Static Constructor
         /// </summary>
         static Values()
@@ -29,6 +37,7 @@ namespace Kingdom.Unitworks.Dimensions.Systems.SI
             G = new Quantity(9.80665d, Acceleration.MetersPerSecondSquared);
             // TODO: Specific Gas Constant: potentially deserving of its own dimension: E M^-1 Theta^-1
             R = new Quantity(287.058d, E.Joule, M.Kilogram.Invert(), Theta.Kelvin.Invert());
+            SeaLevelAirDensityQty = new Quantity(1.225d, D.KilogramPerCubicMeter);
         }
 
         /// <summary>
