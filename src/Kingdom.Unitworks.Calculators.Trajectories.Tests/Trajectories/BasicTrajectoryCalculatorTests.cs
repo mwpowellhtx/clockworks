@@ -72,19 +72,13 @@ namespace Kingdom.Unitworks.Calculators.Trajectories
         /// <param name="e"></param>
         protected override void OnNext(TrajectoryCalculatorEventArgs e)
         {
-            var m = L.Meter;
+            Action<IQuantity> ofLength = qty => Assert.That(qty.Dimensions.AreCompatible(new[] {L.Meter}, true));
 
-            MaxRangeQty = e.Results.Verify(TrajectoryComponent.MaxRange)
-                .Verify(qty => Assert.That(qty.Dimensions.AreCompatible(new[] {m})));
+            MaxRangeQty = e.Results.Verify(TrajectoryComponent.MaxRange).Verify(ofLength);
+            MaxHeightQty = e.Results.Verify(TrajectoryComponent.MaxHeight).Verify(ofLength);
 
-            MaxHeightQty = e.Results.Verify(TrajectoryComponent.MaxHeight)
-                .Verify(qty => Assert.That(qty.Dimensions.AreCompatible(new[] {m})));
-
-            var xQty = e.Results.Verify(TrajectoryComponent.X)
-                .Verify(qty => Assert.That(qty.Dimensions.AreCompatible(new[] {m})));
-
-            var yQty = e.Results.Verify(TrajectoryComponent.Y)
-                .Verify(qty => Assert.That(qty.Dimensions.AreCompatible(new[] {m})));
+            var xQty = e.Results.Verify(TrajectoryComponent.X).Verify(ofLength);
+            var yQty = e.Results.Verify(TrajectoryComponent.Y).Verify(ofLength);
 
             var item = Tuple.Create(xQty, yQty);
 
